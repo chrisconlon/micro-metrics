@@ -20,4 +20,12 @@ The goal is to provide an overview of a number of topics in Microeconometrics in
 7. Duration Models
 8. Bayesian Methods
 
+## My Students
+Over the course of the semester I expect each of my students to find at least two typos or other errors and fix them via a pull request.
+
+## Other Faculty
+You are free to use these notes. However, PLEASE CREATE A FORK.
+
+You are welcome to submit pull requests/update to my notes as well.
+
 Contact: cconlon@stern.nyu.edu
