@@ -5,9 +5,9 @@ This is a PhD level course in Microeconometrics targeted at students conducting 
 In addition to traditional econometric approaches, this course draws connections to recent literature on machine learning.
 
 It is based on some combination of 
-
-[Microeconometrics by Cameron and Trivedi](https://www.amazon.com/Microeconometrics-Methods-Applications-Colin-Cameron/dp/0521848059)
-[Elements of Statistical Learning by Hastie, Tibshirani, and Friedman](https://statweb.stanford.edu/~tibs/ElemStatLearn/)
+- [Microeconometrics by Cameron and Trivedi](https://www.amazon.com/Microeconometrics-Methods-Applications-Colin-Cameron/dp/0521848059)
+- [Elements of Statistical Learning by Hastie, Tibshirani, and Friedman](https://statweb.stanford.edu/~tibs/ElemStatLearn/)
+- Other lectures borrowed/stolen from various sources
 
 The goal is to provide an overview of a number of topics in Microeconometrics including:
 
@@ -19,3 +19,5 @@ The goal is to provide an overview of a number of topics in Microeconometrics in
 6. Dynamic Discrete Choice
 7. Duration Models
 8. Bayesian Methods
+
+Contact: cconlon@stern.nyu.edu
