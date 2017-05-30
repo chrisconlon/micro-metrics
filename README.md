@@ -28,4 +28,7 @@ You are free to use these notes. However, PLEASE CREATE A FORK.
 
 You are welcome to submit pull requests/update to my notes as well.
 
+Everything is distributed under Creative Commons Attribution Share Alike 4.0
+(You can use it freely but you are expected to post source of derivative work).
+
 Contact: cconlon@stern.nyu.edu
