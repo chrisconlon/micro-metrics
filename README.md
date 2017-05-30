@@ -12,13 +12,21 @@ It is based on some combination of
 The goal is to provide an overview of a number of topics in Microeconometrics including:
 
 1. Nonparametrics and Identification
+	- k-NN, Kernels, Nadaraya-Watson
+	- Bootstrap and Cross Validation
 2. Model Selection and Penalized Regression
+	- Ridge, Lasso, LAR, BIC, AIC
 3. Treatment Effects and Selection
+	- Potential Outcomes, LATE, Diff in Diff, RDD, MTE
 4. Binary Discrete Choice (including endogeneity)
+	- MLE, Special Regressors, Control Functions
 5. Multinomial Discrete Choice
+	- Logit, Nested Logit, Mixed Logit
 6. Dynamic Discrete Choice
+	- Rust Models (NFXP), Hotz+Miller (CCP)
 7. Duration Models
 8. Bayesian Methods
+	- Empirical Bayes, MCMC, James-Stein
 
 ## My Students
 Over the course of the semester I expect each of my students to find at least two typos or other errors and fix them via a pull request.
