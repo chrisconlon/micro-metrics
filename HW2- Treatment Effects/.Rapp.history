@@ -1,0 +1,20 @@
+load("/Users/christopherconlon/Documents/micro-metrics/HW2- Treatment Effects/yelp.Rdata")
+?
+??
+)
+whos()
+ls()
+yelp
+head(yelp)
+yelp$rest_id
+unique(yelp$rest_id)
+yelp$rest_id
+yelp$rest__id
+head(yelp)
+time
+quit()
+load("/Users/christopherconlon/Documents/micro-metrics/HW2- Treatment Effects/yelp.Rdata")
+head(yelp)
+len(yelp)
+dim(yelp)
+quit()

@@ -1,0 +1,234 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{amsmath}
+\usepackage{amsxtra}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{dsfont} % for \mathds{N}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{setspace}
+\usepackage[margin=3cm]{geometry}
+\usepackage{natbib}
+\usepackage{lscape}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{rotating}
+\usepackage{authblk}
+\usepackage{bbm}
+\usepackage{verbatim}
+\usepackage{fullpage}
+\usepackage{enumerate}
+
+\setlength{\LTcapwidth}{6in}
+\newenvironment{changemargin}[3]{%
+  \begin{list}{}{%
+    \setlength{\topsep}{0pt}%
+    \setlength{\leftmargin}{#1}%
+    \setlength{\rightmargin}{#2}%
+    \setlength{\topmargin}{#3}%
+    \setlength{\listparindent}{\parindent}%
+    \setlength{\itemindent}{\parindent}%
+    \setlength{\parsep}{\parskip}%
+  }%
+  \item[]}{\end{list}}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+\newtheorem{assumption}{Assumption}
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+\newcounter{subtables}
+
+\makeatletter
+\setlength{\abovecaptionskip}{6pt}   % 0.5cm as an example
+\setlength{\belowcaptionskip}{6pt}   % 0.5cm as an example
+\makeatother
+
+
+\providecommand{\e}[1]{\ensuremath{\times 10^{#1}}}
+
+
+
+\title{Problem Set 2: Treatment Effects}
+\author{Chris Conlon }
+\begin{document}
+\date{Due:  Two Weeks}
+\maketitle
+
+\subsubsection*{Question 1: Treatment Effects}
+I have put in this directory a file \texttt{dataps3.txt}. It has    10,000 observations of
+$(y_i,D_i,x_{1i},x_{2i})$, where $D_i=0,1$ is a treatment variable, $y_i$ the outcome, and $x_{1i}$ and $x_{2i}$ are exogenous explanatory variables. 
+
+\medskip 
+
+{\bf 1.} Give me your best considered estimate of the
+treatment effect $TE(x_1,x_2)$.
+
+\medskip
+
+{\bf 2.} Test for conditional
+independence.
+
+\medskip
+
+{\bf 3.} Compare your estimates under (CIA) and under
+selection on unobservables.
+
+\subsubsection*{Question 2: Regression Discontinuity Design}
+
+Use the RDD checklist from Lee and Lemieux (2010) and the data \textbf{yelp.Rdata} to estimate the causal effect of an additional star (not half-star) on the yelp platform.  Your data contain the following variables:
+
+\begin{description}
+\item[logrev] monthly store revenue in (log) dollars.
+\item[stars] the number of displayed stars on the Yelp site
+\item[score] this is the true Yelp score that is rounded to produce \textit{stars}
+\item[rest\_id] this is the restaurant identifier (1 to 1500)
+\item[time] this is the time identifier (1 to 10).
+\end{description}
+
+
+\subsubsection*{Question 3: Instrumental Variables, Experiments and Quasi-Experiments.}
+This question is based on the article \textit{The Oregon Experiment - Effects of Medicaid on Clinical Outcomes}, by Katherine Baicker, Ph.D., Sarah L. Taubman, Sc.D., Heidi L. Allen, Ph.D., Mira Bernstein, Ph.D., Jonathan H. Gruber, Ph.D., Joseph P. Newhouse, Ph.D., Eric C. Schneider, M.D., Bill J. Wright, Ph.D., Alan M. Zaslavsky, Ph.D., and Amy N. Finkelstein, Ph.D. (\textit{The New England Journal of Medicine 2013, 368: 1713-1722})
+
+\bigskip
+
+Despite the imminent expansion of Medicaid coverage, the effects of expanding this coverage are unclear. This question will ask you for alternative procedures to estimate the effect of Medicaid enrollment on the health outcomes of individuals, as measured by their blood-pressure. 
+
+Define $T_{i}$ as a dummy variable that takes value 1 if individual $i$ is enrolled in the Medicare program. Define $Y_{i}$ as the blood-pressure of individual $i$. Define $W_{i}$ as the income of individual $i$, and $S_{i}$ as the size of the household to whom individual $i$ belongs. Impose the following assumptions:
+\begin{enumerate}
+	\item \textit{Assumption 1}. The expectation of $Y_{i}$ conditional on $(T_{i},W_{i},S_{i})$ is determined by
+	\begin{align*}
+	Y_{i}=\beta_{0}+\beta_{1}T_{i}+\beta_{2}W_{i}+\beta_{3}S_{i}+\varepsilon_{i},\quad\beta_{1}>0,\beta_{2}>0,\beta_{3}>0,
+	\label{eq: structeq}
+	\end{align*}
+	with $\mathbbm{E}[\varepsilon_{i}|T_{i},W_{i},S_{i}]=0$.
+	\item \textit{Assumption 2}. Enrollment in the Medicare program is determined through a random lottery drawing among a group of individuals included on a waiting list.
+	\item \textit{Assumption 3}. Individuals who win the lottery are automatically enrolled in the Medicare program.
+	\item \textit{Assumption 4}. Entitlement applies only to lottery winners. In particular, it does not automatically include other household members.
+	\item \textit{Assumption 5}. Each individual on the waiting list had to voluntarily apply to be included in such list, and pay a small fee.
+\end{enumerate}
+Define $G_{1}$ as the group of individuals that were enrolled in Medicare through this lottery (i.e. individuals who won the lottery), $G_{2}$ as the group of individuals who were on the waiting list but did not win the lottery, and $G_{3}$ as the group of individuals who did not apply to be included on the waiting list. Answer the following questions:
+\begin{enumerate}[(a)]
+	\item Definition of treatment and control groups.
+	\begin{enumerate}[1.]
+		\item Imagine you observe a random sample of each of the three groups $(G_{1},G_{2},G_{3})$. Under \textit{Assumptions 1 to 5}, which of the three groups, $(G_{1},G_{2},G_{3})$, would you use as treatment group ($T_{i}$ = $1$)? Which of the three groups, $(G_{1},G_{2},G_{3})$, would you use as control group ($T_{i}$ = $0$)?
+		\item How would your answer change if, instead of \textit{Assumption 5}, being on the waiting list was also random?
+	\end{enumerate}
+	\item Definition of the regression equation.\\\\
+	For each question below, indicate: (1) the regression you would use to estimate the effect of $T_{i}$ on $Y_{i}$; (2) the parameter of your regression that captures the effect of $T_{i}$ on $Y_{i}$; (3) the estimator you would use to estimate the parameters of your regression.
+	\begin{enumerate}[1.]
+		\item  Under \textit{Assumptions 1 to 5}, which regression would you run? Can you run this regression if you do not observe $W_{i}$ and $S_{i}$?
+		\item  How would your answer change if, instead of \textit{Assumption 4}, winning the lottery implied automatic enrollment for those individuals who won the lottery \textit{and} for all the other members of their households. Can you run this regression if you do not observe $W_{i}$ and $S_{i}$?
+		\item How would your answer change if, instead of \textit{Assumption 3}, winning the lottery only implied a discount in the Medicare premium? Assume that, in this case, not everyone who wins the lottery ends up enrolling in the Medicare program. Define $\tilde{T}_{i}$ = $1$ if individual $i$ won the lottery (and $\tilde{T}_{i}$ = $0$ otherwise), and remember that $T_{i}$ = $1$ if individual $i$ actually enrolled the Medicare program. Assume that both $\tilde{T}_{i}$ and  $T_{i}$ are observed in your sample.
+		\item How would your answer change if, instead of \textit{Assumptions 2 and 3}, every individual whose income level is below \$30,000 per year was automatically enrolled in the medicare program? (i.e. assume that there is no lottery determining Medicare enrollment).
+	\end{enumerate}
+\end{enumerate}
+
+\newpage
+\subsubsection*{Question 4: Local Average Treatment Effect (LATE) and Average Treatment Effect (ATE).}
+Assume that
+\begin{enumerate}
+	\item The following equations hold
+	\begin{align*}
+	Y_{i}=\beta_{0}+\beta_{1i}X_{i}+u_{i},\\
+	X_{i}=\pi_{0}+\pi_{1i}Z_{i}+v_{i}.
+	\end{align*}
+	\item The vector $(\beta_{1i},\pi_{1i})$ is independent of the vector $(u_{i},v_{i},Z_{i}).$
+	\item $\mathbbm{E}[u_{i}|Z_{i}]=0$.
+	\item $\mathbbm{E}[v_{i}|Z_{i}]=0$.
+\end{enumerate}
+Answer the following questions
+\begin{enumerate}[(a)]
+	\item  Prove that
+	\begin{align*}
+	\frac{\mathbbm{E}\big[(Y_{i}-\mathbbm{E}(Y_{i}))(Z_{i}-\mathbbm{E}(Z_{i}))\big]}{\mathbbm{E}\big[(X_{i}-\mathbbm{E}(X_{i}))(Z_{i}-\mathbbm{E}(Z_{i}))\big]}=\frac{\mathbbm{E}\big[\beta_{1i}\pi_{1i}\big]}{\mathbbm{E}\big[\pi_{1i}\big]}.
+	\end{align*}
+	\item  Indicate three different \textbf{sufficient} assumptions under which:
+	\begin{align*}
+	LATE=\frac{\mathbbm{E}\big[\beta_{1i}\pi_{1i}\big]}{\mathbbm{E}\big[\pi_{1i}\big]}=\mathbbm{E}[\beta_{1i}]=ATE
+	\end{align*}
+	\item  Assume that, for every individual $i$ in the population of interest,
+	\begin{align*}
+	\beta_{1i}&=\beta^{H}\text{ with probability 0.5,}\\
+	\beta_{1i}&=\beta^{L}\text{ with probability 0.5,}
+	\end{align*}
+	with $\beta^{H}>\beta^{L}$. Analogously, assume that, for every individual $i$ in the population of interest,
+	\begin{align*}
+	\pi_{1i}&=\pi^{H}\text{ with probability 0.5,}\\
+	\pi_{1i}&=\pi^{L}\text{ with probability 0.5,}
+	\end{align*}
+	with $\pi^{H}>\pi^{L}$. Indicate which of the following three statements is true and why
+	\begin{enumerate}[A.]
+		\item LATE $>$ ATE.
+		\item LATE $<$ ATE.
+		\item We do not have enough information to know whether LATE $>$ ATE or LATE $<$ ATE.
+	\end{enumerate}
+	\item Assume that, for every individual $i$ in the population of interest,
+	\begin{align*}
+	(\beta_{1i},\pi_{1i})&=(\beta^{H},\pi^{H})\text{ with probability 0.25,}\\
+	(\beta_{1i},\pi_{1i})&=(\beta^{H},\pi^{L})\text{ with probability 0.25,}\\
+	(\beta_{1i},\pi_{1i})&=(\beta^{L},\pi^{L})\text{ with probability 0.25,}\\
+	(\beta_{1i},\pi_{1i})&=(\beta^{L},\pi^{H})\text{ with probability 0.25,}
+	\end{align*}
+	with $\beta^{H}>\beta^{L}$ and $\pi^{H}>\pi^{L}$. Indicate which of the following three statements is true and why
+	\begin{enumerate}[A.]
+		\item LATE $>$ ATE.
+		\item LATE $<$ ATE.
+		\item We do not have enough information to know whether LATE $>$ ATE or LATE $<$ ATE.
+	\end{enumerate}
+	\item  Assume that, for every individual $i$ in the population of interest,
+	\begin{align*}
+	(\beta_{1i},\pi_{1i})&=(\beta^{H},\pi^{H})\text{ with probability 0.5,}\\
+	(\beta_{1i},\pi_{1i})&=(\beta^{H},\pi^{L})\text{ with probability 0,}\\
+	(\beta_{1i},\pi_{1i})&=(\beta^{L},\pi^{L})\text{ with probability 0.5,}\\
+	(\beta_{1i},\pi_{1i})&=(\beta^{L},\pi^{H})\text{ with probability 0,}
+	\end{align*}
+	with $\beta^{H}>\beta^{L}$ and $\pi^{H}>\pi^{L}$. Indicate which of the following three statements is true and why
+	\begin{enumerate}[A.]
+		\item LATE $>$ ATE.
+		\item LATE $<$ ATE.
+		\item We do not have enough information to know whether LATE $>$ ATE or LATE $<$ ATE.
+	\end{enumerate}
+	\item Assume that, for every individual $i$ in the population of interest,
+	\begin{align*}
+	(\beta_{1i},\pi_{1i})&=(\beta^{H},\pi^{H})\text{ with probability 0.5,}\\
+	(\beta_{1i},\pi_{1i})&=(\beta^{H},\pi^{L})\text{ with probability 0.5,}\\
+	(\beta_{1i},\pi_{1i})&=(\beta^{L},\pi^{L})\text{ with probability 0,}\\
+	(\beta_{1i},\pi_{1i})&=(\beta^{L},\pi^{H})\text{ with probability 0,}
+	\end{align*}
+	with $\beta^{H}>\beta^{L}$ and $\pi^{H}>\pi^{L}$. Indicate which of the following three statements is true and why
+	\begin{enumerate}
+		\item LATE $>$ ATE.
+		\item LATE $<$ ATE.
+		\item We do not have enough information to know whether LATE $>$ ATE or LATE $<$ ATE.
+	\end{enumerate}
+\end{enumerate}
+
+ \newpage
+ 
+%\section*{\normalsize Question 3: Yelp.com}
+%Consider the following data based on Yelp.com ratings from Michael Luca' (HBS) paper \textit{Reviews, Reputation, and Revenue: The Case of Yelp.com}. You can read the paper if you need more information.
+%
+%\begin{itemize}
+%\item \textbf{logrev} is the revenue (on the log-scale) reported to the tax authority in Seattle.
+%\item \textbf{score} is Yelp.com's internal score -- the average of all user reviews.
+%\item \textbf{stars} is the number of stars reported on Yelp.com's website (they take \textbf{score} and round it to the nearest half star). 
+%\item \textbf{rest\_id} is a unique restaurant identifier (1500 restaurants in the sample)
+%\item \textbf{time\_id} is a unique quarter identifier (10 quarters of data)
+%\end{itemize}
+%We are interested in the following question: \textbf{All things (including restaurant ``quality'') being equal, does earning an additional star on yelp.com increase business, and by how much?}\\
+%
+%Your answer should show the following things (like always provide cleanly formatted tables for all regressions you run):
+%\begin{itemize}
+%\item What the naive/obvious approach produces as the answer (including just score, just stars, or both together)
+%\item Why that answer may or may not be biased
+%\item The effects of using panel data
+%\item An explanation for why panel data might or might not fix the problem
+%\item Do you estimate a different treatment effect at different numbers of stars?
+%\item How the confidence interval changes with different specifications of your new approach.
+%\item \textbf{Most importantly provide clear explanations of what you did, which regressions you ran, and why you did what you did}
+%\end{itemize}
+
+
+
+%\includepdf{CollegeDistance_DataDescription.pdf}
+\end{document}
