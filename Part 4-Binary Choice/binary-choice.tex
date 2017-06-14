@@ -60,8 +60,8 @@ Many problems we are interested in look at discrete rather than continuous outco
 \frametitle{Problem \#1: Endogeneity}
 Four possible solutions (maybe there are more?)
 \begin{enumerate}
-\item Run the LPM with instruments (Suggested by MHE).
-\item Specify the distribution of errors in first and second stage and do MLE (\texttt{ivprobit} in STATA).
+\item Close eyes, run the LPM with instruments (Suggested by MHE).
+\item Specify the distribution of errors in first and second stage and do MLE (\texttt{biprobit} in STATA).
 \item Control Function Estimation
 \item `Special Regressor' Methods
 \end{enumerate}
@@ -107,10 +107,10 @@ Consider the LPM with a single continuous regressor
 \begin{frame}{Some well known textbooks}
 (Baby) Wooldrige:
 \begin{quote}
-``Even with these problems, the linear probability model is useful and often applied in economics. It usually works well for values of the independent variables that are near the averages in the sample'.' (2009, p. 249)
+``Even with these problems, the linear probability model is useful and often applied in economics. It usually works well for values of the independent variables that are near the averages in the sample.'' (2009, p. 249)
 \end{quote}
 \begin{itemize}
-\item Mentions heteroskedasticity of error (which is binomial) but does not address the violation of the first LSA.
+\item Mentions heteroskedasticity of error (which is binomial given $X$) but does not address the violation of the first LSA.
 \end{itemize}
 \end{frame}
 
@@ -140,7 +140,7 @@ D = X \beta + \varepsilon
 \item With exogenous $X$ we have $E[D | X] = Pr[D=1 | X] = X \beta$.
 \item If some elements of $X$ (including treatment indicators) are endogenous or mismeasured they will be correlated with $E$.
 \item In that case we can do IV via 2SLS or IV-GMM given some instruments $Z$.
-\item We need the usual $E[\varepsilon  | X]= 0 $ or $E[\varepsilon | Z] = 0$.
+\item We need the usual $E[\varepsilon  | X]= 0 $ or $E[\varepsilon | Z] = 0$. \pause
 \item An obvious flaw: Given any $\varepsilon | X  $ must equal either $1- X \beta$ or $-X \beta$ which are functions of $X$
 \item \alert{Only the trivial binary $X$ with no other regressors satisfies this!}
 \end{itemize}
