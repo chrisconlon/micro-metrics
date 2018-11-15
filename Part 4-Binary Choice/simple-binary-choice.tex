@@ -18,6 +18,7 @@
 
 
 
+
 \newenvironment{reference}[2]{% 
   \begin{textblock*}{\textwidth}(#1,#2) 
       \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
@@ -80,7 +81,7 @@ And then take logs to get the \alert{log likelihood}:
 \begin{frame}{Simplest Example: Flipping a Coin}
 Differentiate the log-likelihood to find the maximum:
 \begin{eqnarray*}
-\ln  f(y_1,y_2,\ldots,y_N | p )  &=& \left( \sum_{i=1}^N y_i \right)  \ln p  + \left(N-\sum_{i=1}^N y_i \right)  (1-p)\\
+\ln  f(y_1,y_2,\ldots,y_N | p )  &=& \left( \sum_{i=1}^N y_i \right)  \ln p  + \left(N-\sum_{i=1}^N y_i \right)  \ln(1-p)\\
 \rightarrow 0&=& \frac{1}{\hat{p}}  \left( \sum_{i=1}^N y_i \right) + \frac{-1}{1-\hat{p}}   \left(N-\sum_{i=1}^N y_i \right) \\
  \frac{\hat{p}}{1-\hat{p}} &=& \frac{\sum_{i=1}^N y_i }{N- \sum_{i=1}^N y_i } = \frac{\overline{Y}}{1-\overline{Y}} \\
 \hat{p}^{MLE} &=& \overline{Y}
@@ -146,15 +147,35 @@ Goal $Pr(Deny=1 | black, X)$\\
 \end{center}
 \end{frame}
 
-\begin{frame}
-\begin{center}
-\includegraphics[width=2.5in]{resources/hmda3.pdf}\\
-\includegraphics[width=2.5in]{resources/hmda3a.pdf}\\
-\end{center}
+
+\begin{frame}{Linear Probability Model}
+First thing we might try is OLS
+\begin{eqnarray*}
+Y_i  = \beta_0 + \beta_1 X_i + \varepsilon_i
+\end{eqnarray*}
+\begin{itemize}
+\item What does $\beta_1$ mean when $Y$ is binary? Is $\beta_1  = \frac{\Delta Y}{\Delta X}$?
+\item What does the line $\beta_0 + \beta_1 X$ when $Y$ is binary?
+\item What does the predicted value $\hat{Y}$ mean when $Y$ is binary? Does $\hat{Y} = 0.26$ mean that someone gets approved or denied for a loan?
+\end{itemize}
 \end{frame}
 
-
-
+\begin{frame}{Linear Probability Model}
+OLS is called the \alert{linear probability model} 
+\begin{eqnarray*}
+Y_i  = \beta_0 + \beta_1 X_i + \varepsilon_i 
+\end{eqnarray*}
+because:
+\begin{eqnarray*}
+E[Y | X] &=& 1 \times Pr(Y=1 | X) + 0 \times Pr(Y=0  | X) \\
+Pr(Y=1 | X) &=& \beta_0 + \beta_1 X_i + \varepsilon_i
+\end{eqnarray*}
+The predicted value is a \alert{probability} and 
+\begin{eqnarray*}
+\beta_1 = \frac{Pr(Y=1 | X =x+\Delta x) - Pr(Y=1 | X=x)}{\Delta x}
+\end{eqnarray*}
+So $\beta_1$ represents the average change in probability that $Y=1$ for a unit change in $X$.
+\end{frame}
 
 
 \begin{frame}
@@ -162,6 +183,272 @@ Goal $Pr(Deny=1 | black, X)$\\
 \includegraphics[width=5in]{resources/lpm.pdf}\\
 \end{center}
 \end{frame}
+
+\begin{frame}{That didn't look great}
+\begin{itemize}
+\item Is the marginal effect $\beta_1$ actually constant or does it depend on $X$?
+\item Sometimes we predict $\hat{Y} >1$ or $\hat{Y} <0$. What does that even mean? Is it still a probability?
+\item Fit in the middle seems not so great -- what does $\hat{Y} = 0.5$ mean?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Results}
+\begin{eqnarray*}
+\widehat{deny_i}= -.091& + .559 \cdot \text{P/I ratio} + &.177 \cdot \text{black} \\
+(0.32)&( .098) & (.025)\\
+\end{eqnarray*}
+Marginal Effects: 
+\begin{itemize}
+\item Increasing $P/I$ from $0.3 \rightarrow 0.4$ increases probabilty of denial by $5.59$ percentage points. (True at all level of $P/I$).
+\item At all $P/I$ levels blacks are $17.7$ percentage points more likely to be denied.
+\item But still some omitted factors.
+\item True effects are likely to be \alert{nonlinear} can we add polynomials in $P/I$? Dummies for different levels? 
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Moving Away from LPM}
+Problem with the LPM/OLS is that it requires that \alert{marginal effects are constant} or that probability can be written as linear function of parameters.
+\begin{eqnarray*}
+Pr(Y=1 | X) = \beta_0 + \beta_1 X+ \epsilon
+\end{eqnarray*}
+Some desirable properties:
+\begin{itemize}
+\item Can we restrict our predictions to $[0,1]$?
+\item Can we preserve \alert{monotonicity} so that $Pr(Y=1| X)$ is increasing in $X$ for $\beta_1 >0$?
+\item Some other properties (continuity, etc.) \pause
+\item Want a function $F(z): (-\infty,\infty) \rightarrow [0,1]$.
+\item What function will work?
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=5in]{resources/probit.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}{Choosing a transformation}
+\begin{eqnarray*}
+Pr(Y=1 | X) = F(\beta_0 + \beta_1 X)
+\end{eqnarray*}
+\begin{itemize}
+\item One $F(\cdot)$ that works is $\Phi(z)$ the normal CDF. This is the \alert{probit} model.
+\begin{itemize}
+\item Actually any CDF would work but the normal is convenient.
+\end{itemize}
+\item One $F(\cdot)$ that works is $\frac{e^z}{1+ e^z}=\frac{1}{1+e^{-z}}$ the logistic function . This is the \alert{logit} model.
+\item Both of these give `S'-shaped curves.
+\item The LPM is $F(\cdot)$ is the \alert{identity function} (which doesn't satisfy my $[0,1]$ property).
+\item This $F(\cdot)$ is often called a \alert{link function}. Why?
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Why use the normal CDF?}
+Has some nice properties:
+\begin{itemize}
+\item Gives us more of the `S' shape
+\item $Pr(Y=1|X)$ is increasing in $X$ if $\beta_1>0$.
+\item $Pr(Y=1|X) \in [0,1]$ for all $X$
+\item Easy to use -- you can look up or use computer for normal CDF.
+\item Relatively straightforward interpretation
+\begin{itemize}
+\item $Z=\beta_0 + \beta_1 X$ is the $z$-value.
+\item $\beta_1$ is the change in the $z$-value for a change in $X_1$.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=2.5in]{resources/hmda3.pdf}\\
+\includegraphics[width=2.5in]{resources/hmda3a.pdf}\\
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Probit in R}
+\footnotesize
+\begin{semiverbatim}
+bm1 <- glm(deny ~ pi_rat+black, data=hmda, family = binomial(link="probit"))
+coeftest(bm1)
+
+z test of coefficients:
+
+             Estimate Std. Error  z value  Pr(>|z|)    
+(Intercept) -2.258787   0.136691 -16.5248 < 2.2e-16 ***
+pi_rat       2.741779   0.380469   7.2063 5.749e-13 ***
+blackTRUE    0.708155   0.083352   8.4959 < 2.2e-16 ***
+---
+    Signif. codes:  0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1
+
+predict(bm1, data.frame(pi_rat=.3,black=FALSE),type = "response")
+    0.07546516
+predict(bm1, data.frame(pi_rat=.3,black=TRUE),type = "response")
+    0.2332769
+\end{semiverbatim}
+\begin{itemize}
+\item Probit predicts a 7.5\% chance of mortgage denial for non-black applicants, and 23.3\% chance for black ones.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Why use the logistic CDF?}
+Has some nice properties:
+\begin{itemize}
+\item Gives us more of the `S' shape
+\item $Pr(Y=1|X)$ is increasing in $X$ if $\beta_1>0$.
+\item $Pr(Y=1|X) \in [0,1]$ for all $X$
+\item Easy to compute: $\frac{1}{1+e^{-z}}=\frac{e^{z}}{1+e^{z}}$ has analytic derivatives too.
+\item Log odds interpretation
+\begin{itemize}
+\item $\log(\frac{p}{1-p}) = \beta_0 + \beta_1 X$
+\item $\beta_1$ tells us how \alert{log odds ratio} responds to $X$.
+\item $\frac{p}{1-p} \in (-\infty,\infty)$ which fixes the $[0,1]$ problem in the other direction.
+\item more common in other fields (epidemiology, biostats, etc.).
+\end{itemize}
+\item Similar to probit but different scale of coefficients
+\item Logit/Logistic are sometimes used interchangeably but sometimes mean different things depending on the literature.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Logit in R}
+\footnotesize
+\begin{semiverbatim}
+bm1 <-glm(deny~pi_rat+black,data=hmda, family=binomial(link="logit"))
+coeftest(bm1)
+
+z test of coefficients:
+
+            Estimate Std. Error  z value  Pr(>|z|)    
+(Intercept) -4.12556    0.26841 -15.3701 < 2.2e-16 ***
+pi_rat       5.37036    0.72831   7.3737  1.66e-13 ***
+blackTRUE    1.27278    0.14620   8.7059 < 2.2e-16 ***
+---
+    Signif. codes:  0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1
+
+> predict(bm1, data.frame(pi_rat=.3,black=TRUE),type = "response")
+0.2241459 
+> predict(bm1, data.frame(pi_rat=.3,black=FALSE),type = "response")
+0.07485143  
+\end{semiverbatim}
+\begin{itemize}
+\item Logit predicts a 7.5\% chance of mortgage denial for non-black applicants, and 22.4\% chance for black ones. (Very similar to probit).
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{A quick comparison}
+\begin{itemize}
+\item LPM prediction departs greatly from CDF long before $[0,1]$ limits.
+\item We get probabilities that are too extreme even for $X\hat{\beta}$ ``in bounds''.
+\item Some (MHE) argue that though $\hat{Y}$ is flawed, constant marginal effects are still OK.
+\item Logit and Probit are highly similar
+\end{itemize}
+\begin{center}
+\includegraphics[width=2in]{resources/lpm-probit.jpg}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Latent Variables/ Limited Dependent Variables}
+An alternative way to think about this problem is that there is a continuously distributed $Y^{*}$ that we as the econometrician don't observe.
+\begin{eqnarray*}
+Y_i =
+\begin{cases}
+1 \mbox{ if } Y^{*} >0 \\
+0 \mbox{ if } Y^{*} \leq 0
+\end{cases}
+\end{eqnarray*}
+\begin{itemize}
+\item Instead we only see whether $Y^{*}$ exceeds some threshold (in this case $0$).
+\item We can think about $Y^{*}$ as a \alert{latent variable}.
+\item Sometimes you will see this description in the literature, everything else is the same!
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Index Models}
+We sometimes call these single index models or threshold crossing models
+\begin{eqnarray*}
+Z_i = X_i \beta
+\end{eqnarray*}
+\begin{itemize}
+\item We start with a potentially large number of regressors in $X_i$ but $X_i \beta = Z_i$ is a \alert{scalar}
+\item We can just calculate $F(Z_i)$ for Logit or Probit (or some other CDF).
+\item $Z_i$ is the \alert{index}. if $Z_i = X_i \beta$ we say it is a \alert{linear index} model.
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+\frametitle{What does software do?}
+\begin{itemize}
+\item One temptation might be \alert{nonlinear least squares}:
+\begin{eqnarray*}
+\hat{\beta}^{NLLS} = \arg \min_{\beta} \sum_{i=1}^N (Y_i - \Phi(X_i \beta))^2
+\end{eqnarray*}
+\item Turns out this isn't what people do.
+\item We can't always directly estimate using the log-odds
+\begin{eqnarray*}
+\log\left(\frac{p}{1-p}\right)= \beta X_i + \varepsilon_i
+\end{eqnarray*}
+\item The problem is that $p$ or $p(X_i)$ isn't really observed.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{What does software do?}
+\begin{itemize}
+\item Can construct an MLE:
+\begin{eqnarray*}
+\hat{\beta}^{MLE} &=& \arg \max_{\beta} \prod_{i=1}^N F(Z_i)^{y_i} (1-F(Z_i))^{1-{y_i} }\\
+Z_i &=& \beta_0 + \beta_1 X_i
+\end{eqnarray*}
+\item Probit: $F(Z_i) = \Phi(Z_i)$ and its derivative (density) $f(Z_i) = \phi(Z_i)$.
+\item Logit: $F(Z_i) = \frac{1}{1+e^{-z}}$ and its derivative (density) $f(Z_i) = \frac{e^{-z}}{(1+e^{-z})^2}$ a more convenient property is that $\frac{f(z)}{F(z)} = 1 - F(z)$ this is called the \alert{hazard rate}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{FOC of Log-Likelihood}
+\begin{eqnarray*}
+l(y_1,\ldots,y_n | \beta) &=& \sum_{i=1}^N y_i \ln F(Z_i) + (1-y_i) \ln(1- F(Z_i)) \\
+\frac{\partial l }{\partial \beta} &=& \sum_{i=1}^N \frac{y_i}{ F(Z_i)} \frac{ d F}{d \beta}(Z_i) - \frac{1-y_i}{1-F(Z_i)}  \frac{ d F}{d \beta} (Z_i)\\
+ &=& \sum_{i=1}^N \frac{y_i \cdot f(Z_i) }{ F(Z_i)} \frac{ d Z_i}{d \beta} -  \sum_{i=1}^N \frac{(1-y_i)\cdot f(Z_i) }{1-F(Z_i)} \frac{ d Z_i}{d \beta} \\
+ &=& \sum_{i=1}^N  \left[ \frac{y_i \cdot f(Z_i) }{ F(Z_i)} X_i -  \frac{(1-y_i)\cdot f(Z_i) }{1-F(Z_i)} X_i \right] \\
+\end{eqnarray*}
+\end{frame}
+
+\begin{frame}
+\frametitle{FOC of Log-Likelihood}
+This is the \alert{score} of the log-likelihood:
+\begin{eqnarray*}
+\frac{\partial l }{\partial \beta} = \nabla_{\beta} \cdot l(\mathbf{y}; \beta) &=&  \sum_{i=1}^N  \underbrace{\left[ y_i \frac{ f(Z_i) }{ F(Z_i)}  -  (1-y_i) \frac{f(Z_i) }{1-F(Z_i)} \right]}_{\varepsilon_i} \cdot X_i \
+\end{eqnarray*}
+It is technically also a \alert{moment condition}. It is easy for the logit
+\begin{eqnarray*}
+ \nabla_{\beta} \cdot l(\mathbf{y}; \beta) &=&  \sum_{i=1}^N  \underbrace{\left[ y_i (1-F(Z_i)) -  (1-y_i) F(Z_i) \right]}_{\varepsilon_i} \cdot X_i 
+\end{eqnarray*}
+This comes from the hazard rate.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The Hessian Matrix}
+We could also take second derivatives
+\begin{eqnarray*}
+\frac{\partial l^2 }{\partial \beta \partial \beta'} = \nabla_{\beta}^2 \cdot l(\mathbf{y}; \beta) &=&  \sum_{i=1}^N  \underbrace{\left[ y_i \frac{ f(Z_i) }{ F(Z_i)}  -  (1-y_i) \frac{f(Z_i) }{1-F(Z_i)} \right]}_{\varepsilon_i} \cdot X_i 
+\end{eqnarray*}
+It is technically also a \alert{moment condition}
+
+\end{frame}
+
+
+%% LINE
 
 
 \begin{frame}
@@ -195,37 +482,6 @@ Four possible solutions (maybe there are more?)
 \item `Special Regressor' Methods
 \end{enumerate}
 \end{frame}
-
-\begin{frame}{Linear Probability Model}
-First thing we might try is OLS
-\begin{eqnarray*}
-Y_i  = \beta_0 + \beta_1 X_i + \varepsilon_i
-\end{eqnarray*}
-\begin{itemize}
-\item What does $\beta_1$ mean when $Y$ is binary? Is $\beta_1  = \frac{\Delta Y}{\Delta X}$?
-\item What does the line $\beta_0 + \beta_1 X$ when $Y$ is binary?
-\item What does the predicted value $\hat{Y}$ mean when $Y$ is binary? Does $\hat{Y} = 0.26$ mean that someone gets approved or denied for a loan?
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Linear Probability Model}
-OLS is called the \alert{linear probability model} 
-\begin{eqnarray*}
-Y_i  = \beta_0 + \beta_1 X_i + \varepsilon_i 
-\end{eqnarray*}
-because:
-\begin{eqnarray*}
-E[Y | X] &=& 1 \times Pr(Y=1 | X) + 0 \times Pr(Y=0  | X) \\
-Pr(Y=1 | X) &=& \beta_0 + \beta_1 X_i + \varepsilon_i
-\end{eqnarray*}
-The predicted value is a \alert{probability} and 
-\begin{eqnarray*}
-\beta_1 = \frac{Pr(Y=1 | X =x+\Delta x) - Pr(Y=1 | X=x)}{\Delta x}
-\end{eqnarray*}
-So $\beta_1$ represents the average change in probability that $Y=1$ for a unit change in $X$.
-\end{frame}
-
-
 
 \begin{frame}
 \frametitle{Problem \#1: Endogeneity}
