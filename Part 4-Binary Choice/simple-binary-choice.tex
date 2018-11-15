@@ -1,4 +1,4 @@
-\documentclass[xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
+\documentclass[xcolor=pdftex,dvipsnames,table,mathserif]{beamer}
 \usetheme{default}
 %\usetheme{Darmstadt}
 %\usepackage{times}
@@ -306,6 +306,7 @@ Has some nice properties:
 \item $\frac{p}{1-p} \in (-\infty,\infty)$ which fixes the $[0,1]$ problem in the other direction.
 \item more common in other fields (epidemiology, biostats, etc.).
 \end{itemize}
+\item Also has the property that $F(z) = 1-F(-z)$.
 \item Similar to probit but different scale of coefficients
 \item Logit/Logistic are sometimes used interchangeably but sometimes mean different things depending on the literature.
 \end{itemize}
@@ -337,6 +338,7 @@ blackTRUE    1.27278    0.14620   8.7059 < 2.2e-16 ***
 \end{frame}
 
 
+
 \begin{frame}
 \frametitle{A quick comparison}
 \begin{itemize}
@@ -347,6 +349,13 @@ blackTRUE    1.27278    0.14620   8.7059 < 2.2e-16 ***
 \end{itemize}
 \begin{center}
 \includegraphics[width=2in]{resources/lpm-probit.jpg}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=2.5in]{resources/hmda3.pdf}\\
+\includegraphics[width=2.5in]{resources/hmda3a.pdf}\\
 \end{center}
 \end{frame}
 
@@ -408,10 +417,28 @@ Z_i = X_i \beta
 \hat{\beta}^{MLE} &=& \arg \max_{\beta} \prod_{i=1}^N F(Z_i)^{y_i} (1-F(Z_i))^{1-{y_i} }\\
 Z_i &=& \beta_0 + \beta_1 X_i
 \end{eqnarray*}
-\item Probit: $F(Z_i) = \Phi(Z_i)$ and its derivative (density) $f(Z_i) = \phi(Z_i)$.
+\item Probit: $F(Z_i) = \Phi(Z_i)$ and its derivative (density) $f(Z_i) = \phi(Z_i)$. \\
+Also is \alert{symmetric} so that $1 - F(Z_i) = F(-Z_i)$.
 \item Logit: $F(Z_i) = \frac{1}{1+e^{-z}}$ and its derivative (density) $f(Z_i) = \frac{e^{-z}}{(1+e^{-z})^2}$ a more convenient property is that $\frac{f(z)}{F(z)} = 1 - F(z)$ this is called the \alert{hazard rate}.
 \end{itemize}
 \end{frame}
+
+\begin{frame}
+\frametitle{A probit trick}
+Let $q_i = 2 y_i -1$
+\begin{eqnarray*}
+F(q_i \cdot Z_i) = 
+\begin{cases}
+F(Z_i)  &\mbox{ when } y_i=1 \\
+F(-Z_i) = 1-F(Z_i)& \mbox{ when } y_i=0
+\end{cases}
+\end{eqnarray*}
+So that 
+\begin{eqnarray*}
+l(y_1,\ldots, y_n | \beta) = \sum_{i=1}^N \ln F(q_i \cdot Z_i) 
+\end{eqnarray*}
+\end{frame}
+
 
 \begin{frame}
 \frametitle{FOC of Log-Likelihood}
@@ -424,27 +451,190 @@ l(y_1,\ldots,y_n | \beta) &=& \sum_{i=1}^N y_i \ln F(Z_i) + (1-y_i) \ln(1- F(Z_i
 \end{frame}
 
 \begin{frame}
-\frametitle{FOC of Log-Likelihood}
+\frametitle{FOC of Log-Likelihood (Logit)}
 This is the \alert{score} of the log-likelihood:
 \begin{eqnarray*}
-\frac{\partial l }{\partial \beta} = \nabla_{\beta} \cdot l(\mathbf{y}; \beta) &=&  \sum_{i=1}^N  \underbrace{\left[ y_i \frac{ f(Z_i) }{ F(Z_i)}  -  (1-y_i) \frac{f(Z_i) }{1-F(Z_i)} \right]}_{\varepsilon_i} \cdot X_i \
+\frac{\partial l }{\partial \beta} = \nabla_{\beta} \cdot l(\mathbf{y}; \beta) &=&  \sum_{i=1}^N  \left[ y_i \frac{ f(Z_i) }{ F(Z_i)}  -  (1-y_i) \frac{f(Z_i) }{1-F(Z_i)} \right]  \cdot X_i 
 \end{eqnarray*}
 It is technically also a \alert{moment condition}. It is easy for the logit
 \begin{eqnarray*}
- \nabla_{\beta} \cdot l(\mathbf{y}; \beta) &=&  \sum_{i=1}^N  \underbrace{\left[ y_i (1-F(Z_i)) -  (1-y_i) F(Z_i) \right]}_{\varepsilon_i} \cdot X_i 
+ \nabla_{\beta} \cdot l(\mathbf{y}; \beta) &=&  \sum_{i=1}^N  \left[ y_i (1-F(Z_i)) -  (1-y_i) F(Z_i) \right] \cdot X_i \\
+ &=&  \sum_{i=1}^N  \underbrace{\left[ y_i - F(Z_i) \right]}_{\varepsilon_i} \cdot X_i 
 \end{eqnarray*}
 This comes from the hazard rate.
+\end{frame}
+
+\begin{frame}
+\frametitle{FOC of Log-Likelihood (Probit)}
+This is the \alert{score} of the log-likelihood:
+\begin{eqnarray*}
+\frac{\partial l }{\partial \beta} = \nabla_{\beta} \cdot l(\mathbf{y}; \beta) &=&  \sum_{i=1}^N  \left[ y_i \frac{ f(Z_i) }{ F(Z_i)}  -  (1-y_i) \frac{f(Z_i) }{1-F(Z_i)} \right] \cdot X_i  \\
+ &=&  \sum_{y_i=1}  \frac{\phi(Z_i) }{ \Phi(Z_i)} X_i +\sum_{y_i=0} \frac{-\phi(Z_i) }{1-\Phi(Z_i)} X_i
+\end{eqnarray*}
+Using the $q_i = 2 y_i -1$ trick
+\begin{eqnarray*}
+\nabla_{\beta} \cdot l(\mathbf{y}; \beta)= \sum_{i=1}^N \underbrace{\frac{ q_i \phi(q_i Z_i)}{\Phi(Z_i)}}_{\lambda_i} X_i
+\end{eqnarray*}
 \end{frame}
 
 
 \begin{frame}
 \frametitle{The Hessian Matrix}
-We could also take second derivatives
+We could also take second derivatives to get the \alert{Hessian} matrix:
 \begin{eqnarray*}
-\frac{\partial l^2 }{\partial \beta \partial \beta'} = \nabla_{\beta}^2 \cdot l(\mathbf{y}; \beta) &=&  \sum_{i=1}^N  \underbrace{\left[ y_i \frac{ f(Z_i) }{ F(Z_i)}  -  (1-y_i) \frac{f(Z_i) }{1-F(Z_i)} \right]}_{\varepsilon_i} \cdot X_i 
+\frac{\partial l^2 }{\partial \beta \partial \beta'} = - \sum_{i=1}^N   y_i \frac{ f(Z_i)  f(Z_i) - f'(Z_i) F(Z_i) }{ F(Z_i)^2}  X_i X_i' \\
++  \sum_{i=1}^N   (1-y_i) \frac{f(Z_i)f(Z_i) - f'(Z_i)(1-F(Z_i))}{(1-F(Z_i))^2}  X_i X_i'
 \end{eqnarray*}
-It is technically also a \alert{moment condition}
+This is a $K\times K$ matrix where $K$ is the dimension of $X$ or $\beta$.
+\end{frame}
 
+
+
+\begin{frame}
+\frametitle{The Hessian Matrix (Logit)}
+For the logit this is even easier (use the simplified logit score):
+\begin{eqnarray*}
+\frac{\partial l^2 }{\partial \beta \partial \beta'}  &=& - \sum_{i=1}^N f(Z_i) X_i X_i' \\
+&=& - \sum_{i=1}^N F(Z_i) (1- F(Z_i)) X_i X_i'
+\end{eqnarray*}
+This is \alert{negative semi definite}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Hessian Matrix (Probit)}
+Recall
+\begin{eqnarray*}
+\nabla_{\beta} \cdot l(\mathbf{y}; \beta)= \sum_{i=1}^N \underbrace{\frac{ q_i \phi(q_i Z_i)}{\Phi(Z_i)}}_{\lambda_i} X_i
+\end{eqnarray*}
+Take another derivative and recall $\phi'(z_i) = - z_i \phi(z_i)$
+\begin{eqnarray*}
+\nabla_{\beta}^2 \cdot l(\mathbf{y}; \beta)&=& \sum_{i=1}^N \frac{q_i \phi'(q_i Z_i) \Phi(z_i) - q_i \phi(z_i)^2}{\Phi(z_i)^2}  X_i X_i' \\
+&=& - \lambda_i( z_i + \lambda_i) \cdot X_i X_i'
+\end{eqnarray*}
+Hard to show but this is \alert{negative definite} too.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Estimation}
+\begin{itemize} 
+\item We can try to find the values of $\beta$ which make the average score $=0$ (the FOC).
+\item But no closed form solution!
+\item Recall Taylor's Rule:
+\end{itemize}
+\begin{eqnarray*}
+f(x + \Delta x) =  f(x_0) + f'(x_0) \Delta x + \frac{1}{2} f''(x_0) (\Delta x)^2
+\end{eqnarray*}
+Goal is to find the case where $f'(x) \approx 0$ so take derivative w.r.t $\Delta x$:
+\begin{eqnarray*}
+\frac{d}{d \Delta x} \left[  f(x_0) + f'(x_0) \Delta x + \frac{1}{2} f''(x_0) (\Delta x)^2 \right] = f'(x_0) +  f''(x_0) (\Delta x) = 0
+\end{eqnarray*}
+Solve for $\Delta x$
+\begin{eqnarray*}
+\Delta x  = - f'(x_0) / f''(x_0)
+\end{eqnarray*}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Estimation}
+\begin{itemize} 
+\item In multiple dimensions this becomes:
+\begin{eqnarray*}
+x_{n+1} = x_{n} - \alpha \cdot \left[\mathbf{H}_f (x_n) \right]^{-1} \nabla f(x_n)
+\end{eqnarray*}
+\item $\mathbf{H}_f (x_n)$ is the \alert{Hessian} Matrix. $ \nabla f(x_n)$ is the \alert{gradient}.
+\item $\alpha \in [0,1]$ is a parameter that determines \alert{step size}
+\item Idea is that we approximate the likelihood with a quadratic function and minimize that (because we know how to solve those).
+\item Each step we update our quadratic approximation.
+\item If problem is \alert{convex} this will always converge (and quickly)
+\item Most software ``cheats'' and doesn't compute $\left[\mathbf{H}_f (x_n) \right]^{-1}$ but uses tricks to update on the fly (BFGS, Broyden, DFP, SR1). Mostly you see these options in your software.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Marginal effects}
+\begin{eqnarray*}
+\frac{\partial E[Y_i | X_i] }{\partial X_{ik}} = f (Z_i) \beta_k
+\end{eqnarray*}
+\begin{itemize}
+\item The whole point was that we wanted marginal effects not to be constant
+\item So where do we evaluate?
+\begin{itemize}
+\item Software often plugs in mean or median values for each component
+\item Alternatively we can integrate over $X$ and compute:
+$$
+E_{X_i}[ f (Z_i) \beta_k]
+$$
+\item The right thing to do is probably to plot the response surface (either probability) or change in probability over all $X$.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inference}
+\begin{itemize} 
+\item If we have the Hessian Matrix, inference is straightforward.
+\item $\mathbf{H}_f(\hat{\beta}^{MLE})$ tells us about the \alert{curvature} of the log-likelihood around the maximum.
+\begin{itemize}
+\item Function is flat $\rightarrow$ not very precise estimates of parameters
+\item Function is steep $\rightarrow$  precise estimates of parameters
+\end{itemize}
+\item Construct \alert{Fisher Information} $I(\hat{\beta}^{MLE}) = E[H_f(\hat{\beta}^{MLE})]$ where expectation is over the data.
+\begin{itemize}
+\item Logit does not depend on $y_i$ so $E[H_f(\hat{\beta}^{MLE})]=H_f(\hat{\beta}^{MLE})$.
+\item Probit does depend on $y_i$ so $E[H_f(\hat{\beta}^{MLE})]\neq H_f(\hat{\beta}^{MLE})$.
+\end{itemize}
+\item Inverse Fisher information $E[H_f(\hat{\beta}^{MLE})]^{-1}$ is an estimate of the variance covariance matrix for $\hat{\beta}$.
+\item $\sqrt{diag[E[H_f(\hat{\beta}^{MLE})]^{-1}]}$ is an estimate for $SE(\hat{\beta})$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Goodness of Fit \#1: Pseudo $R^2$}
+How well does the model fit the data?
+\begin{itemize} 
+\item No $R^2$ measure (why not?).
+\item Well we have likelihood units so average likelihood tells us something but is hard to interpret.
+\item $\rho = 1- \frac{LL(\hat{\beta}^{MLE})}{LL(\beta_0)}$ where $LL(\beta_0)$ is the likelihood of a model with just a constant (unconditional probability of success).
+\begin{itemize}
+\item If we don't do any better than unconditional mean then $\rho=0$.
+\item Won't ever get all of the way to $\rho =1$.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Goodness of Fit \#2: Confusion Matrix }
+\begin{itemize} 
+\item Machine learning likes to think about this problem more like \alert{classification} then regression.
+\item A caution: these are \alert{regression} models not \alert{classification} models.
+\item Predict either $\hat{y}_i = 1$ or $\hat{y}_i = 0$ for each observation.
+\item Predict $\hat{y}_i =1$ if $Pr(y_i = 1 | X_i =x) \geq0.5$ or $F(X_i \hat{\beta}) > 0.5$.
+\item Imagine for cells Prediction: $\{Success, Failure\}$, Outcome $\{Success, Failure\}$
+\item Can construct this using the R package \texttt{caret} and command \texttt{caret}.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{ROC Curve/ AOC}
+\begin{center}
+\includegraphics[width=3in]{resources/confusion.png}\\
+\end{center}
+\end{frame}
+
+
+
+\begin{frame}{ROC Curve/ AOC}
+\begin{center}
+\includegraphics[width=2.5in]{resources/roc_curve.png}\\
+\end{center}
+\begin{itemize}
+\item At each predicted probability calculate both \alert{True Positive Rate} and \alert{False Positive Rate}.
+\item AOC is area under the curve
+\end{itemize}
 \end{frame}
 
 
