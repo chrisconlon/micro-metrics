@@ -1,8 +1,12 @@
-# micro-metrics
+## Empirical Methods for Applied Micro
 
-This is a PhD level course in Microeconometrics targeted at students conducting applied research (as opposed to econometricians).
+This is a PhD level course in applied econometrics and computational economics, targeted at students conducting applied research (as opposed to econometricians).
 
 In addition to traditional econometric approaches, this course draws connections to recent literature on machine learning.
+
+BC students should also checkout the [syllabus](syllabus.md). 
+
+Much of the material was (graciously) forked from Chris Conlon's [micro-metrics](https://github.com/chrisconlon/micro-metrics) repo. 
 
 It is based on some combination of 
 - [Microeconometrics by Cameron and Trivedi](https://www.amazon.com/Microeconometrics-Methods-Applications-Colin-Cameron/dp/0521848059)
@@ -27,16 +31,3 @@ The goal is to provide an overview of a number of topics in Microeconometrics in
 7. Duration Models
 8. Bayesian Methods
 	- Empirical Bayes, MCMC, James-Stein
-
-## My Students
-Over the course of the semester I expect each of my students to find at least two typos or other errors and fix them via a pull request.
-
-## Other Faculty
-You are free to use these notes. However, PLEASE CREATE A FORK.
-
-You are welcome to submit pull requests/update to my notes as well.
-
-Everything is distributed under Creative Commons Attribution Share Alike 4.0
-(You can use it freely but you are expected to post source of derivative work).
-
-Contact: cconlon@stern.nyu.edu
