@@ -1,6 +1,6 @@
 # ECON8855 - Spring 2019
 
-## Empirical Methods in Applied Micro
+## Empirical Methods for Applied Micro
 
 
 - **Instructors:** murryc@bc.edu and sweeneri@bc.edu
@@ -15,7 +15,7 @@ The only way to really internalize this stuff is to implement it yourself. Thus,
 ### Problem sets
 - (roughly) bi-weekly problem sets
 - 50% of grade 
-- **all problem sets** must be submitted through [canvas](https://bostoncollege.instructure.com/courses/1591956)
+- **all problem sets must be submitted through [canvas](https://bostoncollege.instructure.com/courses/1591956)**
 - you are allowed to work in groups, but each student must code up and submit their own problem set. 
 
 
