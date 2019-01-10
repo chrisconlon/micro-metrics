@@ -6,7 +6,7 @@ In addition to traditional econometric approaches, this course draws connections
 
 BC students should also checkout the [syllabus](syllabus.md). 
 
-Much of the material was (graciously) forked from Chris Conlon's [micro-metrics](https://github.com/chrisconlon/micro-metrics) repo. 
+Much of the material was (gratefully) forked from Chris Conlon's [micro-metrics](https://github.com/chrisconlon/micro-metrics) repo. 
 
 It is based on some combination of 
 - [Microeconometrics by Cameron and Trivedi](https://www.amazon.com/Microeconometrics-Methods-Applications-Colin-Cameron/dp/0521848059)
