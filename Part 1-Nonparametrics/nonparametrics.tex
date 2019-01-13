@@ -37,7 +37,7 @@ Outline
 %tk could put this at the end
 }
 
-\section[Nonparametrics]{Nonparametric Density Estimation}
+\section[Density Estimation]{Nonparametric Density Estimation}
 
 \begin{frame}{Section outline}
 
@@ -45,38 +45,389 @@ Why nonparametrics?
 \begin{itemize}
   \item Sometimes just interested in the distribution % auctions?
   \item sometimes this is the first stage and we want to integrate
-  \item sometimes want to do something semiparametric  
+  \item sometimes want to do something semiparametric 
 \end{itemize}
+
+In this section, we are interested in estimating the \textbf{density} $f(x)$ under minimal assumptions. 
 
 \end{frame}
 
+\begin{frame}{Let's start with the histogram}
+  One of the more successful and popular uses of nonparametric methods is estimating the density or distribution function $f(x)$ or $F(x)$.
+  
+  \begin{eqnarray*}
+    \hat{f}_{HIST}(x_0) = \frac{1}{N} \sum_{i=1}^N \frac{\mathbf{1}(x_0 - h < x_i < x_0 + h)}{2 h}
+  \end{eqnarray*}
+    
+  \begin{itemize}
+  \item Divide the dataset into bins, count up fraction of observations in each bins
+  \end{itemize}
+\end{frame}
+ 
+\begin{frame}{Kernel Estimation}
+  Let's rewrite the histogram estimator
+  \begin{eqnarray*}
+    \hat{f}_{HIST}(x_0) = \frac{1}{Nh} \sum_{i=1}^N  K \left( \frac{x_i - x_0}{h} \right)
+  \end{eqnarray*}
 
-\section{Intro}
-\begin{frame}{Something Familiar}
-Let's start with something we all know, how to calculate:
-\begin{eqnarray*}
-E[Y_i | X_i ] = \beta_0 + \beta_1 X_1 + \ldots + \varepsilon_i
-\end{eqnarray*}
+  Where $K(z) = \frac{1}{2} \cdot \mathbf{1} (|z| < 1) $
+\end{frame}
+
+\begin{frame}{Density estimator interpretation}
+  \begin{itemize}
+    \item for each observation, there is probability mass 1 to spread around
+    \item use the function $K(\cdot)$ and smoothing parameter $h$ to choose how to allocate this mass
+    \item then, for any given $x_0$, sum over these functions that spread out mass, and normalize by dividing by $N$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Smooth Kernels}
+  We call $K(\cdot)$ a \alert{Kernel function} and $h$ the \alert{bandwidth}. We usually assume
+  \begin{enumerate}[(i)]
+  \item $K(z)$ is symmetric about $0$ and continuous.
+  \item $\int K(z) d z = 1$,  $\int z K(z) d z = 0$,  $\int |K(z)| d z < \infty$.
+  \item Either (a) $K(z) = 0$ if $|z| \geq z_0$ for some $z_0$ or \\
+  (b) $|z| K(z) \rightarrow 0$ as $|z| \rightarrow \infty$.
+  \item $\int z^ K(z) d z = \kappa$ where $\kappa$ is a constant.
+  \end{enumerate}
+\end{frame}
+  
+\begin{frame}{Kernel Smoothers}
+  If $K$ is $C^k$, then so is ${\hat f}_n$, so we can plot it nicely.
+  
+  \pause
+  
+  Usually we choose a smooth, symmetric $K$:
+   
+  \pause
+  
+  \begin{itemize}[<+->]
+  \item $K=\phi$, density of $N(0,1)$ (or some other symmetric density);
+  \item $K$ with compact support: Epanechnikov (mildly) optimal
+  \[
+  K(x)= \frac{3}{4} \max(1-x^2,0).
+  \]
+  \end{itemize}
+  \pause
+  A common nonsmooth choice: $K(x)=(|x|<1/2)$ gives the {\em histogram}
+  estimate.
+\end{frame}
+
+\begin{frame}{Some Common Kernels}
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[width=\textwidth]{./resources/CTKernels}
+  \label{kernels}
+  \end{center}
+  \end{figure}
+\end{frame}
+  
+\begin{frame}{Kernel Comparison}
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[width=\textwidth]{./resources/kernelfig.pdf}
+  \label{kernelfig}
+  \end{center}
+  \end{figure}
+\end{frame}
+
+% from CT 9.3.5%
+\begin{frame}{Mean and Variance of $\hat{f}(x_0)$}
+  Assume that the derivative of $f(x)$ exists and is bounded, and  $\int z K(z) d z = 0$
+
+  Then the estimator has \textbf{bias}
+  \[
+    b(x_0) = E \left[\hat{f}(x_0) \right] - f(x_0) = \frac{1}{2} h^2 f''(x_0)\int z^2K(z)dx
+  \]
+
+  The \textbf{variance} of the estimator is
+  \[
+    V \left[\hat{f}(x_0) \right] = \frac{1}{Nh} f(x_0) \int K(z)^2dz \left\{ + o(\frac{1}{Nh}) \right\}
+  \]
+
+  So, unsurprisingly, the bias is decreasing in $h$, and the variance is \textit{increasing} in $h$
+\end{frame}
+ 
+\begin{frame}{How to Choose $h$}
+  \begin{itemize}
+    \item We want both bias and variance to be as small as possible, as usual. 
+    \item In parametric estimation, it is not a problem: they both go to zero as sample size increases.
+    \item In nonparametric estimation reducing $h$ reduces bias, but increases variance; how are we to make his trade off?
+    \item Note that how we set $h$ is going to be much more important than the choice of $K(\cdot)$
+  \end{itemize}  
+\end{frame}
+
+% THIS SECTION FROM GUIDO'S NOTES 
+\begin{frame}{Mean Integrated Square Error}
+  \begin{itemize}
+    \item Start with the local performance at $x_0$
+    $$ MSE \left[ \hat{f}(x_0) \right] = E \left[ \left( \hat{f}(x_0) - f(x_0) \right)^2 \right] $$
+    \item Calculate the \textit{integrated} (as opposed to expected) squared error 
+    \begin{align*}
+      \int \left( {\hat f}(x)-f(x) \right)^2 dx &=& \int \mbox{bias} ^2 \left( {\hat f}(x) \right) + \mbox{var} \left( {\hat f}(x) \right) dx 
+    \end{align*}
+
+  \item Simple approximate expression (symmetric order 2 kernels): $$(\mbox{bias})^2+\mbox{variance}= A
+  h^4+B/nh$$
+  with $A=\int \left(f''(x)\right)^2 \left(\int u^2K\right)^2 /4$ and $B=f(x)\int K^2$
+
+\end{itemize}  
+\end{frame}
+
+%TK Could use Guido's H opt formula here (lecture 16 page 9)
+\begin{frame}{Optimal bandwidth}
+  \begin{itemize}
+  \item The AMISE is $$Ah^4+B/nh$$
+  \item Minimize by taking the FOC 
+    $$h^*_n=\left(\frac{B}{4An}\right)^{1/5}$$
+  
+  \item bias and standard error are \emph{both} in $n^{-2/5}$
+  \item and the AMISE is $n^{-4/5}$---{\bf not} $1/n$ as it is in parametric models.
+  
+  \item But: $A$ and $B$ both depend on $K$ (known) and $f(y)$ (unknown), and
+  especially ``wiggliness''
+  $\int (f'')^2$ (unknown, not easily estimated). Where do we go from here? 
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}{Silverman's Rule of Thumb}
+  \begin{itemize}
+  \item If $f$ is normal with variance $\sigma^2$ (may not be a very appropriate benchmark!), the optimal bandwidth
+  is
+  $$h^*_n=1.06 \sigma n^{-1/5}$$
+  \item Just do it with $\sigma=s$ empirical dispersion of the $x_i$'s , or something more robust/slightly less smooth:
+  $$h^*_n=0.9*\min(s,IQ/1.34)*n^{-1/5}$$ 
+  where IQ=interquartile distance
+  \item Investigate changing it by a reasonable multiple.
+  \end{itemize}
+\pause
+  This tends to work pretty well. But can we do better? 
+\end{frame}
+
+\section{Cross-Validation}
+
+%TK ADD CROSS VALIDATION SLIDE FROM THIS 
+% https://www.r-bloggers.com/cross-validation-for-kernel-density-estimation/
+
+
+\begin{frame}{Cross-validation}
+  \begin{itemize}
+  \item General concept in the whole of nonparametrics: choose $h$ to minimize a criterion $CV(h)$ that approximates
+  $$ AMISE(h)=\int E(\hat{f}_n(x)-f(x))^2dx.$$
+  \item Usually programmed in metrics software. \emph{If you can do it, do it on a subsample, and rescale.}
+  \item CV tries to measure what the expected out of sample (OOS or EPE) prediction error of a new never seen before dataset.
+  \item The main consideration is to prevent \alert{overfitting}.
+  \begin{itemize}
+  \item In sample fit is always going to be maximized by the most complicated model.
+  \item OOS fit might be a different story.
+  \item ie 1-NN might do really well in-sample, but with a new sample might perform badly.
+  \end{itemize}
+  \end{itemize}
+\end{frame}
+  
+\begin{frame}{Sample Splitting/Holdout Method and CV}
+  Cross Validation is actually a more complicated version of \alert{sample splitting} that is one of the organizing principles in machine learning literature.
+  
+  \begin{description}
+  \item[Training Set] This is where you estimate parameter values.
+  \item[Validation Set] This is where you choose a model- a bandwidth $h$ or tuning parameter $\lambda$ by computing the error.
+  \item[Test Set] You are only allowed to look at this after you have chosen a model. \alert{Only Test Once}: compute the error again on fresh data.
+  \end{description}
+  \begin{itemize}
+  \item Conventional approach is to allocate 50-80\% to training and 10-20\% to Validation and Test.
+  \item Sometimes we don't have enough data to do this reliably.
+  \end{itemize}
+  \end{frame}
+  
+\begin{frame}{Sample Splitting/Holdout Method}
+  \begin{center}
+  \includegraphics[width=\textwidth]{./resources/split-sample}
+  \end{center}
+\end{frame}
+  
+\begin{frame}{Challenge with Sample Splitting}
+  \begin{center}
+  \includegraphics[width=\textwidth]{./resources/validation-10fold}
+  \end{center}
+\end{frame}
+  
+  
+\begin{frame}{$k$-fold Cross Validation}
+  \begin{itemize}
+  \item Break the dataset into $k$ equally sized ``folds'' (at random).
+  \item Withhold $i=1$ fold
+  \begin{itemize}
+  \item Estimate the model parameters $\hat{\theta}^{(-i)}$ on the remaining $k-1$ folds
+  \item Predict $\hat{y}^{(-i)}$ using $\hat{\theta}^{(-i)}$ estimates for the $i$th fold (withheld data).
+  \item Compute $MSE_i =\frac{1}{k \cdot N} \sum_j (y^{(-i)}_j -\hat{y}^{(-i)}_j)^2$.
+  \item Repeat for $i=1,\ldots,k$.
+  \end{itemize}
+  \item Construct $\widehat{MSE}_{k,CV} = \frac{1}{k} \sum_i MSE_{i}$
+  \end{itemize}
+\end{frame}
+  
+\begin{frame}{$k$-fold Cross Validation}
+  \begin{center}
+  \includegraphics[width=\textwidth]{./resources/split-cv5}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Leave One Out Cross Validation (LOOCV)}
+  Same as $k$-fold but with $k=N$.
+  \begin{itemize}
+  \item Withhold a single observation $i$
+  \item Estimate $\hat{\theta}_{(-i)}$.
+  \item Predict $\hat{y}_i$ using $\hat{\theta}^{(-i)}$ estimates
+  \item Compute $MSE_i =\frac{1}{N} \sum_j (y_i -\hat{y}_i(\hat{\theta}^{(-i)}))^2$.
+  \end{itemize}
+  \vspace{0.2cm}
+  Note: this requires estimating the model $N$ times which can be costly.
+\end{frame}
+    
+\begin{frame}{LOOCV vs $k$-fold CV}
+  \begin{center}
+  \includegraphics[width=\textwidth]{./resources/comparison-cv}
+  \end{center}
+\end{frame}
+  
+\begin{frame}{Cross Validation}
+  \begin{itemize}
+  \item Main advantage of cross validation is that we use all of the data in both \alert{estimation} and in \alert{validation}.
+  \begin{itemize}
+  \item For our purposes validation is mostly about choosing the right bandwidth or tuning parameter.
+  \end{itemize}
+  \item We have much lower variance in our estimate of the OOS mean squared error.
+  \begin{itemize}
+  \item Hopefully our bandwidth choice doesn't depend on randomness of splitting sample.
+  \end{itemize}
+  \end{itemize}
+\end{frame}
+  
+  
+\begin{frame}{Test Data}
+  \begin{itemize}
+  \item In Statistics/Machine learning there is a tradition to withhold 10\% of the data as \alert{Test Data}.
+  \item This is \alert{completely new data} that was not used in the CV procedure.
+  \item The idea is to report the results using this test data because it most accurately simulates true OOS performance.
+  \item We don't do much of this in economics.\\
+   (Should we do more?)
+  \end{itemize}
+\end{frame}
+
+
+\frame{\frametitle{Local Bandwidths}
+
+\pause
+
+If you only care about $f(y)$ at some given point, then 
+\[
+A=f''(y)^2 \left(\int u^2K\right)^2/4 \mbox{ and } B=f(y)\int K^2.
+\]
+
+\pause
+
+So in a low-density region, worry about variance and take $h$ larger.
+In a curvy region, worry about bias and take $h$ small.
+ 
+}
+
+\frame{\frametitle{Higher-Order Kernels}
 \begin{itemize}
-\item The Gauss-Markov theorem (remember that?) tells us that OLS is best among linear unbiased estimators.
+\item $K$ of order $r$ iff $\int x^j K(x) dx=0$ for $j<r$ and $\int x^r
+K(x)dx \neq 0$. Try $r>2$?
+\item The beauty of it: bias in $h^r$ if $f$ is at least $C^r$\ldots so AMISE can be
+reduced to $n^{-r/(2r+1)}$, almost $\sqrt{n}$-consistent if $r$ is
+large. 
+\item But gives wiggly (and sometimes negative) estimates
+$\rightarrow$ leave them to theorists. 
 \end{itemize}
+}
+
+\frame{\frametitle{Back to the CDF}
+
+\pause
+
+Since now we have estimated the density with
+
+\[
+{\hat f}_n(y)= \frac{1}{nh}\sum_{i=1}^n K\left(
+\frac{y-y_i}{h}\right),
+\]
+
+\pause
+
+a natural idea is to integrate; let $\mathcal{K}(y)=\int_{-\infty}^y K(t)dt$, try
+
+\pause
+
+\[
+{\hat F}_n(y)= \frac{1}{n}\sum_{i=1}^n \mathcal{K}\left(
+\frac{y-y_i}{h}\right)
+\]
+
+as a reasonable estimator of the cdf in $y$.
+
+\pause
+
+Very reasonable indeed:
+
+\begin{itemize}
+  \item when $n \longrightarrow \infty$ and $h$ goes to zero (at rate
+    $n^{-1/3}$\ldots) 
+
+
+it is consistent at rate $\sqrt{n}$
+\item it is nicely smooth
+\item by construction it accords well with the density estimator
+\item \ldots\ it is a much better choice than the empirical cdf.
+\end{itemize}
+
+}
+
+\section{Example: Auctions}
+
+\begin{frame}{Example application: Auctions}
+  \begin{itemize}
+    \item Why auctions? 
+    \item Great introduction to structural approach. Arguably the most successful application. 
+    \item Auctions are an example of a game with assymetric information: participants know the primitives of the game, but do not know their rivals exact valuations. 
+    \item By imposing rationality/ profit maximization, we can recover the distribution of values. 
+    \item Can then run counterfatuals
+  \end{itemize}
+
+For more detail, check out Chris Conlon's slides in this folder, or John Asker's PhD lecture notes. 
+
+% http://www.johnasker.com/Auctions%20I.pdf
+\end{frame}
+
+\section{Non-parametric Regression}
+
+\begin{frame}{Something Familiar}
+  Let's start with something we all know, how to calculate:
+  \begin{eqnarray*}
+  E[Y_i | X_i ] = \beta_0 + \beta_1 X_1 + \ldots + \varepsilon_i
+  \end{eqnarray*}
+  \begin{itemize}
+  \item The Gauss-Markov theorem (remember that?) tells us that OLS is best among linear unbiased estimators.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Identification}
-What does it mean for a model to be identified?
-\begin{eqnarray*}
-\hat{\beta}_{OLS} = \arg \max_{\beta} (\mathbf{y} - \mathbf{x} \beta)' (\mathbf{y} - \mathbf{x} \beta)
-\end{eqnarray*}
-\begin{itemize}
-\item We need there to be a unique value of $\beta$ that solves the above equation.
-\item For OLS this reduces to solving a linear system of $\dim(X)=k$ equations and unknowns.
-\item The OLS estimator produces $\hat{\beta}_{OLS} = \beta + (X'X)^{-1}X'\varepsilon$.
-\begin{itemize}
-\item Identification: means that we require $(X'X)$ is invertible (no perfect multicollinearity).
-\item When $E[X' \varepsilon ] =0$ then this converges in probability to true $\beta$.
-\end{itemize}
+  What does it mean for a model to be identified?
+  \begin{eqnarray*}
+  \hat{\beta}_{OLS} = \arg \max_{\beta} (\mathbf{y} - \mathbf{x} \beta)' (\mathbf{y} - \mathbf{x} \beta)
+  \end{eqnarray*}
+  \begin{itemize}
+  \item We need there to be a unique value of $\beta$ that solves the above equation.
+  \item For OLS this reduces to solving a linear system of $\dim(X)=k$ equations and unknowns.
+  \item The OLS estimator produces $\hat{\beta}_{OLS} = \beta + (X'X)^{-1}X'\varepsilon$.
+  \begin{itemize}
+  \item Identification: means that we require $(X'X)$ is invertible (no perfect multicollinearity).
+  \item When $E[X' \varepsilon ] =0$ then this converges in probability to true $\beta$.
+  \end{itemize}
 
-\end{itemize}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{A Little More Complicated}
@@ -166,6 +517,24 @@ P(x) = \int \mathbf{1}(F(x) - \varepsilon > 0) dH(\varepsilon | x) = H(F(x)| x)
 \end{frame}
 
 
+\begin{frame}{Single-Index Models}
+ 
+  \begin{itemize}
+  \item Consider $$ E \left[ y | \mathbf{x} \right] = g(\mathbf{x}'\beta ) $$ 
+  such as logit and probit. 
+  \item With conditional mean of change in $x_j$ 
+  $$ \frac{ \partial \left[ y | \mathbf{x} \right]}{\partial x_j} = g'(\mathbf{x}'\beta ) \beta_j $$ 
+  
+  \item Can use Marginal Rate of Substitution (MRS) to identify $\beta_k / \beta_l$.
+  $$ \frac{ \partial \left[ y | \mathbf{x} \right] / \partial x_j }{ \partial \left[ y | \mathbf{x} \right] / \partial x_k} = \frac{\beta_j}{\beta_k} $$ 
+  
+  \item Suggests the \alert{average derivative estimator} which doesn't require normality assumptions of probit
+  \item More robust, but potentially less efficient if true distribution of $\varepsilon \sim N(0,1)$.
+  \item Can we extend the general intuition to more cases?
+  \end{itemize}
+\end{frame}
+
+  
 \begin{frame}{A Fake Data Example}
 Following the THF textbook example, we can generate some fake data and let: 
 \begin{eqnarray*}
@@ -180,12 +549,14 @@ Y=&BLUE  \mbox{ if }   Y* &\leq 0.5
 \end{frame}
 
 \begin{frame}{Linear Probability Model}
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=3.5in]{./resources/classifierOLS.pdf}
-\label{classOLS}
-\end{center}
-\end{figure}
+  \vspace{-15pt}
+    
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[height = .95\textheight]{./resources/classifierOLS.pdf}
+  \label{classOLS}
+  \end{center}
+  \end{figure}
 \end{frame}
 
 
@@ -205,6 +576,7 @@ Y^{*} = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
 
 
 \begin{frame}{15 Nearest Neighbor}
+  \vspace{-15pt}
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=3.5in]{./resources/classifier15nn.pdf}
@@ -214,6 +586,8 @@ Y^{*} = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
 \end{frame}
 
 \begin{frame}{Extreme: 1 Nearest Neighbor}
+\vspace{-15pt}
+
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=3.5in]{./resources/classifier1nn.pdf}
@@ -223,21 +597,21 @@ Y^{*} = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
 \end{frame}
 
 \begin{frame}{Comparisons}
-\begin{itemize}
-\item What would happen if $K \rightarrow N$?
-\item The k-NN model is locally constant.
-\item The k-NN approach tends to be really bumpy which can be undesirable.
-\item The OLS model is globally linear (is this always true?)
-\end{itemize}
-\end{frame}
-\begin{frame}{What about?}
-\begin{itemize}
-\item If we fixed the fact that there are discrete jumps in who is in the neighborhood by smoothly weighting observations and varying those weights instead (Kernels).
-\item Another drawback of $k-NN$ is that we consider distance in each $X$ dimension on the same scale, perhaps we could rescale the data to improve our ``closeness'' measure.
-\item Instead of fitting a constant locally, we fit a linear function locally (Lowess).
-\item Instead of using a global linear approximation in OLS use a more flexible nonlinear one.
-\item There is a bias/variance tradeoff. \alert{explain}.
-\end{itemize}
+  \begin{itemize}
+  \item What would happen if $K \rightarrow N$?
+  \item The k-NN model is locally constant.
+  \item The k-NN approach tends to be really bumpy which can be undesirable.
+  \item The OLS model is globally linear (is this always true?)
+  \end{itemize}
+  \end{frame}
+  \begin{frame}{What about?}
+  \begin{itemize}
+  \item If we fixed the fact that there are discrete jumps in who is in the neighborhood by smoothly weighting observations and varying those weights instead (Kernels).
+  \item Another drawback of $k-NN$ is that we consider distance in each $X$ dimension on the same scale, perhaps we could rescale the data to improve our ``closeness'' measure.
+  \item Instead of fitting a constant locally, we fit a linear function locally (Lowess).
+  \item Instead of using a global linear approximation in OLS use a more flexible nonlinear one.
+  \item There is a bias/variance tradeoff. \alert{explain}.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Bias Variance Decomposition}
@@ -322,278 +696,6 @@ One of the more successful and popular uses of nonparametric methods is estimati
 \end{frame}
 
 
-\begin{frame}{Density/Distribution Estimation}
-One of the more successful and popular uses of nonparametric methods is estimating the density or distribution function $f(x)$ or $F(x)$.
-\begin{itemize}
-\item Think about the histogram (definition of derivative):
-\begin{eqnarray*}
-\hat{f}_{HIST}(x_0) = \frac{1}{N} \sum_{i=1}^N \frac{\mathbf{1}(x_0 - h < x_i < x_0 + h)}{2 h}
-\end{eqnarray*}
-\item Divide the dataset into bins, count up fraction of observations in each bins
-\item Similar to k-NN except instead of windows that vary with $x_i$ we have fixed width bins
-\item Larger bin width $\rightarrow$ More Bias, Less Variance.
-\item Histogram will never be smooth! (Just like k-NN).
-\end{itemize}
-\begin{eqnarray*}
-\hat{f}_{HIST}(x_0) = \frac{1}{Nh} \sum_{i=1}^N  \frac{1}{2} \cdot \mathbf{1} \left (|\frac{x_i - x_0}{h}| < 1 \right)
-\end{eqnarray*}
-\end{frame}
-
-\begin{frame}{Smooth Kernels}
-We can take our histogram and smooth it out:
-\begin{eqnarray*}
-\hat{f}(x_0) = \frac{1}{Nh} \sum_{i=1}^N  K  \left(\frac{x_i - x_0}{h} \right)  \frac{1}{n}\sum_{i=1}^n K_h\left(
-y-y_i\right).
-\end{eqnarray*}
-We call $K(\cdot)$ a \alert{Kernel function} and $h$ the \alert{bandwidth}. We usually assume
-\begin{enumerate}[(i)]
-\item $K(z)$ is symmetric about $0$ and continuous.
-\item $\int K(z) d z = 1$,  $\int z K(z) d z = 0$,  $\int |K(z)| d z < \infty$.
-\item Either (a) $K(z) = 0$ if $|z| \geq z_0$ for some $z_0$ or \\
-(b) $|z| K(z) \rightarrow 0$ as $|z| \rightarrow \infty$.
-\item $\int z^ K(z) d z = \kappa$ where $\kappa$ is a constant.
-\end{enumerate}
-\end{frame}
-
-\begin{frame}{Kernel Smoothers}
-If $K$ is $C^k$, then so is ${\hat f}_n$, so we can plot it nicely.
-
-\pause
-
-Usually we choose a smooth, symmetric $K$:
-
-
-
-\pause
-
-
-
-
-\begin{itemize}[<+->]
-\item $K=\phi$, density of $N(0,1)$ (or some other symmetric density);
-\item $K$ with compact support: Epanechnikov (mildly) optimal
-\[
-K(x)= \frac{3}{4} \max(1-x^2,0).
-\]
-\end{itemize}
-\pause
-A common nonsmooth choice: $K(x)=(|x|<1/2)$ gives the {\em histogram}
-estimate.
-\end{frame}
-
-\begin{frame}{Kernel Comparison}
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=3.5in]{./resources/kernelfig.pdf}
-\label{classOLS}
-\end{center}
-\end{figure}
-\end{frame}
-
-
-\begin{frame}{How to Choose $h$}
-\begin{itemize}
-\item We want both bias and variance to be as small as possible, as usual. 
-\item In parametric estimation, it is not a problem: they both go to zero as sample size increases.
-\end{itemize}
- {\bf Problem with nonparametrics:}
-$$E\hat{f}_n(y)=\int K((y-t)/h)f(t)dt/h=\int K(-u)f(y+uh)du=f(y)+O(h^2)$$
-$\rightarrow$ bias can be made tiny by having a very concentrated kernel ($h\simeq 0$);
-but 
-$$V\hat{f}_n(y)=\frac{1}{nh^2}VK((y-Y)/h)=O\left(\frac{1}{nh}\right)$$
-$\rightarrow$ a small $h$ gives a high variance! \\
-Reducing $h$ reduces bias, but increases variance; how are we to
-trade off?
-\end{frame}
-
-\frame{\frametitle{The AMISE}
-\begin{itemize}
-\item  Asymptotic Mean Integrated Square Error =asymptotic approximation of a quadratic loss function
-$$E\left({\hat f}_n(y)-f(y)\right)^2 dy$$
-\item Simple approximate expression (symmetric kernels of order 2): $$(\mbox{bias})^2+\mbox{variance}= A
-h^4+B/nh$$
-\item {\bf Why?}\\
-
-Bias in $y$ is
-$$
-\int K(-u)\left(f(y+uh)-f(y)\right)du \simeq h^2 \frac{f''(y)}{2}\int K(u)u^2 du.
-$$
-{\em Intuition:} if $f$ is close to linear around $y$, then averaging
-does not hurt us: $f"(y)\simeq 0$ and the bias is small. The bias is larger  (and negative) at the mode of $f$.
-\end{itemize}
-}
-
-\frame{\frametitle{The Variance}
-
-\pause
-
-\[
-V\hat{f}_n(y)=\frac{1}{nh^2} VK((y-Y)/h)
-\]
-
-\pause
-
-The important term in 
-\[
-VK((y-Y)/h)
-\]
-is 
-\[
-h\int K(u)^2 f(y+uh)du\simeq h f(y)\int K(u)^2 du.
-\]
-
-\pause
-
-And we end up with 
-\[
-V\hat{f}_n(y) \simeq \frac{f(y)}{nh} \int K(u)^2du.
-\]
-
-\pause
-
-{\em Intuition:} we are really taking an average over $nhf(y)$
-points. In low-density region, this induces a high \emph{relative\/}
-imprecision:
-\[
-\frac{\sigma(\hat{f}_n(y))}{f(y)}=\frac{1}{nhf(y)} \int K(u)^2du.
-\]
- }
-
-\frame{\frametitle{Optimal bandwidth}
-\begin{itemize}
-\item The AMISE is $$Ah^4+B/nh$$
- with $A=\int \left(f''(y)\right)^2 \left(\int u^2K\right)^2 /4$ and $B=f(y)\int K^2$
-\item  AMISE is
-smallest in $h^*_n=\left(\frac{B}{4An}\right)^{1/5}$. Then,
-\begin{itemize}[<+->]
-\item bias and standard error are \emph{both} in $n^{-2/5}$
-\item and the AMISE is $n^{-4/5}$---{\bf not} $1/n$ as it is in parametric models.
-\end{itemize}
-\item But: $A$ and $B$ both depend on $K$ (known) and $f(y)$ (unknown), and
-especially ``wiggliness''
-$\int (f'')^2$ (unknown, not easily estimated). Where do we go from here? 
-\end{itemize}
-}
-
-
-\frame{\frametitle{Silverman's Rule of Thumb}
-\begin{itemize}
-\item If $f$ is normal with variance $\sigma^2$ (may not be a very appropriate benchmark!), the optimal bandwidth
-is
-$$h^*_n=1.06 \sigma n^{-1/5}$$
-\item Just do it with $\sigma=s$ empirical dispersion of the $y_i$'s , or
-something more robust/slightly less smooth:
-$$h^*_n=0.9*\min(s,IQ/1.34)*n^{-1/5}, \; \mbox{IQ=interquartile
- distance}$$
-\item Investigate changing it by a reasonable multiple.
-\end{itemize}
-}
-
-\frame{\frametitle{Cross-validation}
-\begin{itemize}
-\item General concept in the whole of nonparametrics: choose $h$ to minimize
-a criterion $CV(h)$ that approximates
-$$ AMISE(h)=\int E(\hat{f}_n(x)-f(x))^2dx.$$
-\item Usually programmed in metrics software. \emph{If you can do it, do it on a subsample, and rescale.}
-\item Two problems:
-
-\begin{itemize}[<+->]
-\item it is costly; often it involves computing ``leave-one-out''
-  estimators
-\[
-\hat{f}_{(-i)}(x_i)=\frac{1}{nh}\sum_{j\neq i}
-K\left(\frac{x_i-x_j}{h}\right),
-\]
-for {\em every\/} observation $i$.
-\item the resulting $h$ converges super-slowly ($n^{-1/10}$!) to the
-  optimal one. 
-\end{itemize}
-\end{itemize}
-}
-
-\begin{frame}{Alternatives to Cross-Validation}
-\begin{itemize}
-\item LOOCV
-\item k-fold CV
-\item Sample Splitting
-\begin{itemize}
-\item Training Set
-\item Test Set
-\item Validation Set
-\end{itemize}
-\end{itemize}
-\end{frame}
-
-
-
-\frame{\frametitle{Local Bandwidths}
-
-\pause
-
-If you only care about $f(y)$ at some given point, then 
-\[
-A=f''(y)^2 \left(\int u^2K\right)^2/4 \mbox{ and } B=f(y)\int K^2.
-\]
-
-\pause
-
-So in a low-density region, worry about variance and take $h$ larger.
-In a curvy region, worry about bias and take $h$ small.
- 
-}
-
-\frame{\frametitle{Higher-Order Kernels}
-\begin{itemize}
-\item $K$ of order $r$ iff $\int x^j K(x) dx=0$ for $j<r$ and $\int x^r
-K(x)dx \neq 0$. Try $r>2$?
-\item The beauty of it: bias in $h^r$ if $f$ is at least $C^r$\ldots so AMISE can be
-reduced to $n^{-r/(2r+1)}$, almost $\sqrt{n}$-consistent if $r$ is
-large. 
-\item But gives wiggly (and sometimes negative) estimates
-$\rightarrow$ leave them to theorists. 
-\end{itemize}
-}
-
-\frame{\frametitle{Back to the CDF}
-
-\pause
-
-Since now we have estimated the density with
-
-\[
-{\hat f}_n(y)= \frac{1}{nh}\sum_{i=1}^n K\left(
-\frac{y-y_i}{h}\right),
-\]
-
-\pause
-
-a natural idea is to integrate; let $\mathcal{K}(y)=\int_{-\infty}^y K(t)dt$, try
-
-\pause
-
-\[
-{\hat F}_n(y)= \frac{1}{n}\sum_{i=1}^n \mathcal{K}\left(
-\frac{y-y_i}{h}\right)
-\]
-
-as a reasonable estimator of the cdf in $y$.
-
-\pause
-
-Very reasonable indeed:
-
-\begin{itemize}
-  \item when $n \longrightarrow \infty$ and $h$ goes to zero (at rate
-    $n^{-1/3}$\ldots) 
-
-
-it is consistent at rate $\sqrt{n}$
-\item it is nicely smooth
-\item by construction it accords well with the density estimator
-\item \ldots\ it is a much better choice than the empirical cdf.
-\end{itemize}
-
-}
 
 
 \frame{\frametitle{What if $y$ is of dimension $p_y>1$?}
