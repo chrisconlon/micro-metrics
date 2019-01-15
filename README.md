@@ -24,10 +24,16 @@ The goal is to provide an overview of a number of topics in Microeconometrics in
 	- Potential Outcomes, LATE, Diff in Diff, RDD, MTE
 4. Binary Discrete Choice (including endogeneity)
 	- MLE, Special Regressors, Control Functions
-5. Multinomial Discrete Choice
+5. Computational 
+	- Root finding, Optimization
+	- Differentiation, Integration
+6. Multinomial Discrete Choice
 	- Logit, Nested Logit, Mixed Logit
-6. Dynamic Discrete Choice
+7. Dynamic Discrete Choice
 	- Rust Models (NFXP), Hotz+Miller (CCP)
-7. Duration Models
-8. Bayesian Methods
+8. Partial Identificaton
+
+Repo material likely not covered: 
+- Duration Models
+- Bayesian Methods
 	- Empirical Bayes, MCMC, James-Stein
