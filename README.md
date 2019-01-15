@@ -16,7 +16,7 @@ It is based on some combination of
 The goal is to provide an overview of a number of topics in Microeconometrics including:
 
 1. Nonparametrics and Identification
-	- k-NN, Kernels, Nadaraya-Watson
+	- Density estimatation, k-NN, Kernels, Nadaraya-Watson
 	- Bootstrap and Cross Validation
 2. Model Selection and Penalized Regression
 	- Ridge, Lasso, LAR, BIC, AIC

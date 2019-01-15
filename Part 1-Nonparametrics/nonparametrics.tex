@@ -1,9 +1,12 @@
 \input{../slideHeader}
 
-\title [Nonparametrics]{Nonparametrics and Local Methods}
+\setlength{\parskip}{5pt} 
+
+\title [Non-parametrics]{Nonparametrics and Local Methods}
 \author{Richard L. Sweeney}
-\institute{Empirical Methods}
-%\date{Jan 2016}
+\institute{based on slides by Chris Conlon}
+\date{Empirical Methods \\ Spring 2019}
+
 \setbeamerfont{equation}{size=\tiny}
 
 \begin{document}
@@ -16,6 +19,7 @@
   \tableofcontents  
 \end{frame}
 
+\begin{comment}
 \frame{{ Outline}
 Outline
 
@@ -32,10 +36,7 @@ Outline
   - semi parametric 
     - robinson 
 }
-
-\frame{{Acknowledgements/ References}
-%tk could put this at the end
-}
+\end{comment}
 
 \section[Density Estimation]{Nonparametric Density Estimation}
 
@@ -43,7 +44,7 @@ Outline
 
 Why nonparametrics?
 \begin{itemize}
-  \item Sometimes just interested in the distribution % auctions?
+  \item sometimes just interested in the distribution % auctions?
   \item sometimes this is the first stage and we want to integrate
   \item sometimes want to do something semiparametric 
 \end{itemize}
@@ -90,29 +91,15 @@ In this section, we are interested in estimating the \textbf{density} $f(x)$ und
   (b) $|z| K(z) \rightarrow 0$ as $|z| \rightarrow \infty$.
   \item $\int z^ K(z) d z = \kappa$ where $\kappa$ is a constant.
   \end{enumerate}
-\end{frame}
-  
-\begin{frame}{Kernel Smoothers}
-  If $K$ is $C^k$, then so is ${\hat f}_n$, so we can plot it nicely.
-  
-  \pause
-  
-  Usually we choose a smooth, symmetric $K$:
-   
-  \pause
-  
-  \begin{itemize}[<+->]
-  \item $K=\phi$, density of $N(0,1)$ (or some other symmetric density);
-  \item $K$ with compact support: Epanechnikov (mildly) optimal
-  \[
-  K(x)= \frac{3}{4} \max(1-x^2,0).
-  \]
-  \end{itemize}
-  \pause
-  A common nonsmooth choice: $K(x)=(|x|<1/2)$ gives the {\em histogram}
-  estimate.
-\end{frame}
 
+  \pause
+  
+  \bigskip
+
+  Usually we choose a smooth, symmetric $K$. But a common nonsmooth choice: $K(x)=(|x|<1/2)$ gives the {\em histogram} estimate.
+
+\end{frame}
+ 
 \begin{frame}{Some Common Kernels}
   \begin{figure}[htbp]
   \begin{center}
@@ -145,7 +132,7 @@ In this section, we are interested in estimating the \textbf{density} $f(x)$ und
     V \left[\hat{f}(x_0) \right] = \frac{1}{Nh} f(x_0) \int K(z)^2dz \left\{ + o(\frac{1}{Nh}) \right\}
   \]
 
-  So, unsurprisingly, the bias is decreasing in $h$, and the variance is \textit{increasing} in $h$
+  So, unsurprisingly, the bias is \textit{increasing} in $h$, and the variance is \textit{decreasing} in $h$.
 \end{frame}
  
 \begin{frame}{How to Choose $h$}
@@ -160,7 +147,7 @@ In this section, we are interested in estimating the \textbf{density} $f(x)$ und
 % THIS SECTION FROM GUIDO'S NOTES 
 \begin{frame}{Mean Integrated Square Error}
   \begin{itemize}
-    \item Start with the local performance at $x_0$
+    \item Start with the \textit{local} performance at $x_0$
     $$ MSE \left[ \hat{f}(x_0) \right] = E \left[ \left( \hat{f}(x_0) - f(x_0) \right)^2 \right] $$
     \item Calculate the \textit{integrated} (as opposed to expected) squared error 
     \begin{align*}
@@ -206,6 +193,28 @@ In this section, we are interested in estimating the \textbf{density} $f(x)$ und
 \end{frame}
 
 \section{Cross-Validation}
+
+\begin{frame}{Why not search for optimal $h$ in our data?}
+  \begin{itemize}
+  \item Know we want to minimize MISE. 
+  \item One option is to find the $h$ that minimizes it \textit{in sample}
+  \begin{itemize}
+    \item Loop through increments of $h$
+    \item Calculate MISE
+  \end{itemize}
+  \item Example: Old Faithful R data
+  \begin{itemize}
+    \item Waiting time between eruptions and the duration of the eruption for the Old Faithful geyser in Yellowstone National Park, Wyoming, USA.
+    \item See R code in this folder.
+  \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Example: Old Faithful}
+  \begin{center}
+  \includegraphics[width=\textwidth]{./resources/faithfulDensity}
+  \end{center}
+\end{frame}
 
 %TK ADD CROSS VALIDATION SLIDE FROM THIS 
 % https://www.r-bloggers.com/cross-validation-for-kernel-density-estimation/
@@ -1014,6 +1023,7 @@ estimate (so that bias is negligible.)
 
 
 
+\section{Semi-parametrics}
 
 \frame{\frametitle{Seminonparametric (=Flexible) Regression}
 
@@ -1085,6 +1095,10 @@ $p_x>1$.
 \end{itemize}
 \end{itemize}
 
+\section*{References}
+\frame{{Acknowledgements/ References}
+%tk could put this at the end
+}
 \end{frame}
 
 %\begin{frame}
