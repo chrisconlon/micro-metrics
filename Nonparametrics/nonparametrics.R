@@ -1,9 +1,15 @@
 # KDENSITY EXAMPLE
+library(MASS)
 library(ggplot2)
+
+# par(mar=c(1,1,1,1))
+
+?faithful
 
 #LOAD OLD FAITHFUL DF
 hist(faithful$waiting)
 
+eruptions <- faithful$eruptions
 h.cv <- ucv(eruptions)
 h.plugin <-width.SJ(eruptions)
 
@@ -22,10 +28,10 @@ J<- function(h){
 vx=seq(.05,.2,by=.01)
 vy=Vectorize(J)(vx)
 df=data.frame(vx,vy)
-library(ggplot2)
+
 qplot(vx,vy,geom="line",data=df)
 
-optimize(J,interval=c(.1,1))
+topt<- optimize(J,interval=c(.1,1))
 
 h.plugin
 bw=topt$minimum

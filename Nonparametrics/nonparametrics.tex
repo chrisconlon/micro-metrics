@@ -104,7 +104,7 @@ In this section, we are interested in estimating the \textbf{density} $f(x)$ und
   \begin{figure}[htbp]
   \begin{center}
   \includegraphics[width=\textwidth]{./resources/CTKernels}
-  \label{kernels}
+  \label{fig:kernels}
   \end{center}
   \end{figure}
 \end{frame}
@@ -175,7 +175,17 @@ In this section, we are interested in estimating the \textbf{density} $f(x)$ und
   especially ``wiggliness''
   $\int (f'')^2$ (unknown, not easily estimated). Where do we go from here? 
   \end{itemize}
+\end{frame}
+
+\begin{frame}{Optimal bandwidth}
+  Can be shown that the optimal bandwidth is 
   
+  $$h* = \delta \left( \int f''(x_0)^2dx_0\right)^{-0.2}N^{-0.2} $$
+
+  where $\delta$ depends on the kernel used (Silverman 1986) [these $\delta$'s are given in the \href{fig:kernels}{kernel table}]
+
+  Note the "optimal" kernel is Epanechnikov, although the difference is small. 
+
 \end{frame}
 
 \begin{frame}{Silverman's Rule of Thumb}
@@ -183,7 +193,7 @@ In this section, we are interested in estimating the \textbf{density} $f(x)$ und
   \item If $f$ is normal with variance $\sigma^2$ (may not be a very appropriate benchmark!), the optimal bandwidth
   is
   $$h^*_n=1.06 \sigma n^{-1/5}$$
-  \item Just do it with $\sigma=s$ empirical dispersion of the $x_i$'s , or something more robust/slightly less smooth:
+  \item In practice, typically use \textbf{Silverman's plug-in estimate}:
   $$h^*_n=0.9*\min(s,IQ/1.34)*n^{-1/5}$$ 
   where IQ=interquartile distance
   \item Investigate changing it by a reasonable multiple.
@@ -209,16 +219,6 @@ In this section, we are interested in estimating the \textbf{density} $f(x)$ und
   \end{itemize}
   \end{itemize}
 \end{frame}
-
-\begin{frame}{Example: Old Faithful}
-  \begin{center}
-  \includegraphics[width=\textwidth]{./resources/faithfulDensity}
-  \end{center}
-\end{frame}
-
-%TK ADD CROSS VALIDATION SLIDE FROM THIS 
-% https://www.r-bloggers.com/cross-validation-for-kernel-density-estimation/
-
 
 \begin{frame}{Cross-validation}
   \begin{itemize}
@@ -260,7 +260,6 @@ In this section, we are interested in estimating the \textbf{density} $f(x)$ und
   \includegraphics[width=\textwidth]{./resources/validation-10fold}
   \end{center}
 \end{frame}
-  
   
 \begin{frame}{$k$-fold Cross Validation}
   \begin{itemize}
@@ -355,41 +354,26 @@ $\rightarrow$ leave them to theorists.
 
 \frame{\frametitle{Back to the CDF}
 
-\pause
-
 Since now we have estimated the density with
-
-\[
-{\hat f}_n(y)= \frac{1}{nh}\sum_{i=1}^n K\left(
-\frac{y-y_i}{h}\right),
-\]
-
+$${\hat f}_n(x)= \frac{1}{nh}\sum_{i=1}^n K\left(
+\frac{x-x_i}{h}\right),$$
 \pause
+a natural idea is to integrate; let $\mathcal{K}(x)=\int_{-\infty}^x K(t)dt$, try
 
-a natural idea is to integrate; let $\mathcal{K}(y)=\int_{-\infty}^y K(t)dt$, try
-
-\pause
-
-\[
-{\hat F}_n(y)= \frac{1}{n}\sum_{i=1}^n \mathcal{K}\left(
-\frac{y-y_i}{h}\right)
-\]
-
+$$ {\hat F}_n(y)= \frac{1}{n}\sum_{i=1}^n \mathcal{K}\left(
+\frac{y-y_i}{h}\right) $$
 as a reasonable estimator of the cdf in $y$.
 
 \pause
 
 Very reasonable indeed:
-
 \begin{itemize}
   \item when $n \longrightarrow \infty$ and $h$ goes to zero (at rate
     $n^{-1/3}$\ldots) 
-
-
-it is consistent at rate $\sqrt{n}$
-\item it is nicely smooth
-\item by construction it accords well with the density estimator
-\item \ldots\ it is a much better choice than the empirical cdf.
+      it is consistent at rate $\sqrt{n}$
+  \item it is nicely smooth
+  \item by construction it accords well with the density estimator
+  \item \ldots\ it is a much better choice than the empirical cdf.
 \end{itemize}
 
 }
