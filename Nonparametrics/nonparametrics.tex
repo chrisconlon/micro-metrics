@@ -388,7 +388,8 @@ Very reasonable indeed:
     \item Auctions are an example of a game with assymetric information: participants know the primitives of the game, but do not know their rivals exact valuations. 
     \item By imposing rationality/ profit maximization, we can recover the distribution of values. 
     \item Can then run counterfatuals
-  \end{itemize}
+    \item Example: Asker (AER 2008) - stamp cartel 
+\end{itemize}
 
 For more detail, check out Chris Conlon's slides in this folder, or John Asker's PhD \href{http://www.johnasker.com}{lecture notes}.
 
@@ -397,6 +398,21 @@ For more detail, check out Chris Conlon's slides in this folder, or John Asker's
 
 \begin{frame}{Setup}
 Let's consider the first price sealed bid (FPSB) auction
+
+\begin{itemize}
+  \item bidders have \textbf{private information} (or type) scalar rv $X_i$ with realization $x_i$
+  \item signals are informative: $dE[U|x]/dx >0$ 
+  \item given their signal, they make a bid $b_i$
+  \item if its the highest bid, recieve utility $[U| x_i,x_{-i}] - b_i$ 
+  \item else get $0$
+  \item note that if we assume values are \textbf{independent}, we get $E[U| x_i,x_{-i}]=E[U | x_i]$
+\end{itemize}
+
+This introduces a tradeoff in first price auctions: Increasing the bid increases the probability of winning; but reduces your net utility from the object.
+
+\end{frame}
+
+\begin{frame}{How to bid?}
 
 Denote the equilibrium bid as $B_i$, with realizations $b_i$
 
@@ -408,6 +424,9 @@ Perfect Bayes Nash equilibrium:
 \begin{multline*} 
   max_{\tilde b}  \left( E \left[ U_i | X_i = x_i \right] - b , max_{j \in N_{-i}} B_j \leq \tilde b \right) \\ Pr \left( max_{j \in N_{-i}} B_j \leq \tilde b | X_i = x_i \right) 
 \end{multline*}
+
+See Athey and Haile or Krishna for an accessible derivation. 
+
 \end{frame}  
 
 \begin{frame}{Can find bid as a function of primitives}
@@ -436,11 +455,12 @@ Perfect Bayes Nash equilibrium:
     \end{align*}  
     \item Value equation becomes 
     $$ u = b + \frac{G_B \left(b | n \right)}{ (n-1) g_B \left(b | n \right)} $$
-    where $G$ and $g$ are the marginal distribution of bids and the densities in $n$ bidder auctions
-
-    \item can estimate $G$ and $g$ using kernels 
+    where $G_B$ and $g_B$ are now the marginal distribution of equilibrium bids and the densities in $n$ bidder auctions
 
     \framebreak
+    
+    \item can estimate $G$ and $g$ using kernels 
+
 
     \item now have 
     $$ \hat u = b + \frac{\hat G_B \left(b | n \right)}{ (n-1) \hat g_B \left(b | n \right)} $$
@@ -476,24 +496,26 @@ Perfect Bayes Nash equilibrium:
     \item Each bin could have small $n$. [Likely if $X$ has many dimensions]
     \item $X$ could be continuous  
   \end{itemize}
-  \item One option is to pick a parametric function form $y=f(x)$. But often hard to think about how sensible these assumptions are (and what they impose on the economics of the problem)
+  \item One option is to pick a parametric functional form $y=f(x)$. But often hard to think about how sensible these assumptions are (and what they impose on the economics of the problem)
   \item An alternative is to extend the concepts of nonparametric density estimation
   \end{itemize}
 \end{frame}
 
 \begin{frame}{A Fake Data Example}
-THF 2.3 includes an example classification problem. 
+HTF 2.3 includes an example classification problem. 
 
-An (unknown) model maps a pair of inputs $X_1$ and $X_2$ into classifications of either BLUE or ORANGE. 
+An (unknown) model maps a pair of inputs $X_1$ and $X_2$ into classes of either BLUE or ORANGE. 
 
+Training data: 
+Imagine we have 100 points from each class. 
 
-
-Imagine we have 100 points from each class. OLS solution 
+OLS solution 
 \begin{eqnarray*}
 Y=&ORANGE \mbox{ if } Y* = x^T\hat \beta &> 0.5 \\
 Y=&BLUE  \mbox{ if }   Y* =  x^T\hat \beta &\leq 0.5
 \end{eqnarray*}
 \end{frame}
+
 
 \begin{frame}{Linear Probability Model}
   \vspace{-15pt}
