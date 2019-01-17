@@ -467,6 +467,8 @@ Perfect Bayes Nash equilibrium:
 
 \section{Non-parametric Regression}
 
+% PROBABLY NOT GOING TO USE THE IDENTIFICATION STUFF 
+\begin{comment}
 \begin{frame}{Something Familiar}
   Let's start with something we all know, how to calculate:
   \begin{eqnarray*}
@@ -544,7 +546,6 @@ y_i = \mathbf{1}[F(X_i) - \varepsilon_i > 0]
 \end{itemize}
 \end{frame}
 
-
 \begin{frame}{The Binary Case}
 What is the least I can assume in the binary case and still learn something?
 \begin{eqnarray*}
@@ -597,8 +598,23 @@ P(x) = \int \mathbf{1}(F(x) - \varepsilon > 0) dH(\varepsilon | x) = H(F(x)| x)
   \item Can we extend the general intuition to more cases?
   \end{itemize}
 \end{frame}
+\end{comment}
 
-  
+\begin{frame}{Nonparametric Regression}
+  \begin{itemize}
+  \item Often we're interested in $E\left[Y_i | X_i = x \right]$ 
+  \item If $X$ is discrete, can just average for each value
+  \item But often times we want to smooth across values of $X$
+  \begin{itemize}
+    \item Each bin could have small $n$. [Likely if $X$ has many dimensions]
+    \item $X$ could be continuous  
+  \end{itemize}
+  \item One option is to pick a parametric function form $y=f(x)$. But often hard to think about how sensible these assumptions are (and what the impose on the problem)
+%  \item Another option is to extend density discussion we just had to two dimensions using local weighted averages 
+%  $$ \hat m(x_0) = \sum_{i=1}^{N} w_{i0,h}y_i$$
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{A Fake Data Example}
 Following the THF textbook example, we can generate some fake data and let: 
 \begin{eqnarray*}
@@ -629,15 +645,13 @@ Y=&BLUE  \mbox{ if }   Y* &\leq 0.5
 \item Lots of potential alternatives to our decision rule.
 \item A simple idea is to hold a majority vote of neighboring points 
 \begin{eqnarray*}
-Y^{*} = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
+Y^{*} = \frac{1}{k} \sum_{x_{-i} \in N_k(x)} y_i
 \end{eqnarray*}
-\item To avoid including ``yourself'' in your neighborhood, we often estimate on one sample and validate on another
 \item How many parameters does this model have: None? One? $k$? 
 \item Technically it has something like $N/k$.
 \item As $N \rightarrow \infty$ this means we have an infinite number of parameters! (This is a defining characteristic of non-parametrics).
 \end{itemize}
 \end{frame}
-
 
 \begin{frame}{15 Nearest Neighbor}
   \vspace{-15pt}
@@ -660,6 +674,7 @@ Y^{*} = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
 \end{figure}
 \end{frame}
 
+\begin{comment}
 \begin{frame}{Comparisons}
   \begin{itemize}
   \item What would happen if $K \rightarrow N$?
@@ -677,6 +692,7 @@ Y^{*} = \frac{1}{k} \sum_{x_i \in N_k(x)} y_i
   \item There is a bias/variance tradeoff. \alert{explain}.
   \end{itemize}
 \end{frame}
+\end{comment}
 
 \begin{frame}{Bias Variance Decomposition}
 We can decompose any estimator into two components
@@ -687,6 +703,7 @@ We can decompose any estimator into two components
 \item In general we face a tradeoff between bias and variance.
 \item In k-NN as $k$ gets large we reduce the variance (each point has less influence) but we increase the bias since we start incorporating far away and potentially irrelevant information.
 \item In OLS we minimize the variance among unbiased estimators assuming that the true $f$ is linear.
+\item A natural alternative is to use kernels or local smoothers
 \end{itemize}
 \end{frame}
 
@@ -703,270 +720,48 @@ f(x_i) = E[Y_i | X_i]
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Common weights}
+  Another option is to extend density discussion we just had to two dimensions using local weighted averages 
+   $$ \hat m(x_0) = \sum_{i=1}^{N} w_{i0,h}y_i$$
 
-\begin{frame}{Big Data}
-\begin{itemize}
-\item It used to be that if you had $N=50$ observations then you had a lot of data.
-\item Those were the days of finite-sample adjusted t-statistics.
-\item Now we frequently have 1 million observations or more, why can't we use k-NN type methods everywhere?
-\end{itemize}
+  Rearranging, can see that OLS uses the following weights
+
+  $$ \hat m_{OLS}(x_0) = \sum_{i=1}^{N} \lbrace \frac{1}{N} \frac{ (x_0 - \bar{x}) (x_i - \bar{x})}{\sum_j (x_j - \bar{x})^2} \rbrace y_i $$
+
+  CT note that these weights can actually \textit{increase} with the distance between $x_0$ and $x_i$! 
+  (for example if $x_i > x_0 > \bar{x}$ )
+  
 \end{frame}
 
-\begin{frame}{Curse of Dimensionality}
-Take a unit hypercube in dimension $p$ and we put another hypercube within it that captures a fraction of the observations $r$ within the cube
-\begin{itemize}
-\item Since it corresponds to a fraction of the unit volume, $r$ each edge  will be $e_p(r) = r^{1/p}$.
-\item $e_{10}(0.01) = 0.63$ and $e_{10}(0.1) = 0.80$, so we need almost 80\% of the data to cover 10\% of the sample!
-\item If we choose a smaller $r$ (include less in our average) we increase variance quite a bit without really reducing the required interval length substantially.
-\end{itemize}
+\begin{frame}{k-NN is simply a running average}
+  $$ \hat m_k(x_0) = \frac{1}{k}(y_{i-(k-1)/2} + ... + y_{i+(k-1)/2}$$
+
+  Of course, we could also average all the observations within some bandwidth $h$
+  
+  $$ \hat m(x_0) = \frac{\sum_{i=1}^{Nh} K \left( \frac{x_i - x_0}{h} \right) y_i}{\sum_{i=1}^{Nh} K \left( \frac{x_i - x_0}{h} \right)} $$
+  
+  where $K(\cdot)$ is a kernel weighting function as above. 
+
 \end{frame}
 
-\begin{frame}{Curse of Dimensionality}
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=3.5in]{./resources/figure26.pdf}
-\label{class15nn}
-\end{center}
-\end{figure}
+\begin{frame}{Link to density estimation}
+  CT  
+  
 \end{frame}
 
-\begin{frame}{Curse of Dimensionality}
-Don't worry, it only gets worse:
-\begin{eqnarray*}
-d(p,N) = \left(1-\left(\frac{1}{2} \right)^{1/N} \right)^{1/p}
-\end{eqnarray*}
+\begin{frame}{Nonparametric Regression}
 
-\begin{itemize}
-\item $d(p,N)$ is the distance from the origin to the closest point.
-\item $N=500$ and $p=10$ means $d = 0.52$ or that the closest point is closer to the boundary than the origin!
-\item Why is this a problem?
-\item In some dimension nearly every point is the closest point to the boundary -- when we average over nearest neighbors we are \alert{extrapolating} not \alert{interpolating}.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Density/Distribution Estimation}
-One of the more successful and popular uses of nonparametric methods is estimating the density or distribution function $f(x)$ or $F(x)$.
-\begin{itemize}
-\item Estimating the CDF is easy and something you have already done
-\item Q-Q plots, etc.
-\end{itemize}
-\begin{eqnarray*}
-\hat{F}_{ECDF}(x_0) = \frac{1}{N} \sum_{i=1}^N (x_i \leq x_0 )
-\end{eqnarray*}
-\begin{itemize}
-\item Differentiating to get density is unhelpful : $F_{ECDF}'(x) = 0$ in most places.
-\end{itemize}
-\end{frame}
-
-
-
-
-\frame{\frametitle{What if $y$ is of dimension $p_y>1$?}
-
-\pause
-
-``Easy'': use $p_y$-dimensional $K$ (often a $p_y$-product of 1-dim
-kernels) and bandwidth $h$, and do
-
-\pause
-
-
+Nadaraya-Watson, inspired from kernel idea:
 \[
-{\hat f}_n(y)= \frac{1}{nh^p_y}\sum_{i=1}^n K\left(
-\frac{y-y_i}{h}\right).
-\]
-
-\begin{itemize}
-\item {\bf 1st minor pitfall:} the various dimensions may have very
-different variances, so use  $(h_1,\ldots,h_{p_y})$.
-\item {\bf 2nd minor pitfall:} they may be strongly correlated; then
-sphericize first.
-\item {\bf Major problem:} next slide\ldots
-\end{itemize}
- }
-
- \frame{\frametitle{The Curse of Dimensionality}
-
-\pause
-
-\begin{itemize}
-\item Computational cost increases exponentially.
-\item {\em Much worse:} to achieve precision $\epsilon$ in dimension $p_y$, the number of
-  observations you need increases as
-\[
-n \simeq \epsilon^{-(2+p_y/2)}.
-\]
-\item The {\em empty space\/} phenomenon: 
-if $(y_1,\ldots,y_{p_y})$ all are iid uniform on $[-1,1]$, then only
-$n/(10^{p_y})$ observations on average have all components in
-$[-0.1,0.1]$. Bias still in $h^2$, but variance in $1/nh^{p_y}$ now.
-\end{itemize}
-}
-
-\frame{\frametitle{Silverman's Table}
-
-\pause
-
- Silverman (1986 book) 
-provides a table illustrating the difficulty of kernel estimation
-in high dimensions. To estimate the density at 0 of a $N(0,1)$ with
-a given accuracy, he reports:
-
-\pause
-
-\begin{table}
-\begin{center}
-\vspace{1ex}
-\begin{tabular}{|c|c|}\hline
-Dimensionality Required & Sample Size    \\
-\hline
-1               &  4    \\
-2               &  19    \\
-5           & 786 \\
-7          & 10,700 \\
-10           & 842,000 \\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
-
-\pause
-
-{\bf Not to be taken lightly\ldots} in any case convergence  with
-the optimal bandwidth  is in $n^{-2/(4+p_y)}$ now---and Silverman's
-rule of thumb for choosing $h^*_n$ must be adapted too. }
-
-\frame{\frametitle{Usually we care about conditional densities}
-
-\pause
-
-That is: we have covariates $x$, we want the density $f(y|x)$. Again, ``easy'':
-
-\pause
-
-\begin{enumerate}
-\item get a kernel estimator of the joint density $f(y,x)$;
-\item and one of of the marginal density $f(x)$;
-\item then define
-\[
-\hat{f}_n(y|x)=\frac{\hat{f}_n(y,x)}{\hat{f}_n(x)}=\frac{\frac{1}{n
-h_y^{p_y}h_x^{p_x}}\sum_{i=1}^n
-K\left(\frac{y-y_i}{h_y}\right)K\left(\frac{x-x_i}{h_x}\right)}{\frac{1}{h_y^{p_y}}
-\sum_{i=1}^n K\left(\frac{x-x_i}{h_x}\right)}.
-\]
-\end{enumerate}
-
-\pause
-
-But the joint density is $(p_x+p_y)$ dimensional\ldots\ and the curse
-strikes big time.
-
-}
-
-
-
-
-\frame{\frametitle{What if my distribution is discrete-continuous?}
-Very often in microeconometrics some covariates only take discrete
-values (e.g. gender, race, income bracket\ldots). Say the only discrete variable is gender, we care about the density of income of men. 
-\begin{itemize}
-\item The kernel approach adapts directly: we separately
-estimate a density for men (on the corresponding subsample).
-\item {\em Better:}  mix the two subsamples! Add women, but  {\bf with a small weight $w$}.
-\item Intuition: by doing so we increase the bias (the density for women is
-probably different than for men) $\rightarrow$  bad, in $w^2$ but we reduce the variance, by $O(w)$; and this dominates for small $w$. (cf Li-Racine).
-\end{itemize}
-}
-
- \frame{\frametitle{The
-Seminonparametric Approach}
-\begin{itemize}
-\item If we are ``pretty sure'' that $f$ is almost $f_{m,\sigma}$ for some
-family of densities indexed by  $(m,\sigma)$, then we can choose a family of positive functions of increasing complexity  $P^1_\theta,P^2_\theta,\ldots$
-\item Choose some $M$ that goes to infinity as $n$ does (more slowly), and
-maximize over $(m,\sigma,\theta)$ the loglikelihood
-
-\[
-\sum_{i=1}^n \log f_{m,\sigma}(y_i)P^M_\theta(y_i).
-\]
-It works\ldots but it is hard to constrain it to be a density for
-large $M$. \end{itemize}}
-
-
-
-\frame{\frametitle{Mixtures of Normals}
-
-\pause
-
-A special case of seminonparametrics, and
-usually a very good approach: Let $y|x$ be drawn from
-
-\pause
-
-\begin{description}
-\item[] $N(m_1(x,\theta),\sigma^2_1(x,\theta))$ with probability
-$q_1(x,\theta)$;
-\item[] \ldots
-\item[] $N(m_K(x,\theta),\sigma^2_K(x,\theta))$ with probability
-$q_K(x,\theta).$
-\end{description}
-where you choose some parameterizations, and the $q_k$'s are positive
-and sum to 1.
-
-\pause
-
-Can be estimated by maximum-likelihood:
-
-
-\[
-\max_{\theta} \sum_{i=1}^n  \log\left(
-\sum_{k=1}^K
-\frac{q_k(x_i,\theta)}{\sigma_k(x,\theta)}
-\phi\left(\frac{y_i-m_k(x_i,\theta)}{\sigma_k(x_i,\theta)}\right)\right).
-\]
-
-
-\pause
-
-Usually works very well with $K\leq 3$ (perhaps after transforming
-$y$ to $\log y$, e.g).
-
-
-}
-
-
-\frame{\frametitle{Nonparametric Regression}
-
-\pause
-
-Data $(y_i,x_i)_{i=1}^n$ now, we are after $E(g(y,x)|x)=m(x)$ for
-some function $g$.
-\begin{itemize}
-\item Best-fit approach, quite unbiased:
-\begin{itemize}[<+->]
-\item
-if $x=x_i$ then ${\hat m}_n(x)=g(y_i,x_i)$; otherwise \ldots whatever.
-\end{itemize}
- But: very jagged estimate; variance independent of $n$, so not
-consistent.
-\item Better and most usual: Nadaraya-Watson, inspired from kernel idea:
-\[
-{\hat m}_n(x)=\frac{\sum_{i=1}^n g(y_i,x_i)
+{\hat m}_n(x)=\frac{\sum_{i=1}^n y_i
 K\left(\frac{x-x_i}{h}\right)}{\sum_{i=1}^n
 K\left(\frac{x-x_i}{h}\right)}.
 \]
 again, bias in $h^2$ and variance in $1/nh$ if $p_x=1$.
 
-\pause
+\end{frame}
 
-{\em Pitfall 1:} very unreliable where  $f(x)$ is small.
-
-\pause
-
-{\em Pitfall 2:} the formal for the optimal bandwidth $h$  is very ugly.
-\end{itemize}
-}
+% COULD PLUG IN GUIDOS DESCRIPTION HERE 
 
 \frame{\frametitle{Choosing $h$}
 \begin{itemize}
@@ -981,12 +776,199 @@ where $k_i(h)=K_h(0)/\sum_{j=1}^n K_h(x_i-x_j).$
 \end{itemize}
 }
 
-\frame{\frametitle{Local Linear Regression}
-\begin{itemize}
-\item The Nadaraya-Watson  estimator in $x$ can be obtained very simply by regressing $g(y_i,x_i)$ on 1, weighting each
-observation by $K((x-x_i)/h)$.
-\item We could also regress on 1 and  $(x-x_i)$ (going to  higher terms
-has problems) instead;\\
+\subsection{Multivariate Kernels}
+\begin{frame}
+  typically we are interested in more than one regressors 
+  $$ y_i = m(x_{1i},...,x_{ki}) $$
+
+  the NW kernel estimator extends naturally to $k$ dimensions
+
+  \[
+{\hat m}_n(\mathbf{x_0})=\frac{\sum_{i=1}^n y_i
+K\left(\frac{x-x_i}{h}\right)}{\sum_{i=1}^n
+K\left(\frac{x-x_i}{h}\right)}.
+\]
+ where we just use a mutivariate kernel. 
+
+ if you put everything in the same scale by dividing by the standard deviation, you can even use a common bandwidth. 
+
+\end{frame}
+
+\begin{frame}{Big Data}
+  \begin{itemize}
+  \item It used to be that if you had $N=50$ observations then you had a lot of data.
+  \item Those were the days of finite-sample adjusted t-statistics.
+  \item Now we frequently have 1 million observations or more, why can't we use k-NN type methods everywhere?
+  \end{itemize}
+\end{frame}
+  
+\begin{frame}{Curse of Dimensionality}
+  Take a unit hypercube in dimension $p$ and we put another hypercube within it that captures a fraction of the observations $r$ within the cube
+  \begin{itemize}
+  \item Since it corresponds to a fraction of the unit volume, $r$ each edge  will be $e_p(r) = r^{1/p}$.
+  \item $e_{10}(0.01) = 0.63$ and $e_{10}(0.1) = 0.80$, so we need almost 80\% of the data to cover 10\% of the sample!
+  \item If we choose a smaller $r$ (include less in our average) we increase variance quite a bit without really reducing the required interval length substantially.
+  \end{itemize}
+  \end{frame}
+  
+  \begin{frame}{Curse of Dimensionality}
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[width=3.5in]{./resources/figure26.pdf}
+  \label{class15nn}
+  \end{center}
+  \end{figure}
+  \end{frame}
+  
+  \begin{frame}{Curse of Dimensionality}
+  Don't worry, it only gets worse:
+  \begin{eqnarray*}
+  d(p,N) = \left(1-\left(\frac{1}{2} \right)^{1/N} \right)^{1/p}
+  \end{eqnarray*}
+  
+  \begin{itemize}
+  \item $d(p,N)$ is the distance from the origin to the closest point.
+  \item $N=500$ and $p=10$ means $d = 0.52$ or that the closest point is closer to the boundary than the origin!
+  \item Why is this a problem?
+  \item In some dimension nearly every point is the closest point to the boundary -- when we average over nearest neighbors we are \alert{extrapolating} not \alert{interpolating}.
+  \end{itemize}
+  \end{frame}
+  
+  
+  \begin{frame}{Density/Distribution Estimation}
+  One of the more successful and popular uses of nonparametric methods is estimating the density or distribution function $f(x)$ or $F(x)$.
+  \begin{itemize}
+  \item Estimating the CDF is easy and something you have already done
+  \item Q-Q plots, etc.
+  \end{itemize}
+  \begin{eqnarray*}
+  \hat{F}_{ECDF}(x_0) = \frac{1}{N} \sum_{i=1}^N (x_i \leq x_0 )
+  \end{eqnarray*}
+  \begin{itemize}
+  \item Differentiating to get density is unhelpful : $F_{ECDF}'(x) = 0$ in most places.
+  \end{itemize}
+  \end{frame}
+  
+  \frame{\frametitle{What if $y$ is of dimension $p_y>1$?}
+  
+  \pause
+  
+  ``Easy'': use $p_y$-dimensional $K$ (often a $p_y$-product of 1-dim
+  kernels) and bandwidth $h$, and do
+  
+  \pause
+    
+  \[
+  {\hat f}_n(y)= \frac{1}{nh^p_y}\sum_{i=1}^n K\left(
+  \frac{y-y_i}{h}\right).
+  \]
+  
+  \begin{itemize}
+  \item {\bf 1st minor pitfall:} the various dimensions may have very
+  different variances, so use  $(h_1,\ldots,h_{p_y})$.
+  \item {\bf 2nd minor pitfall:} they may be strongly correlated; then
+  sphericize first.
+  \item {\bf Major problem:} next slide\ldots
+  \end{itemize}
+   }
+  
+  \frame{\frametitle{The Curse of Dimensionality}
+  \pause
+  
+  \begin{itemize}
+  \item Computational cost increases exponentially.
+  \item {\em Much worse:} to achieve precision $\epsilon$ in dimension $p_y$, the number of
+    observations you need increases as
+  \[
+  n \simeq \epsilon^{-(2+p_y/2)}.
+  \]
+  \item The {\em empty space\/} phenomenon: 
+  if $(y_1,\ldots,y_{p_y})$ all are iid uniform on $[-1,1]$, then only
+  $n/(10^{p_y})$ observations on average have all components in
+  $[-0.1,0.1]$. Bias still in $h^2$, but variance in $1/nh^{p_y}$ now.
+  \end{itemize}
+  }
+  
+  \frame{\frametitle{Silverman's Table}
+  
+  \pause
+  
+   Silverman (1986 book) 
+  provides a table illustrating the difficulty of kernel estimation
+  in high dimensions. To estimate the density at 0 of a $N(0,1)$ with
+  a given accuracy, he reports:
+  
+  \pause
+  
+  \begin{table}
+  \begin{center}
+  \vspace{1ex}
+  \begin{tabular}{|c|c|}\hline
+  Dimensionality Required & Sample Size    \\
+  \hline
+  1               &  4    \\
+  2               &  19    \\
+  5           & 786 \\
+  7          & 10,700 \\
+  10           & 842,000 \\
+  \hline
+  \end{tabular}
+  \end{center}
+  \end{table}
+  
+  \pause
+  
+  {\bf Not to be taken lightly\ldots} in any case convergence  with
+  the optimal bandwidth  is in $n^{-2/(4+p_y)}$ now---and Silverman's
+  rule of thumb for choosing $h^*_n$ must be adapted too. }
+  
+  \frame{\frametitle{Usually we care about conditional densities}
+  
+  \pause
+  
+  That is: we have covariates $x$, we want the density $f(y|x)$. Again, ``easy'':
+  
+  \pause
+  
+  \begin{enumerate}
+  \item get a kernel estimator of the joint density $f(y,x)$;
+  \item and one of of the marginal density $f(x)$;
+  \item then define
+  \[
+  \hat{f}_n(y|x)=\frac{\hat{f}_n(y,x)}{\hat{f}_n(x)}=\frac{\frac{1}{n
+  h_y^{p_y}h_x^{p_x}}\sum_{i=1}^n
+  K\left(\frac{y-y_i}{h_y}\right)K\left(\frac{x-x_i}{h_x}\right)}{\frac{1}{h_y^{p_y}}
+  \sum_{i=1}^n K\left(\frac{x-x_i}{h_x}\right)}.
+  \]
+  \end{enumerate}
+  
+  \pause
+  
+  But the joint density is $(p_x+p_y)$ dimensional\ldots\ and the curse
+  strikes big time.
+  
+}
+
+\subsection{Local linear}
+\begin{frame}[allowframebreaks]{Local Linear Regression}
+We can interpret the standard kernel estimator as estimating a constant regressino function $g(x) = m$ 
+
+where $$\hat m = \mbox{arg min}_{m_0} \sum_{i=1}^{N} K \left( \frac{x_i - x_0}{h} \right) \cdot \left( y_i - m_0 \right)^2 $$
+
+Taking the FOC, we see that this yields 
+
+$$\hat g(x) = \hat m = \sum_{i=1}^{N} K \left( \frac{x_i - x_0}{h} \right) \cdot y_i / \sum_{i=1}^{N} K \left( \frac{x_i - x_0}{h} \right) $$
+
+\framebreak
+This suggests other functions instead of constants (that is why we're interested in this regression in the first place!)
+
+A natural option is \textbf{local linear regression}:
+$$ m(x) = \alpha + \beta(x-x_0) $$ 
+
+where $$(\hat \alpha, \hat \beta) = \mbox{arg min}_{m_0} \sum_{i=1}^{N} K \left( \frac{x_i - x_0}{h} \right) \cdot \left( y_i - \alpha + \beta(x_i-x_0) \right)^2 $$
+
+\framebreak
+
 Advantages:
 \begin{itemize}
 \item the bias becomes 0 if the true $m(x)$ is linear.
@@ -994,14 +976,15 @@ Advantages:
 \item behaves better in ``almost empty'' regions.
 \end{itemize}
 {Disadvantages:} hardly any, just do it!
-\end{itemize}
 
- }
- 
- \begin{frame}{Local Linear}
+How to do it:
+TK lowess in CT page 320 
+\end{frame} 
+
+\begin{frame}{Local Linear}
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=3.5in]{./resources/nwloclinear.pdf}
+\includegraphics[width=\textwidth]{./resources/nwloclinear.pdf}
 \label{loclinear1}
 \end{center}
 \end{figure}
@@ -1010,7 +993,7 @@ Advantages:
  \begin{frame}{Local Linear}
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=3.5in]{./resources/nwloclinear2.pdf}
+\includegraphics[width=\textwidth]{./resources/nwloclinear2.pdf}
 \label{loclinear2}
 \end{center}
 \end{figure}
@@ -1020,15 +1003,29 @@ Advantages:
  \begin{frame}{Local Quadratic}
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=3.5in]{./resources/locquad.pdf}
+\includegraphics[width=\textwidth]{./resources/locquad.pdf}
 \label{loclinear2}
 \end{center}
 \end{figure}
 \end{frame}
 
-\frame{\frametitle{Nonparametric Regression, summary, 1}
 
-\pause
+\begin{comment}
+\frame{\frametitle{What if my distribution is discrete-continuous?}
+Very often in microeconometrics some covariates only take discrete
+values (e.g. gender, race, income bracket\ldots). Say the only discrete variable is gender, we care about the density of income of men. 
+\begin{itemize}
+\item The kernel approach adapts directly: we separately
+estimate a density for men (on the corresponding subsample).
+\item {\em Better:}  mix the two subsamples! Add women, but  {\bf with a small weight $w$}.
+\item Intuition: by doing so we increase the bias (the density for women is
+probably different than for men) $\rightarrow$  bad, in $w^2$ but we reduce the variance, by $O(w)$; and this dominates for small $w$. (cf Li-Racine).
+\end{itemize}
+}
+\end{comment}
+
+
+\frame{\frametitle{Nonparametric Regression, summary, 1}
 
 Nadaraya--Watson for $E(y\vert x)=m(x)$ 
 \[
@@ -1047,11 +1044,7 @@ scale up.
 
 \frame{\frametitle{Nonparametric Regression, summary, 2}
 
-\pause
-
 Nadaraya--Watson=\textbf{local constant regression}:  to get $\hat{m}(x)$,
-
-\pause
 
 \begin{enumerate}[<+->]
   \item  regress $y_i$ on $1$ with weight $K_h(x-x_i)$
@@ -1076,52 +1069,39 @@ To estimate the standard errors: bootstrap on an \emph{undersmoothed}
 estimate (so that bias is negligible.)
 }
 
+\begin{frame}{Seminonparametric (=Flexible) Regression}
 
+\begin{itemize}
+  \item This is a \textit{parametric} approximation that becomes more accurate as the sample size increases (series of sieves)
 
-\section{Semi-parametrics}
+  \item {\bf Idea:} we add regressors when we have more data, eventually providing an arbitrarily close approximation to the true regression function
 
-\frame{\frametitle{Seminonparametric (=Flexible) Regression}
+  \item Polynomial Example: $ m(x;\beta_K) = \sum_{j=1}^{K} \hat \beta_j x^j$ 
+  \item Given $K$, \textbf{just estimate model using OLS}
+  \item In practice, you'll want to choose $K$ using leave-one-out cross validation. 
+\end{itemize}
+\end{frame}
 
-\pause
+\begin{frame}{Splines: trading off fit and smoothness}
 
-{\bf Idea:} we add regressors when we have more data
+  \begin{itemize}
+    \item Another option is to use splines
+    \item {\bf Idea:} Approximate regression function \textit{locally} using (low order) polynomials, then connect these polynomials at knots. 
+    \item The regression function will be continuous at the knots, but not as many times differentiable as elsewhere
+    \item For example, can estimate a linear spline with an intercept and separate slopes depending on whether $x > x_0$
+  \end{itemize}
+\end{frame} 
 
-\pause
+\begin{frame}{Cubic Splines}
 
-$\rightarrow$ \ \textbf{series or sieve estimators}: choose a basis of functions $P_k(x_i)$
-($x_i^k$, or orthogonal polynomials, or sines\ldots)
-
-\pause
-
-$\rightarrow$\ run {\em linear regression} $y_i=\sum_{k=1}^M
-P_k(x_i)\theta_k+\epsilon_i$
-
-\pause
-
-a reasonable compromise (again, $M$ must go to infinity, more slowly
-than $n$).
-
-\pause
-
-Still  curse of dimensionality, and nonparametric asymptotics.
-
-
- }
-\frame{\frametitle{Splines: trading off fit and smoothness}
-
-\pause
-
-Choose some $0<\lambda<\infty$ and
+Another common option is 
 \[
-\min_{m(.)} \sum_i (y_i-m(x_i))^2+\lambda J(m),
+\min_{m(.)} \sum_i^N (y_i-m(x_i))^2 +\lambda J \int (m''(x))^2 dx 
 \]
 
-\pause
+where $\lambda$ is a \textbf{smoothing parameter} and $m$ is a cubic polynomial 
 
-Then we ``obtain'' the
-natural cubic spline with knots=$(x_1,\ldots,x_n)$:
-
-\pause
+Then we ``obtain'' the natural cubic spline with knots=$(x_1,\ldots,x_n)$:
 
 \begin{itemize}[<+->]
 \item $m$ is a cubic polynomial between consecutive $x_i$'s
@@ -1138,7 +1118,12 @@ $p_x>1$.
 
 \textbf{Orthogonal polynomials:} check out Chebyshev, $1, x,
 2x^2-1,4x^3-3x\ldots$ (on $[-1,1]$ here.)
-}
+
+\end{frame}
+
+
+
+\section{Semi-parametrics}
 
 \begin{frame}{Review: What was the point?}
 \begin{itemize}
