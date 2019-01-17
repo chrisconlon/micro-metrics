@@ -467,139 +467,6 @@ Perfect Bayes Nash equilibrium:
 
 \section{Non-parametric Regression}
 
-% PROBABLY NOT GOING TO USE THE IDENTIFICATION STUFF 
-\begin{comment}
-\begin{frame}{Something Familiar}
-  Let's start with something we all know, how to calculate:
-  \begin{eqnarray*}
-  E[Y_i | X_i ] = \beta_0 + \beta_1 X_1 + \ldots + \varepsilon_i
-  \end{eqnarray*}
-  \begin{itemize}
-  \item The Gauss-Markov theorem (remember that?) tells us that OLS is best among linear unbiased estimators.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Identification}
-  What does it mean for a model to be identified?
-  \begin{eqnarray*}
-  \hat{\beta}_{OLS} = \arg \max_{\beta} (\mathbf{y} - \mathbf{x} \beta)' (\mathbf{y} - \mathbf{x} \beta)
-  \end{eqnarray*}
-  \begin{itemize}
-  \item We need there to be a unique value of $\beta$ that solves the above equation.
-  \item For OLS this reduces to solving a linear system of $\dim(X)=k$ equations and unknowns.
-  \item The OLS estimator produces $\hat{\beta}_{OLS} = \beta + (X'X)^{-1}X'\varepsilon$.
-  \begin{itemize}
-  \item Identification: means that we require $(X'X)$ is invertible (no perfect multicollinearity).
-  \item When $E[X' \varepsilon ] =0$ then this converges in probability to true $\beta$.
-  \end{itemize}
-
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{A Little More Complicated}
-\begin{itemize}
-\item For many cases that we care about, $E[X' \varepsilon ] \neq 0$. (Endogeneity)
-\item We know this is not the end of the world if we have an instrument $Z$:
-\item Now we need that $Z'X$ is invertible.
-\end{itemize}
-\begin{eqnarray*}
-E[\mathbf{x}' (\mathbf{y} - \mathbf{x} \beta)] &\neq& 0\\
-E[\mathbf{z}' (\mathbf{y} - \mathbf{x} \beta)] &=&0\\
-\rightarrow \hat{\beta}_{TSLS} &=& E(Z'X)^{-1} E[Z'Y]
-\end{eqnarray*}
-\end{frame}
-
-
-\begin{frame}{Some more information}
-This leads to the common terminology:
-\begin{itemize}
-\item Under-identified: if $\dim(X) > \dim(Z)$.
-\item Just-identified: if $\dim(X) = \dim(Z)$.
-\item Over-identified: if $\dim(X) < \dim(Z)$.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{What does this mean exactly}
-To understand this we usually construct the GMM form of the moment conditions:
-\begin{eqnarray*}
-E[\mathbf{z}' (\mathbf{y} - \mathbf{x} \beta)] &=&0\\
-f(\beta)&=&  (\mathbf{y} - \mathbf{x} \beta)' \mathbf{z} \cdot W \cdot \mathbf{z}' (\mathbf{y} - \mathbf{x} \beta)
-\end{eqnarray*}
-\begin{itemize}
-\item Because $f(\beta)$ is a quadratic form, and when $W$ is PSD then $f(\beta) \geq 0$.
-\item Just-identified: There is exactly one solution to $f(\beta) = 0$ which does not depend on $W$.
-\item Under-identified: $f(\beta) = 0$ has many solutions because we have fewer instruments (or moment restrictions) than parameters.
-\item Over-identified: There are no solutions and $f(\beta) > 0$. Instead we choose $\beta$ to minimize the distance from zero with distance metric $W$.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{The Binary Case}
-Now let's think about a case where $Y \in \{0,1\}$:
-\begin{eqnarray*}
-y_i = \mathbf{1}[F(X_i) - \varepsilon_i > 0]
-\end{eqnarray*}
-\begin{itemize}
-\item There are different choices of $F(X_i)$ and $f(\varepsilon)$
-\item  Probit: $F(X_i) = \beta X_i$ where $\varepsilon_i \sim N(0,1)$.
-\item  Logit: same $F(\cdot)$ but different $f(\varepsilon)$ (Type I Extreme Value). $P(Y_i = 1 | X_i) = 1/(1+exp[-\beta X_i])$.
-\item These choices of $F$ are strong and somewhat arbitrary, we choose them out of convenience because both transformations are monotonic in $\beta X_i$, and continuously map $[-\infty,\infty] \rightarrow [0,1]$
-\end{itemize}
-\end{frame}
-
-\begin{frame}{The Binary Case}
-What is the least I can assume in the binary case and still learn something?
-\begin{eqnarray*}
-y_i = \mathbf{1}[F(X_i) - \varepsilon_i > 0]
-\end{eqnarray*}
-\begin{itemize}
-\item Suppose instead we observe $P(x) = Pr(y_i = 1 | x_i)$ at many values of $x_i$. (Often refer to this as the CCP).
-\item Sometimes CCPs are all we care about. (if we are lucky).
-\end{itemize}
-Instead we can try and solve:
-\begin{eqnarray*}
-P(x) = \int \mathbf{1}(F(x) - \varepsilon > 0) dH(\varepsilon | x) = H(F(x)| x)
-\end{eqnarray*}
-\begin{itemize}
-\item Identification asks, what is the least we need to assume in order to recover $F,H$?
-\item Even with $\varepsilon \perp X$ we still have too many degrees of freedom.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Are we stuck?}
-
-\begin{itemize}
-\item We know that Logit and Probit are identified.
-\item Start with $\varepsilon \perp X$.
-\item $F(X_i) = G(X_i \beta)$ is a very powerful assumption often called \alert{(single) index model}
-\item Can use Marginal Rate of Substitution (MRS) of $P(x)$ to identify $\beta_k / \beta_l$.
-\begin{itemize}
-\item How do conditional probabilities respond to changes in $X^{(k)}$ versus $X^{(l)}$?
-\item Suggests the \alert{average derivative estimator} which doesn't require normality assumptions of probit
-\item More robust, but potentially less efficient if true distribution of $\varepsilon \sim N(0,1)$.
-\end{itemize}
-\item Can we extend the general intuition to more cases?
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}{Single-Index Models}
- 
-  \begin{itemize}
-  \item Consider $$ E \left[ y | \mathbf{x} \right] = g(\mathbf{x}'\beta ) $$ 
-  such as logit and probit. 
-  \item With conditional mean of change in $x_j$ 
-  $$ \frac{ \partial \left[ y | \mathbf{x} \right]}{\partial x_j} = g'(\mathbf{x}'\beta ) \beta_j $$ 
-  
-  \item Can use Marginal Rate of Substitution (MRS) to identify $\beta_k / \beta_l$.
-  $$ \frac{ \partial \left[ y | \mathbf{x} \right] / \partial x_j }{ \partial \left[ y | \mathbf{x} \right] / \partial x_k} = \frac{\beta_j}{\beta_k} $$ 
-  
-  \item Suggests the \alert{average derivative estimator} which doesn't require normality assumptions of probit
-  \item More robust, but potentially less efficient if true distribution of $\varepsilon \sim N(0,1)$.
-  \item Can we extend the general intuition to more cases?
-  \end{itemize}
-\end{frame}
-\end{comment}
-
 \begin{frame}{Nonparametric Regression}
   \begin{itemize}
   \item Often we're interested in $E\left[Y_i | X_i = x \right]$ 
@@ -609,23 +476,23 @@ P(x) = \int \mathbf{1}(F(x) - \varepsilon > 0) dH(\varepsilon | x) = H(F(x)| x)
     \item Each bin could have small $n$. [Likely if $X$ has many dimensions]
     \item $X$ could be continuous  
   \end{itemize}
-  \item One option is to pick a parametric function form $y=f(x)$. But often hard to think about how sensible these assumptions are (and what the impose on the problem)
-%  \item Another option is to extend density discussion we just had to two dimensions using local weighted averages 
-%  $$ \hat m(x_0) = \sum_{i=1}^{N} w_{i0,h}y_i$$
+  \item One option is to pick a parametric function form $y=f(x)$. But often hard to think about how sensible these assumptions are (and what they impose on the economics of the problem)
+  \item An alternative is to extend the concepts of nonparametric density estimation
   \end{itemize}
 \end{frame}
 
 \begin{frame}{A Fake Data Example}
-Following the THF textbook example, we can generate some fake data and let: 
+THF 2.3 includes an example classification problem. 
+
+An (unknown) model maps a pair of inputs $X_1$ and $X_2$ into classifications of either BLUE or ORANGE. 
+
+
+
+Imagine we have 100 points from each class. OLS solution 
 \begin{eqnarray*}
-Y=&ORANGE \mbox{ if } Y* &> 0.5 \\
-Y=&BLUE  \mbox{ if }   Y* &\leq 0.5
+Y=&ORANGE \mbox{ if } Y* = x^T\hat \beta &> 0.5 \\
+Y=&BLUE  \mbox{ if }   Y* =  x^T\hat \beta &\leq 0.5
 \end{eqnarray*}
-\begin{itemize}
-\item Easiest way to recover $Y*$ is by running OLS on the linear probability model.
-\item Draws from bivariate normal distribution with uncorrelated components but different means (2 overlapping types)
-\item Mixture of 10 low variance (nearly point mass) normal distributions where the individual means were drawn from another normal distribution. (10 nearly distinct types).
-\end{itemize}
 \end{frame}
 
 \begin{frame}{Linear Probability Model}
@@ -639,6 +506,19 @@ Y=&BLUE  \mbox{ if }   Y* &\leq 0.5
   \end{figure}
 \end{frame}
 
+\begin{frame}{Is this the best we can do?}
+
+Consider two DGPs: 
+\begin{enumerate}
+  \item Draws from bivariate normal distribution with uncorrelated components but different means (2 overlapping types)
+  \item Mixture of 10 low variance (nearly point mass) normal distributions where the individual means were drawn from another normal distribution. (10 nearly distinct types).
+\end{enumerate}
+
+In the case of 1, OLS is the best we can do. 
+
+In the case of 2, OLS will perform very poorly.
+
+\end{frame}
 
 \begin{frame}{Alternative}
 \begin{itemize}
@@ -702,97 +582,10 @@ We can decompose any estimator into two components
 \begin{itemize}
 \item In general we face a tradeoff between bias and variance.
 \item In k-NN as $k$ gets large we reduce the variance (each point has less influence) but we increase the bias since we start incorporating far away and potentially irrelevant information.
-\item In OLS we minimize the variance among unbiased estimators assuming that the true $f$ is linear.
-\item A natural alternative is to use kernels or local smoothers
+\item In OLS we minimize the variance among unbiased estimators assuming that the true $f$ is linear and using the entire dataset. 
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Bias Variance Decomposition}
-What minimizes MSE?
-\begin{eqnarray*}
-f(x_i) = E[Y_i | X_i] 
-\end{eqnarray*}
-\begin{itemize}
-\item Seems simple enough (but we are back where we started).
-\item How do we compute the expectation ?
-\item k-NN tries to use local information to estimate conditional mean
-\item OLS uses entire dataset and adds structure $ y = x \beta$ to the problem.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Common weights}
-  Another option is to extend density discussion we just had to two dimensions using local weighted averages 
-   $$ \hat m(x_0) = \sum_{i=1}^{N} w_{i0,h}y_i$$
-
-  Rearranging, can see that OLS uses the following weights
-
-  $$ \hat m_{OLS}(x_0) = \sum_{i=1}^{N} \lbrace \frac{1}{N} \frac{ (x_0 - \bar{x}) (x_i - \bar{x})}{\sum_j (x_j - \bar{x})^2} \rbrace y_i $$
-
-  CT note that these weights can actually \textit{increase} with the distance between $x_0$ and $x_i$! 
-  (for example if $x_i > x_0 > \bar{x}$ )
-  
-\end{frame}
-
-\begin{frame}{k-NN is simply a running average}
-  $$ \hat m_k(x_0) = \frac{1}{k}(y_{i-(k-1)/2} + ... + y_{i+(k-1)/2}$$
-
-  Of course, we could also average all the observations within some bandwidth $h$
-  
-  $$ \hat m(x_0) = \frac{\sum_{i=1}^{Nh} K \left( \frac{x_i - x_0}{h} \right) y_i}{\sum_{i=1}^{Nh} K \left( \frac{x_i - x_0}{h} \right)} $$
-  
-  where $K(\cdot)$ is a kernel weighting function as above. 
-
-\end{frame}
-
-\begin{frame}{Link to density estimation}
-  CT  
-  
-\end{frame}
-
-\begin{frame}{Nonparametric Regression}
-
-Nadaraya-Watson, inspired from kernel idea:
-\[
-{\hat m}_n(x)=\frac{\sum_{i=1}^n y_i
-K\left(\frac{x-x_i}{h}\right)}{\sum_{i=1}^n
-K\left(\frac{x-x_i}{h}\right)}.
-\]
-again, bias in $h^2$ and variance in $1/nh$ if $p_x=1$.
-
-\end{frame}
-
-% COULD PLUG IN GUIDOS DESCRIPTION HERE 
-
-\frame{\frametitle{Choosing $h$}
-\begin{itemize}
-\item Plug-in estimates work badly.
-\item Fortunately, cross-validation amounts to
-\[
-\min_h \sum_{i=1}^n
-\frac{\left(g(y_i,x_i)-\hat{m}_n(x_i;h)\right)^2}{1-k_i(h)}
-\]
-where $k_i(h)=K_h(0)/\sum_{j=1}^n K_h(x_i-x_j).$ 
-\item So not that hard, and can be done on a subsample and rescaled.
-\end{itemize}
-}
-
-\subsection{Multivariate Kernels}
-\begin{frame}
-  typically we are interested in more than one regressors 
-  $$ y_i = m(x_{1i},...,x_{ki}) $$
-
-  the NW kernel estimator extends naturally to $k$ dimensions
-
-  \[
-{\hat m}_n(\mathbf{x_0})=\frac{\sum_{i=1}^n y_i
-K\left(\frac{x-x_i}{h}\right)}{\sum_{i=1}^n
-K\left(\frac{x-x_i}{h}\right)}.
-\]
- where we just use a mutivariate kernel. 
-
- if you put everything in the same scale by dividing by the standard deviation, you can even use a common bandwidth. 
-
-\end{frame}
 
 \begin{frame}{Big Data}
   \begin{itemize}
@@ -809,18 +602,18 @@ K\left(\frac{x-x_i}{h}\right)}.
   \item $e_{10}(0.01) = 0.63$ and $e_{10}(0.1) = 0.80$, so we need almost 80\% of the data to cover 10\% of the sample!
   \item If we choose a smaller $r$ (include less in our average) we increase variance quite a bit without really reducing the required interval length substantially.
   \end{itemize}
-  \end{frame}
+\end{frame}
   
-  \begin{frame}{Curse of Dimensionality}
+\begin{frame}{Curse of Dimensionality}
   \begin{figure}[htbp]
   \begin{center}
-  \includegraphics[width=3.5in]{./resources/figure26.pdf}
+  \includegraphics[width=\textwidth]{./resources/figure26.pdf}
   \label{class15nn}
   \end{center}
   \end{figure}
-  \end{frame}
+\end{frame}
   
-  \begin{frame}{Curse of Dimensionality}
+\begin{frame}{Curse of Dimensionality}
   Don't worry, it only gets worse:
   \begin{eqnarray*}
   d(p,N) = \left(1-\left(\frac{1}{2} \right)^{1/N} \right)^{1/p}
@@ -832,10 +625,105 @@ K\left(\frac{x-x_i}{h}\right)}.
   \item Why is this a problem?
   \item In some dimension nearly every point is the closest point to the boundary -- when we average over nearest neighbors we are \alert{extrapolating} not \alert{interpolating}.
   \end{itemize}
-  \end{frame}
+\end{frame}
   
+\begin{frame}{Back to Bias - Variance}
+What minimizes MSE?
+\begin{eqnarray*}
+f(x_i) = E[Y_i | X_i] 
+\end{eqnarray*}
+\begin{itemize}
+\item Seems simple enough (but we are back where we started).
+\item How do we compute the expectation ?
+\item k-NN tries to use local information to estimate conditional mean
+\item OLS uses entire dataset and adds structure $ y = x \beta$ to the problem.
+\item A natural middleground point is to use a smoother that weights "close" observations more than "far" ones. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Common weights}
+  Consider the following \textbf{local weighted average estimator}: 
+   $$ \hat m(x_0) = \sum_{i=1}^{N} w_{i0,h}y_i$$
+
+   where $w_{i0,h} = w(x_i,x_0,h)$ and $\sum_i  w_{i0,h} = 1$. 
+
+\pause 
+
+  Rearranging, can see that OLS uses the following weights
+
+  $$ \hat m_{OLS}(x_0) = \sum_{i=1}^{N} \lbrace \frac{1}{N} + \frac{ (x_0 - \bar{x}) (x_i - \bar{x})}{\sum_j (x_j - \bar{x})^2} \rbrace y_i $$
+
+  CT note that these weights can actually \textit{increase} with the distance between $x_0$ and $x_i$! 
+  (for example if $x_i > x_0 > \bar{x}$ )
   
-  \begin{frame}{Density/Distribution Estimation}
+\end{frame}
+
+\begin{frame}{k-NN is simply a running average}
+  $$ \hat m_k(x_0) = \frac{1}{k}(y_{i-(k-1)/2} + ... + y_{i+(k-1)/2}$$
+
+  Can immediately see that this will not be great at the end points. 
+  
+  For the smallest and largest $x$, the average is one sided. This is the \textbf{boundary problem}. 
+
+\end{frame}
+
+\begin{comment}
+\begin{frame}{Link to density estimation}
+  CT  
+  
+\end{frame}
+\end{comment}
+
+\begin{frame}{Nonparametric Regression}
+Of course, we could also average all the observations within some bandwidth $h$  
+
+
+Nadaraya-Watson:
+\[
+{\hat m}_n(x)=\frac{\sum_{i=1}^n y_i
+K\left(\frac{x-x_i}{h}\right)}{\sum_{i=1}^n
+K\left(\frac{x-x_i}{h}\right)}.
+\]
+
+where $K(\cdot)$ is a kernel weighting function as above. 
+
+Again, bias in $h^2$ and variance in $1/nh$ if $p_x=1$.
+
+\end{frame}
+
+% COULD PLUG IN GUIDOS DESCRIPTION HERE 
+
+\begin{frame}{Choosing $h$}
+Plug-in estimates work badly here. 
+
+In most cases leave one out cross-validation is feasible
+
+Can be shown that this amounts to 
+$$ \min_h CV(h) = \sum_{i=1}^N \left(\frac{y_i - \hat m (x_i)}{1 - \left[w_{ii,h}/\sum_j w{ji,h}\right]} \right)^2 $$
+
+So not that hard: for each $h$, only need to compute one weighted average $\hat m(x_i)$ for each $N$.
+\end{frame}
+
+\subsection{Multivariate Kernels}
+\begin{frame}{Multivariate Kernels}
+  Typically we are interested in more than one regressor 
+  $$ y_i = m(x_{1i},...,x_{ki}) $$
+
+  the NW kernel estimator extends naturally to $k$ dimensions
+
+  \[
+{\hat m}(\mathbf{x_0})=\frac{\sum_{i=1}^N y_i
+K\left(\frac{\mathbf{x_1}-\mathbf{x_0}}{h}\right)}{\sum_{i=1}^N
+K\left(\frac{\mathbf{x_1}-\mathbf{x_0}}{h}\right)}.
+\]
+ where we just use a mutivariate kernel. 
+
+ If you rescale by dividing by the standard deviation, you can even use a common bandwidth. 
+
+\end{frame}
+
+\begin{comment}  
+\begin{frame}{Density/Distribution Estimation}
   One of the more successful and popular uses of nonparametric methods is estimating the density or distribution function $f(x)$ or $F(x)$.
   \begin{itemize}
   \item Estimating the CDF is easy and something you have already done
@@ -888,8 +776,9 @@ K\left(\frac{x-x_i}{h}\right)}.
   $[-0.1,0.1]$. Bias still in $h^2$, but variance in $1/nh^{p_y}$ now.
   \end{itemize}
   }
-  
-  \frame{\frametitle{Silverman's Table}
+\end{comment}
+
+\frame{\frametitle{Silverman's Table}
   
   \pause
   
@@ -921,8 +810,9 @@ K\left(\frac{x-x_i}{h}\right)}.
   {\bf Not to be taken lightly\ldots} in any case convergence  with
   the optimal bandwidth  is in $n^{-2/(4+p_y)}$ now---and Silverman's
   rule of thumb for choosing $h^*_n$ must be adapted too. }
-  
-  \frame{\frametitle{Usually we care about conditional densities}
+
+\begin{comment}
+\frame{\frametitle{Usually we care about conditional densities}
   
   \pause
   
@@ -946,11 +836,11 @@ K\left(\frac{x-x_i}{h}\right)}.
   
   But the joint density is $(p_x+p_y)$ dimensional\ldots\ and the curse
   strikes big time.
-  
 }
+\end{comment}
 
 \subsection{Local linear}
-\begin{frame}[allowframebreaks]{Local Linear Regression}
+\begin{frame}[allowframebreaks]{Back to one dimesion}
 We can interpret the standard kernel estimator as estimating a constant regressino function $g(x) = m$ 
 
 where $$\hat m = \mbox{arg min}_{m_0} \sum_{i=1}^{N} K \left( \frac{x_i - x_0}{h} \right) \cdot \left( y_i - m_0 \right)^2 $$
@@ -959,7 +849,10 @@ Taking the FOC, we see that this yields
 
 $$\hat g(x) = \hat m = \sum_{i=1}^{N} K \left( \frac{x_i - x_0}{h} \right) \cdot y_i / \sum_{i=1}^{N} K \left( \frac{x_i - x_0}{h} \right) $$
 
-\framebreak
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Local Linear Regression}
+
 This suggests other functions instead of constants (that is why we're interested in this regression in the first place!)
 
 A natural option is \textbf{local linear regression}:
@@ -975,12 +868,49 @@ Advantages:
 \item the coefficient of $(x-x_i)$ estimates $m'(x)$.
 \item behaves better in ``almost empty'' regions.
 \end{itemize}
-{Disadvantages:} hardly any, just do it!
+{Disadvantages:} hardly any, just do it! How? 
 
-How to do it:
-TK lowess in CT page 320 
+\pause 
+
+Locally Weighted Scatterplot Smoothing (\textbf{lowess})
+\begin{itemize}
+  \item uses a variable bandwidth $h_{0,k}$ 
+  \item tricubic kernel 
+  \item downweights observations with large residuals (through $N$ iterations)
+  \item Output: robust to outliers, smooth, and better at boundaries
+  \item In most packages, but can be 
+\end{itemize}
+
 \end{frame} 
 
+\begin{frame}{Example from Cameron and Trivedi}
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[width=\textwidth]{./resources/CTsimulation}
+  \label{loclinear1}
+  \end{center}
+  \end{figure}
+  \end{frame}
+  
+\begin{frame}{k-NN performance}
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[width=\textwidth]{./resources/CTknn}
+  \label{loclinear2}
+  \end{center}
+  \end{figure}
+\end{frame}
+    
+\begin{frame}{Lowess}
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[width=\textwidth]{./resources/CTlowess}
+  \label{loclinear2}
+  \end{center}
+  \end{figure}
+\end{frame}
+
+\begin{comment}
 \begin{frame}{Local Linear}
 \begin{figure}[htbp]
 \begin{center}
@@ -999,8 +929,7 @@ TK lowess in CT page 320
 \end{figure}
 \end{frame}
 
-
- \begin{frame}{Local Quadratic}
+\begin{frame}{Local Quadratic}
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=\textwidth]{./resources/locquad.pdf}
@@ -1009,8 +938,6 @@ TK lowess in CT page 320
 \end{figure}
 \end{frame}
 
-
-\begin{comment}
 \frame{\frametitle{What if my distribution is discrete-continuous?}
 Very often in microeconometrics some covariates only take discrete
 values (e.g. gender, race, income bracket\ldots). Say the only discrete variable is gender, we care about the density of income of men. 
@@ -1165,3 +1092,140 @@ $p_x>1$.
 
 
 \end{document}
+
+%% OLD / UNUSED (BUT USEFUL) SLIDES
+
+
+% PROBABLY NOT GOING TO USE THE IDENTIFICATION STUFF 
+\begin{comment}
+  \begin{frame}{Something Familiar}
+    Let's start with something we all know, how to calculate:
+    \begin{eqnarray*}
+    E[Y_i | X_i ] = \beta_0 + \beta_1 X_1 + \ldots + \varepsilon_i
+    \end{eqnarray*}
+    \begin{itemize}
+    \item The Gauss-Markov theorem (remember that?) tells us that OLS is best among linear unbiased estimators.
+    \end{itemize}
+  \end{frame}
+  
+  \begin{frame}{Identification}
+    What does it mean for a model to be identified?
+    \begin{eqnarray*}
+    \hat{\beta}_{OLS} = \arg \max_{\beta} (\mathbf{y} - \mathbf{x} \beta)' (\mathbf{y} - \mathbf{x} \beta)
+    \end{eqnarray*}
+    \begin{itemize}
+    \item We need there to be a unique value of $\beta$ that solves the above equation.
+    \item For OLS this reduces to solving a linear system of $\dim(X)=k$ equations and unknowns.
+    \item The OLS estimator produces $\hat{\beta}_{OLS} = \beta + (X'X)^{-1}X'\varepsilon$.
+    \begin{itemize}
+    \item Identification: means that we require $(X'X)$ is invertible (no perfect multicollinearity).
+    \item When $E[X' \varepsilon ] =0$ then this converges in probability to true $\beta$.
+    \end{itemize}
+  
+    \end{itemize}
+  \end{frame}
+  
+  \begin{frame}{A Little More Complicated}
+  \begin{itemize}
+  \item For many cases that we care about, $E[X' \varepsilon ] \neq 0$. (Endogeneity)
+  \item We know this is not the end of the world if we have an instrument $Z$:
+  \item Now we need that $Z'X$ is invertible.
+  \end{itemize}
+  \begin{eqnarray*}
+  E[\mathbf{x}' (\mathbf{y} - \mathbf{x} \beta)] &\neq& 0\\
+  E[\mathbf{z}' (\mathbf{y} - \mathbf{x} \beta)] &=&0\\
+  \rightarrow \hat{\beta}_{TSLS} &=& E(Z'X)^{-1} E[Z'Y]
+  \end{eqnarray*}
+  \end{frame}
+  
+  
+  \begin{frame}{Some more information}
+  This leads to the common terminology:
+  \begin{itemize}
+  \item Under-identified: if $\dim(X) > \dim(Z)$.
+  \item Just-identified: if $\dim(X) = \dim(Z)$.
+  \item Over-identified: if $\dim(X) < \dim(Z)$.
+  \end{itemize}
+  \end{frame}
+  
+  \begin{frame}{What does this mean exactly}
+  To understand this we usually construct the GMM form of the moment conditions:
+  \begin{eqnarray*}
+  E[\mathbf{z}' (\mathbf{y} - \mathbf{x} \beta)] &=&0\\
+  f(\beta)&=&  (\mathbf{y} - \mathbf{x} \beta)' \mathbf{z} \cdot W \cdot \mathbf{z}' (\mathbf{y} - \mathbf{x} \beta)
+  \end{eqnarray*}
+  \begin{itemize}
+  \item Because $f(\beta)$ is a quadratic form, and when $W$ is PSD then $f(\beta) \geq 0$.
+  \item Just-identified: There is exactly one solution to $f(\beta) = 0$ which does not depend on $W$.
+  \item Under-identified: $f(\beta) = 0$ has many solutions because we have fewer instruments (or moment restrictions) than parameters.
+  \item Over-identified: There are no solutions and $f(\beta) > 0$. Instead we choose $\beta$ to minimize the distance from zero with distance metric $W$.
+  \end{itemize}
+  \end{frame}
+  
+  \begin{frame}{The Binary Case}
+  Now let's think about a case where $Y \in \{0,1\}$:
+  \begin{eqnarray*}
+  y_i = \mathbf{1}[F(X_i) - \varepsilon_i > 0]
+  \end{eqnarray*}
+  \begin{itemize}
+  \item There are different choices of $F(X_i)$ and $f(\varepsilon)$
+  \item  Probit: $F(X_i) = \beta X_i$ where $\varepsilon_i \sim N(0,1)$.
+  \item  Logit: same $F(\cdot)$ but different $f(\varepsilon)$ (Type I Extreme Value). $P(Y_i = 1 | X_i) = 1/(1+exp[-\beta X_i])$.
+  \item These choices of $F$ are strong and somewhat arbitrary, we choose them out of convenience because both transformations are monotonic in $\beta X_i$, and continuously map $[-\infty,\infty] \rightarrow [0,1]$
+  \end{itemize}
+  \end{frame}
+  
+  \begin{frame}{The Binary Case}
+  What is the least I can assume in the binary case and still learn something?
+  \begin{eqnarray*}
+  y_i = \mathbf{1}[F(X_i) - \varepsilon_i > 0]
+  \end{eqnarray*}
+  \begin{itemize}
+  \item Suppose instead we observe $P(x) = Pr(y_i = 1 | x_i)$ at many values of $x_i$. (Often refer to this as the CCP).
+  \item Sometimes CCPs are all we care about. (if we are lucky).
+  \end{itemize}
+  Instead we can try and solve:
+  \begin{eqnarray*}
+  P(x) = \int \mathbf{1}(F(x) - \varepsilon > 0) dH(\varepsilon | x) = H(F(x)| x)
+  \end{eqnarray*}
+  \begin{itemize}
+  \item Identification asks, what is the least we need to assume in order to recover $F,H$?
+  \item Even with $\varepsilon \perp X$ we still have too many degrees of freedom.
+  \end{itemize}
+  \end{frame}
+  
+  \begin{frame}{Are we stuck?}
+  
+  \begin{itemize}
+  \item We know that Logit and Probit are identified.
+  \item Start with $\varepsilon \perp X$.
+  \item $F(X_i) = G(X_i \beta)$ is a very powerful assumption often called \alert{(single) index model}
+  \item Can use Marginal Rate of Substitution (MRS) of $P(x)$ to identify $\beta_k / \beta_l$.
+  \begin{itemize}
+  \item How do conditional probabilities respond to changes in $X^{(k)}$ versus $X^{(l)}$?
+  \item Suggests the \alert{average derivative estimator} which doesn't require normality assumptions of probit
+  \item More robust, but potentially less efficient if true distribution of $\varepsilon \sim N(0,1)$.
+  \end{itemize}
+  \item Can we extend the general intuition to more cases?
+  \end{itemize}
+  \end{frame}
+  
+  
+  \begin{frame}{Single-Index Models}
+   
+    \begin{itemize}
+    \item Consider $$ E \left[ y | \mathbf{x} \right] = g(\mathbf{x}'\beta ) $$ 
+    such as logit and probit. 
+    \item With conditional mean of change in $x_j$ 
+    $$ \frac{ \partial \left[ y | \mathbf{x} \right]}{\partial x_j} = g'(\mathbf{x}'\beta ) \beta_j $$ 
+    
+    \item Can use Marginal Rate of Substitution (MRS) to identify $\beta_k / \beta_l$.
+    $$ \frac{ \partial \left[ y | \mathbf{x} \right] / \partial x_j }{ \partial \left[ y | \mathbf{x} \right] / \partial x_k} = \frac{\beta_j}{\beta_k} $$ 
+    
+    \item Suggests the \alert{average derivative estimator} which doesn't require normality assumptions of probit
+    \item More robust, but potentially less efficient if true distribution of $\varepsilon \sim N(0,1)$.
+    \item Can we extend the general intuition to more cases?
+    \end{itemize}
+  \end{frame}
+\end{comment}
+  
