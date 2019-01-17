@@ -9,15 +9,9 @@ editor_options:
   chunk_output_type: inline
 ---
 
-### Motivation
-1. We know that bonuses are lower. 
-2. Reason to suspect that that mechanism affects allocation more generally.
+## Optimal bandwidth selection
 
-### Outline
-- combine sample leases with private leases
-- compare productivities across groups using regression
-
-```{r, include=FALSE}
+```{r,echo=TRUE}
 # KDENSITY EXAMPLE
 library(MASS)
 library(ggplot2)
