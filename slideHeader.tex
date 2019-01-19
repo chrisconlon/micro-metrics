@@ -1,4 +1,4 @@
-\documentclass[11pt,handout,xcolor=pdftex,dvipsnames,table,t]{beamer}
+\documentclass[ignorenonframetext,11pt,handout,xcolor=pdftex,dvipsnames,table,t]{beamer}
 \usefonttheme[onlymath]{serif}
 %\usetheme{default}
 \usetheme{Hannover}
@@ -30,3 +30,9 @@
 \setbeamertemplate{footline}[frame number]
 
 \addtobeamertemplate{frametitle}{\vspace*{-.20cm}}{\vspace*{0.1cm}}
+
+% Bib stuff
+
+\usepackage{natbib}
+\usepackage{bibentry}
+\renewcommand{\cite}{\citet}

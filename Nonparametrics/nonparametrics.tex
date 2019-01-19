@@ -932,47 +932,23 @@ Locally Weighted Scatterplot Smoothing (\textbf{lowess})
   \end{figure}
 \end{frame}
 
-\begin{comment}
-\begin{frame}{Local Linear}
+\begin{frame}
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=\textwidth]{./resources/nwloclinear.pdf}
-\label{loclinear1}
-\end{center}
-\end{figure}
-\end{frame}
-
- \begin{frame}{Local Linear}
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=\textwidth]{./resources/nwloclinear2.pdf}
+\includegraphics[width=\textwidth]{./resources/MSTAbstract}
 \label{loclinear2}
 \end{center}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Local Quadratic}
+\begin{frame}{Use Lowess Plot to Motivate DD}
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=\textwidth]{./resources/locquad.pdf}
+\includegraphics[width=\textwidth]{./resources/MSTGradient}
 \label{loclinear2}
 \end{center}
 \end{figure}
 \end{frame}
-
-\frame{\frametitle{What if my distribution is discrete-continuous?}
-Very often in microeconometrics some covariates only take discrete
-values (e.g. gender, race, income bracket\ldots). Say the only discrete variable is gender, we care about the density of income of men. 
-\begin{itemize}
-\item The kernel approach adapts directly: we separately
-estimate a density for men (on the corresponding subsample).
-\item {\em Better:}  mix the two subsamples! Add women, but  {\bf with a small weight $w$}.
-\item Intuition: by doing so we increase the bias (the density for women is
-probably different than for men) $\rightarrow$  bad, in $w^2$ but we reduce the variance, by $O(w)$; and this dominates for small $w$. (cf Li-Racine).
-\end{itemize}
-}
-\end{comment}
-
 
 \frame{\frametitle{Nonparametric Regression, summary, 1}
 
@@ -1018,10 +994,78 @@ To estimate the standard errors: bootstrap on an \emph{undersmoothed}
 estimate (so that bias is negligible.)
 }
 
+\subsection{Basis Expansions}
+
 \begin{frame}{Seminonparametric (=Flexible) Regression}
+  \begin{itemize}
+    \item Linear model won't fit well when true relationshipt nonlinear
+    \item But fully flexible models may require a lot of data 
+    \item Alternative is to replace $X$ with $M$ transformations of $h_m(X)$
+    \item Then model $f(X) = \sum_m \beta_m h_m(X)$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Piecewise polynomials}
+  \begin{itemize}
+    \item First consider a single dimensional $X$
+    \item Divide $f$ into contiguous intervals, and pick a function to represent $y$ on each interval 
+    \item A natural starting point would be a piecewise constant function, broken up by boundary points $\xi_1$ and $xi_2$
+    $$ h_1 = I(X < \xi_1) ; h_2 = I(\xi_1 < X < \xi_2); h_3 = I(\xi_2 < X) $$ 
+    \item This predicts the interval average for all $X$ 
+    \item We can improve this by adding three additional basis functions: $h_{m+3} = h_m(X)X$. 
+    \item We can then make it continuous by 
+    \begin{eqnarray*}
+      h_1 = 1 \\
+      h_2 = X \\
+      h_3 = (X- \xi_1)_+ \\
+      h_4 = (X - \xi_2)_+ 
+    \end{eqnarray*} 
+      
+  \end{itemize}
+  
+\end{frame}
+
+
+\begin{frame}
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[height=\textheight]{./resources/ESLPiecewise}
+  \end{center}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Smooth splines}
+  \begin{itemize}
+    \item We can improve this further by increasing the order of the local polynomial
+    \item A common option is cubic splines: 
+    \begin{eqnarray*}
+      h_1 = 1 ;  h_2 = X ; h_3 = X^2 \\
+      h_4 = x^ 3 ; h_5 (X- \xi_1)_+^3; h_6 = (X - \xi_2)_+^3 
+    \end{eqnarray*} 
+    \item This is a six dimensional space: (3 regions) X (4 parameters per region) - (2 knots) X (3 constraints per knot)
+    \item In practice people never use higher than cubic
+    \item Picking the knots is more subjective (use CV?)
+    \item Also typically use B-splines (see HTF)
+  \end{itemize}
+
+ \end{frame}
+
+ 
+\begin{frame}
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[height=\textheight]{./resources/ESLPiecewiseCubic}
+  \end{center}
+  \end{figure}
+\end{frame}
+
+\begin{comment}
+\begin{frame}{Series or sieves}
 
 \begin{itemize}
-  \item This is a \textit{parametric} approximation that becomes more accurate as the sample size increases (series of sieves)
+  \item This is a \textit{parametric} approximation that becomes more accurate as the sample size increases
 
   \item {\bf Idea:} we add regressors when we have more data, eventually providing an arbitrarily close approximation to the true regression function
 
@@ -1029,7 +1073,11 @@ estimate (so that bias is negligible.)
   \item Given $K$, \textbf{just estimate model using OLS}
   \item In practice, you'll want to choose $K$ using leave-one-out cross validation. 
 \end{itemize}
+
+Note that simply polynomials often perform poorly in some parts of the data! 
+
 \end{frame}
+
 
 \begin{frame}{Splines: trading off fit and smoothness}
 
@@ -1040,8 +1088,10 @@ estimate (so that bias is negligible.)
     \item For example, can estimate a linear spline with an intercept and separate slopes depending on whether $x > x_0$
   \end{itemize}
 \end{frame} 
+\end{comment}
 
 \begin{frame}{Cubic Splines}
+  Note that simply polynomials often perform poorly in some parts of the data! 
 
 Another common option is 
 \[
@@ -1074,6 +1124,95 @@ $p_x>1$.
 
 \section{Semi-parametrics}
 
+\begin{frame}{Semiparametric Regression}
+  \begin{itemize}
+    \item Previous methods placed no structure on the model
+    \item Sometime we're willing to impose \textit{some} structure, typically to isolate a parameter or ratio that we're particularly interested in
+    \item Fully non-parametric methods controlling for other factors not possible due to the curse of dimensionality. 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Examples}
+  
+  \begin{figure}[htbp]
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/CTSemiPExamples}
+    \label{loclinear2}
+    \end{center}
+  \end{figure}
+
+  For a formal treatment of these and discussion of convergence, see \cite{powell_chapter_1994}.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Partial linear model}
+  We'll focus on the most commonly used model: the \textbf{partial linear model} 
+  $$ y_i = X_i'\beta + g(Z_i) + e_i $$ 
+  
+  We are interested in $\beta$, but $g()$ is an unrestricted (unknown) function of $z$. 
+
+  Identification requires $Cov[X,g(Z)]=0$ 
+
+  \citet{robinson_root-n-consistent_1988} showed that we can concentrate this $g()$ out of the model. 
+
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{Robinson 1988}
+  $$ y_i = X_i'\beta + g(Z_i) + e_i $$ 
+  where $e_i = y_i - E[y_i | X_i,Z_i]$. 
+  
+  Take the conditional expectation
+  $$ E[y_i | Z_i]  = E [X_i | Z_i]'\beta + g(Z_i) + E[e_i | Z_i] $$ 
+  then note that $E[e_i | Z_i] = E[E[e_i | X_i,Z_i]] = 0$ 
+
+  Subtractcing yields 
+
+  $$ y_i - E[y_i | Z_i] = (X_i - E [X_i | Z_i])'\beta + e_i $$
+
+  \framebreak 
+
+  So this suggests a natural procedure: 
+
+  1. Estimate the conditional expectations $m_y(z) = E[y_i | Z_i]$ and $m_x(z) = E[X_i | Z_i]$ separately (and flexibly) \textbf{for each $x$} using the methods discussed in the previous section. 
+
+  2. Estimate $\beta$ using OLS on the residuals 
+  
+  $$y_i - \hat m_y(z_i) =  (X_i - \hat m_x(z_i))'\beta + e_i $$
+
+  \pause 
+
+  Note: Yatchew (1997) suggest step 1 can be avoided entirely by simply sorting on $z$, and running the model in first-differences. 
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Recent example: Hastings and Shapiro (2018)}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Single-Index Models}
+   
+  \begin{itemize}
+  \item Assume we are willing to specify that the conditional mean is a scalar function of the linear combination of $X's$ 
+  $$ E \left[ y | \mathbf{x} \right] = g(\mathbf{x}'\beta ) $$ 
+  \item Often we'll assume $g()$ as in logit and probit. 
+  \item Instead, note that the conditional mean of a change in $x$ 
+  $$ \delta \equiv E \left[g'(\mathbf{x}'\beta ) \beta_j \right] $$ 
+  
+  \item Suggests the \alert{average derivative estimator} which doesn't require normality assumptions of probit
+  \item Let $m(x_i) = g(x_i'\beta)$. 
+  $$ \hat \delta_{AD} = -\frac{1}{N} \sum_{i=1}^N y_i \frac{f'(x_i)}{f(x_i)} $$
+  where $f(x)$ is the density of $x$
+
+  \item More robust, but potentially less efficient if true distribution of $\varepsilon \sim N(0,1)$.
+ 
+  \item Can use Marginal Rate of Substitution (MRS) to identify $\beta_k / \beta_l$.
+  $$ \frac{ \partial \left[ y | \mathbf{x} \right] / \partial x_j }{ \partial \left[ y | \mathbf{x} \right] / \partial x_k} = \frac{\beta_j}{\beta_k} $$ 
+  
+   \end{itemize}
+\end{frame}
+
 \begin{frame}{Review: What was the point?}
 \begin{itemize}
 \item OLS is lowest variance among linear unbiased estimators.
@@ -1083,12 +1222,16 @@ $p_x>1$.
 \item Nearly anything can be written as Kernel.
 \end{itemize}
 \end{itemize}
-
-\section*{References}
-\frame{{Acknowledgements/ References}
-%tk could put this at the end
-}
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]
+  \bibliographystyle{jpe}
+  \bibliography{../empirical-methods}
+\end{frame}
+
+\end{document}
 
 %\begin{frame}
 %\frametitle{Additive models}
@@ -1113,7 +1256,7 @@ $p_x>1$.
 %
 
 
-\end{document}
+
 
 %% OLD / UNUSED (BUT USEFUL) SLIDES
 

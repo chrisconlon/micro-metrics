@@ -1,21 +1,15 @@
-NP reg
+Semi-param outline 
 
-slide: one idea is to build on what we just did and take a local weighted average
+- motivation
+    - high dimensional (or theory)
+- use CT example table 
+    - see power 1994 handbook chapter for a formal treatment 
 
-ols is one 
+- partial linear model
+    - robinson 1988
+    - example: electricity, oil 
 
-another common one is knn 
 
-conlon plots
 
-bias variance 
-
-kernel regs 
-
-include giudo's nadarya waston derivation
-
-cross validation (guido or ct)
-
-multivariate 
-
-curse of dimensionality
+### Commit notes:
+- added bib file and references to slides
