@@ -12,7 +12,8 @@ It is based on some combination of
 - [Microeconometrics by Cameron and Trivedi](https://www.amazon.com/Microeconometrics-Methods-Applications-Colin-Cameron/dp/0521848059)
 - [Elements of Statistical Learning by Hastie, Tibshirani, and Friedman](https://statweb.stanford.edu/~tibs/ElemStatLearn/)
 - Other lectures borrowed/stolen from various sources
-
+	- Bruce Hansen's [online text](https://www.ssc.wisc.edu/~bhansen/econometrics/)
+	
 The goal is to provide an overview of a number of topics in Microeconometrics including:
 
 1. Nonparametrics and Identification

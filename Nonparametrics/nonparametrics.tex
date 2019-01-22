@@ -1,7 +1,8 @@
 \input{../slideHeader}
 
 \setlength{\parskip}{5pt} 
-\usepackage{hyperref}
+
+\usepackage{comment}
 
 \title [Non-parametrics]{Nonparametrics and Local Methods}
 \author{Richard L. Sweeney}
@@ -19,25 +20,6 @@
 \begin{frame}
   \tableofcontents  
 \end{frame}
-
-\begin{comment}
-\frame{{ Outline}
-Outline
-
-  - nonparametric review
-    - histogram 
-    - kernels
-    - optimal bandwidth 
-    - cross validation
-  - nonparametric regression
-    - linear vs nearest neighbor
-    - bias variance
-    - curse of dimensionality
-    - local linear 
-  - semi parametric 
-    - robinson 
-}
-\end{comment}
 
 \section[Density Estimation]{Nonparametric Density Estimation}
 
@@ -744,7 +726,7 @@ K\left(\frac{\mathbf{x_1}-\mathbf{x_0}}{h}\right)}.
 
 \end{frame}
 
-\begin{comment}  
+\begin{comment} 
 \begin{frame}{Density/Distribution Estimation}
   One of the more successful and popular uses of nonparametric methods is estimating the density or distribution function $f(x)$ or $F(x)$.
   \begin{itemize}
@@ -801,15 +783,10 @@ K\left(\frac{\mathbf{x_1}-\mathbf{x_0}}{h}\right)}.
 \end{comment}
 
 \frame{\frametitle{Silverman's Table}
-  
-  \pause
-  
    Silverman (1986 book) 
   provides a table illustrating the difficulty of kernel estimation
   in high dimensions. To estimate the density at 0 of a $N(0,1)$ with
   a given accuracy, he reports:
-  
-  \pause
   
   \begin{table}
   \begin{center}
@@ -932,47 +909,34 @@ Locally Weighted Scatterplot Smoothing (\textbf{lowess})
   \end{figure}
 \end{frame}
 
-\begin{comment}
-\begin{frame}{Local Linear}
+\begin{frame}
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=\textwidth]{./resources/nwloclinear.pdf}
-\label{loclinear1}
-\end{center}
-\end{figure}
-\end{frame}
-
- \begin{frame}{Local Linear}
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=\textwidth]{./resources/nwloclinear2.pdf}
+\includegraphics[width=\textwidth]{./resources/MSTAbstract}
 \label{loclinear2}
 \end{center}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Local Quadratic}
+\begin{frame}{Empirical Strategy: DD}
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[width=.9\textwidth]{./resources/MSTRegression}
+  \label{loclinear2}
+  \end{center}
+  \end{figure}
+\end{frame}
+
+  
+\begin{frame}{First show flexible representation}
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=\textwidth]{./resources/locquad.pdf}
+\includegraphics[width=\textwidth]{./resources/MSTGradient}
 \label{loclinear2}
 \end{center}
 \end{figure}
+See code in this repo. 
 \end{frame}
-
-\frame{\frametitle{What if my distribution is discrete-continuous?}
-Very often in microeconometrics some covariates only take discrete
-values (e.g. gender, race, income bracket\ldots). Say the only discrete variable is gender, we care about the density of income of men. 
-\begin{itemize}
-\item The kernel approach adapts directly: we separately
-estimate a density for men (on the corresponding subsample).
-\item {\em Better:}  mix the two subsamples! Add women, but  {\bf with a small weight $w$}.
-\item Intuition: by doing so we increase the bias (the density for women is
-probably different than for men) $\rightarrow$  bad, in $w^2$ but we reduce the variance, by $O(w)$; and this dominates for small $w$. (cf Li-Racine).
-\end{itemize}
-}
-\end{comment}
-
 
 \frame{\frametitle{Nonparametric Regression, summary, 1}
 
@@ -995,7 +959,7 @@ scale up.
 
 Nadaraya--Watson=\textbf{local constant regression}:  to get $\hat{m}(x)$,
 
-\begin{enumerate}[<+->]
+\begin{enumerate}
   \item  regress $y_i$ on $1$ with weight $K_h(x-x_i)$
 \item take the estimated coeff as your $\hat{m}(x)$.
 \end{enumerate}
@@ -1005,9 +969,7 @@ Nadaraya--Watson=\textbf{local constant regression}:  to get $\hat{m}(x)$,
 
 Better: \textbf{local linear regression}
 
-\pause
-
-\begin{enumerate}[<+->]
+\begin{enumerate}
   \item  regress $y_i$ on $1$ and $(x_i-x)$ with weight $K_h(x-x_i)$
 \item take the estimated coeffs as your $\hat{m}(x)$ and $\hat{m}^\prime(x)$.
 \end{enumerate}
@@ -1018,10 +980,426 @@ To estimate the standard errors: bootstrap on an \emph{undersmoothed}
 estimate (so that bias is negligible.)
 }
 
+\section{Bootstrap}
+
+\begin{frame}{Bootstrap and Delta Method}
+  \begin{itemize}
+  \item We know how to construct confidence intervals for parameter estimates:  $\hat{\theta}_k \pm 1.96 SE(\hat{\theta}_k)$
+  \item Often we are asked to construct standard errors or confidence intervals around model outputs that are not just parameter estimates: ie:  $g(x_i,\hat{\theta})$.
+  \item Sometimes we can't even write $g(x_i,\theta)$ as an explicit function of $\theta$ ie: $\Psi(g(x_i,\theta),\theta) = 0$.
+  \item Two options:
+  \begin{enumerate}
+  \item Delta Method
+  \item Bootstrap
+  \end{enumerate}
+  \end{itemize}
+\end{frame}
+  
+\begin{frame}{Delta Method}
+  Delta method works by considering a \alert{Taylor Expansion} of $g(x_i,\theta)$.
+  \begin{eqnarray*}
+  g(z) \approx g(z_0) + g'(z_0)(z-z_0) + o(||z-z_0||)
+  \end{eqnarray*}
+  Assume that $\theta_n$ is asymptotically normally distributed so that:
+  \begin{eqnarray*}
+  \sqrt{n} (\theta_n - \theta_0) \sim N(0,\Sigma)
+  \end{eqnarray*}
+ % (How do we get this: OLS? GMM? MLE?).\\
+  
+  Then we have that 
+  \begin{eqnarray*}
+  \sqrt{n} (g(\theta_n) - g(\theta_0)) \sim N(0,D(\theta)' \Sigma  D(\theta))
+  \end{eqnarray*}
+  Where $D(\theta) = \frac{\partial g(x_i, \theta)}{\partial \theta}$ is the Jacobian of $g$ with respect to theta evaluated at $\theta$.\\
+  We need $g$ to be continuously differentiable around the center of our expansion $\theta$.
+\end{frame}
+  
+  
+\begin{frame}{Delta Method: Examples}
+  Start with something simple: $Y= \overline{X}_1\cdot \overline{X}_2$ with $(X_{1i},X_{2i}) \sim IID$.
+  We know the CLT applies so that:
+  \begin{eqnarray*}
+  \sqrt{n}
+  \begin{pmatrix}
+  \overline{X}_1 - \mu_1\\
+  \overline{X}_2 - \mu_2
+  \end{pmatrix} &\sim  N
+  \begin{bmatrix}
+  \begin{pmatrix}
+  0\\
+  0
+  \end{pmatrix},
+  \Sigma
+  \end{bmatrix}
+  \end{eqnarray*}
+  The Jacobian is just $D(\theta) =  \begin{pmatrix}\frac{\partial g(\theta)}{\partial \theta_1} \\ \frac{\partial g(\theta)}{\partial \theta_2}  \end{pmatrix} =  \begin{pmatrix}\mu_2\\ \mu_1 \end{pmatrix}$\\
+  So,
+  \begin{eqnarray*}
+  V(Y) = D(\theta)' \Sigma D(\theta) =\begin{pmatrix} \mu_2 & \mu_1 \end{pmatrix}  \begin{pmatrix} \sigma_{11} & \sigma_{12} \\ \sigma_{21} & \sigma_{22} \end{pmatrix} \begin{pmatrix} \mu_2 \\\mu_1  
+  \end{pmatrix} \\
+  \sqrt{n} ( \overline{X}_1 \overline{X}_2 - \mu_1 \mu_2) \sim N(0,\mu_2^2 \sigma_{11}^2 + 2 \mu_1 \mu_2 \sigma_{12}  + \mu_1^2 \sigma_{22}^2)
+  \end{eqnarray*}
+\end{frame}
+  
+\begin{frame}{Delta Method: Logit}
+  Think about a simple logit:
+  \begin{eqnarray*}
+  P(Y_i=1 | X_i ) = \frac{\exp^{\beta_0 + \beta_1 X_i}}{1+\exp^{\beta_0 + \beta_1 X_i}} \\
+  P(Y_i=0 | X_i ) = \frac{1}{1+\exp^{\beta_0 + \beta_1 X_i}} 
+  \end{eqnarray*}
+  Remember the ``trick'' to use GLM (log-odds):
+  \begin{eqnarray*}
+  \log P(Y_i=1 | X_i) - \log P(Y_i=0 | X_i) = \beta_0 + \beta_1 X_i
+  \end{eqnarray*}
+  \vspace{-10pt}
+  \begin{itemize}
+  \item Suppose that we have estimated $\hat{\beta_0},\hat{\beta_1}$ via GLM/MLE but we want to know the confidence interval for the probability: $P(Y_i=1 | X_i,\hat{\theta})$
+  \item The derivatives are a little bit tricky, but the idea is the same.
+  \item This is what STATA should be doing when you type: \tt{mfx, compute}
+  \end{itemize}
+\end{frame}
+
+%https://faculty.washington.edu/ezivot/econ583/asymptoticsprimerslides.pdf
+
+\begin{frame}{Delta Method: Learning example}
+  Often we have a nonlinear model that we transform and estimate linearly.
+   
+  Here is an example on learning curves from Eric Zivot. 
+  \vspace{-15pt}
+
+  \includegraphics[page=1,trim={2cm 2cm 2cm 2cm},clip,width=\textwidth]{./resources/zivotLearning.pdf}
+
+\end{frame}
+
+\begin{frame}[plain]{}
+	\includegraphics[page=2,trim={2cm 2cm 2cm 2cm},clip,width=\textwidth]{./resources/zivotLearning.pdf}
+\end{frame}
+
+\begin{frame}[plain]{}
+	\includegraphics[page=3,trim={2cm 2cm 2cm 2cm},clip,width=\textwidth]{./resources/zivotLearning.pdf}
+\end{frame}
+
+\begin{frame}[plain]{}
+	\includegraphics[page=4,trim={2cm 2cm 2cm 2cm},clip,width=\textwidth]{./resources/zivotLearning.pdf}
+\end{frame}
+
+\begin{frame}[plain]{}
+	\includegraphics[page=5,trim={2cm 2cm 2cm 2cm},clip,width=\textwidth]{./resources/zivotLearning.pdf}
+\end{frame}
+
+\begin{frame}[plain]{}
+	\includegraphics[page=6,trim={2cm 2cm 2cm 2cm},clip,width=\textwidth]{./resources/zivotLearning.pdf}
+\end{frame}
+
+\begin{frame}{Delta Method: Some Failures}
+  But we need to be careful.  Suppose that $\theta \approx 0$ and 
+  \begin{itemize}
+  \item $g(x)  = |X|$
+  \item $g(x)  = 1/X$
+  \item $g(x)  = \sqrt{X}$
+  \end{itemize}
+  These situations can arise in practice when we have weak instruments or other problems.\end{frame}
+  
+\begin{frame}[allowframebreaks]{Bootstrap}
+\vspace{-10pt}
+  \begin{itemize}
+  \item Bootstrap takes a different approach.
+  \begin{itemize}
+  \item Instead of estimating $\hat{\theta}$ and then using a first-order Taylor Approximation...
+  \item What if we directly tried to construct the \alert{sampling distribution} of $\hat{\theta}$?
+  \end{itemize}
+  
+\framebreak
+ 
+  \item Data $(X_1,\ldots,X_n) \sim P$ are drawn from some measure $P$
+  \begin{itemize}
+  \item We can form a \alert{nonparametric estimate} $\hat{P}$ by just assuming that each $X_i$ has weight $\frac{1}{n}$.
+  \end{itemize}
+  \item We can then simulate a new sample $X^{*} = (X_1^{*},\ldots X_n^{*}) \sim \hat{P}$.
+  \begin{itemize}
+  \item Easy: we take our data and construct $n$ observations by \alert{sampling with replacement} 
+  \end{itemize}
+  \item Compute whatever statistic of $X^{*}$, $S(X^*)$ we would like.
+  \begin{itemize}
+  \item Could be the OLS coefficients $\beta_1^{*},\ldots, \beta_k^{*}$.
+  \item Or some function $\beta_1^{*}/\beta_2^{*}$.
+  \item Or something really complicated: estimate parameters of a game $\hat{\theta}^*$ and now find Nash Equilibrium of the game $S(X^{*},\hat{\theta^*})$ changes.
+  \end{itemize}
+  \item Do this $B$ times and calculate at $Var(S_b)$ or $CI(S_1,\ldots, S_b)$.
+  \end{itemize}
+\end{frame}
+  
+\begin{frame}{Bootstrap: OLS}
+ \begin{itemize}
+ 	\item Linear predictor $\beta = E[X_i X_i']^{-1}E[X_i Y_i] $
+ 	\item Sample $\{(Y_i,X_i) \}_{i=1}^{N}$  
+ 	\item OLS: $\hat \beta_{ols} = [\sum^N_{i=1} X_i X_i']^{-1}[\sum^N_{i=1} X_i Y_i] $
+ 	\item To get the variance, resample with replacement B times and calculate $\hat\beta_{ols,b}=   [\sum^N_{j=1} X_j X_j']^{-1}[\sum^N_{j=1} X_j Y_j] $
+ 	\item Now an estimate of the variance is just 
+ 	$$ V(\beta_{ols}) = \frac{1}{B}\sum_b^B (\hat \beta_{ols,b} - \bar \beta_{ols,b}) \cdot  (\hat \beta_{ols,b} - \bar \beta_{ols,b})' $$
+ \end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Bootstrap: Variants}
+  The bootstrap I have presented is sometimes known as the \alert{nonparametric bootstrap} and is the most common one.
+  \begin{description}
+  \item[Parametric Bootstrap] instead of bootstrapping pairs $(Y_i,X_i)$, we can bootstrap the residuals. 
+  \begin{itemize}
+  	\item First estimate $\hat \beta_{ols}$ by OLS
+  	\item Get residuals $\hat \epsilon_i = Y_i - X_i'\hat{\beta_{ols}}$ 
+  	\item For $b=1,...,B$, resample $N$ residuals $\hat \epsilon_i$
+  	\item Predict a new $Y_{b,j} = X_j' \hat \beta_{ols} + \hat \epsilon_{b,j}$
+  	\item Estimate with OLS and proceed as before. 
+  \end{itemize}
+\framebreak
+
+   \item[Wild Bootstrap] Similar to parametric bootstrap but we rescale $\epsilon_i$ to allow for \alert{heteroskedasticity}
+  \item[Block Bootstrap] For correlated data (e.g.: time series). Blocks can be overlapping or not.  
+  \end{description}
+\end{frame}
+  
+\begin{frame}{Bootstrap: Bias Correction}
+  \small
+  The main idea is that $\hat{\theta}^{1*},\ldots, \hat{\theta}^{B*}$ approximates the \alert{sampling distribution} of $\hat{\theta}$. There are lots of things we can do now:
+  \begin{itemize}
+  \item We already saw how to calculate $Var(\hat{\theta}^{1*},\ldots, \hat{\theta}^{B*})$.
+  \begin{eqnarray*}
+  \frac{1}{B-1} \sum_{b=1}^B (\hat{\theta}_{(b)}^* - \overline{\theta^{*}})^2
+  \end{eqnarray*}
+  
+  \item Calculate $E(\hat{\theta}^{*}_{(1)},\ldots, \hat{\theta}^{*}_{(B)}) = \overline{\theta^{*}} = \frac{1}{B} \sum_{b=1}^B \hat{\theta}_{(b)}^*$.
+  \begin{itemize}
+  \item We can use the estimated bias to \alert{bias correct} our estimates
+  \begin{eqnarray*}
+  Bias(\hat{\theta}) &=&E[\hat{\theta}] - \theta \\
+  Bias_{bs}(\hat{\theta}) &=&\overline{\theta^{*}} -\hat{\theta}
+  \end{eqnarray*}
+  Recall $\theta = E[\hat{\theta}] - Bias[\hat{\theta}]$:
+  \begin{eqnarray*}
+  \hat{\theta}- Bias_{bs}(\hat{\theta}) = \hat{\theta}-(\overline{\theta^{*}}-\hat{\theta}) = 2 \hat{\theta} - \overline{\theta^{*}}
+  \end{eqnarray*}
+  \end{itemize}
+  \item Correcting bias isn't for free - variance tradeoff!
+  \item Linear models are (hopefully) unbiased, but most nonlinear models are \alert{consistent but biased}.
+  \end{itemize}
+  \end{frame}
+  
+  
+\begin{frame}{Bootstrap: Confidence Intervals}
+  There are actually three ways to construct bootstrap CI's:
+  \begin{enumerate}
+  \item Obvious way: sort  $\hat{\theta}^{*}$ then take $CI: [\hat{\theta}^{*}_{\alpha/2},\hat{\theta}^{*}_{1-\alpha/2}]$.
+  \item Asymptotic Normal:  $CI: \hat{\theta} \pm 1.96 \sqrt{V(\hat{\theta}^{*})}$. (CLT).
+  \item Better Way: Use a pivotal statistic that you know the distribution of.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Bootstrap CI: percentile t method}
+  \begin{itemize}
+    \item Instead of estimating $\theta_b$ for each bootstrap sample, estimate the t-statistic $t^b = (\hat \theta^b - \hat \theta )/ s_{\hat \theta^b \theta}$, where $\hat \theta$ is the original estimate. 
+    \item The empirical distribution of $t^b$ can then be used to approximate the \textbf{known} t-distribution (which has nothing to do with our data)
+    \item Let $t^b_{[1-\alpha/2]}$ and $t^b_{[\alpha/2]}$ denote the lower and upper $\alpha/2$ quintiles of this distribution. 
+    \item A confidence interval can then be constructed as 
+    $$ \left( \hat \theta - t^b_{[1-\alpha/2]} \times \hat s_{\hat \theta}, \hat \theta + t^b_{[\alpha/2]} \times \hat s_{\hat \theta} \right) $$
+  \end{itemize}
+\end{frame}
+  
+\begin{frame}{Bootstrap: Why do people like it?}
+  \begin{itemize}
+  \item Econometricians like the bootstrap because under certain conditions it is \alert{higher order efficient} for the confidence interval construction (but not the standard errors).
+  \begin{itemize}
+  \item Intuition: because it is non-parametric it is able to deal with more than just the first term in the Taylor Expansion (actually an \alert{Edgeworth Expansion}).
+  \item Higher-order asymptotic theory is best left for real econometricians!
+  \end{itemize}
+  \item Practitioner's like the bootstrap because it is easy.
+  \begin{itemize}
+  \item If you can estimate your model once in a reasonable amount of time, then you can construct confidence intervals for most parameters and model predictions.
+  \end{itemize}
+  \end{itemize}
+  \end{frame}
+  
+  \begin{frame}{Bootstrap: When Does It Fail?}
+  \begin{itemize}
+  \item Bootstrap isn't magic. If you are constructing standard errors for something that isn't asymptotically normal, don't expect it to work!
+  \item The Bootstrap exploits the notion that your sample is IID (by sampling with replacement). If IID does not hold, the bootstrap may fail (but we can sometimes fix it!).
+  \item Bootstrap depends on asymptotic theory. In small samples weird things can happen. We need $\hat{P}$ to be a good approximation to the true $P$ (nothing missing).
+  \end{itemize}
+  \end{frame}
+  
+  
+\begin{frame}{Bootstrap vs Delta Method}
+  \begin{itemize}
+  \item Delta Method works best when working out Jacobian $D(\theta)$ is easy and statistic is well approximated with a linear function (not too curvy).
+  \item I would almost always advise Bootstrap unless:
+  \begin{itemize}
+  \item Delta method is trivial e.g.: $\beta_1 / \beta_2$ in linear regression.
+  \item Computing model takes many days so that 10,000 repetitions would be impossible.
+  \end{itemize}
+  \item Worst case scenario: rent time on Amazon EC2!
+  \begin{itemize}
+  \item I ``bought'' over \$1,000 of standard errors recently.
+  \end{itemize}
+  \item But neither is magic and both can fail!
+  \end{itemize}
+\end{frame}
+
+% from CT 9.5.4
+\begin{frame}{CI's for Kernel Smoothers}
+  \begin{itemize}
+    \item Return to the theme of these slides: Estimating a nonparametric regression function. 
+    \item For kernel regression, you need to present CI's \textbf{pointwise}. 
+    \begin{itemize}
+      \item CT recommend presenting CIs for $f(x_0)$ for the first nine deciles of $x$
+    \end{itemize}
+
+\pause
+
+    \item If we ignore the bias $b(x_0)$ inherent in $\hat m(x_0)$ then, 
+    $$ m(x_0) \in \hat m(x_0) \pm 1.96 \sqrt{\frac{1}{Nh}{\hat \sigma_\epsilon^2}{\hat f(x_0)} \int K(z)^2dz} $$
+    where $\hat \sigma_\epsilon^2 = \sum_i w_{i0,h}\hat \epsilon^2$ and $\hat f(x_0)$ is the kernel density estimate at $x_0$
+    \item Since we know that there is bias, if we use $h_{opt}$, this CI will suffer from \textbf{undercoverage}
+    \item On option is to undersmooth. By pick a bigger $h$, the bias goes to zero, the square of the bias will converge faster than the variance 
+  % see guido's notes 17 for this
+  \end{itemize}
+\end{frame}
+
+% from CT 9.5.4
+\begin{frame}{An alternative is to bootstramp CI's}
+  Consider the following routine proposed by Yatchew. 
+  \begin{enumerate}
+    \item Use CV to find the optimal bandwith. Call this $\lambda$ and the estimated function $f_\lambda$
+    \item Reestimate $f$ with using a \textit{wider} bandwidth $\bar \lambda = 1.1 \lambda$ (oversmoothing)
+    \item Reestimate $f$ with using a \textit{narrower} bandwidth of $.9 \lambda$. Get \textit{undersmoothed} residuals $\hat \epsilon_i$
+    \item Center residuals and use \textbf{parametric} boostrap to generated $B$ samples $y_i^b = \hat f_{\bar \lambda}(x_i) + \hat \epsilon_i^b$
+    \item Now estimate $\hat f_\lambda^b(x_0)$ using the \textbf{original} $\lambda$
+    \item Can obtain 95\% CIs from 0.025 and 0.975 quintiles of $\hat f^B_{\lambda}(x_0)$
+  \end{enumerate}
+\end{frame}
+
+\section{Basis Expansions}
+
 \begin{frame}{Seminonparametric (=Flexible) Regression}
+  \begin{itemize}
+    \item Linear model won't fit well when true relationship is nonlinear
+    \item But fully flexible models may require a lot of data 
+    \item Alternative is to replace $X$ with $M$ transformations of $h_m(X)$
+    \item Then model $f(X) = \sum_m \beta_m h_m(X)$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Series or sieves}
+
+  \begin{itemize}
+    \item This is a \textit{parametric} approximation that becomes more accurate as the sample size increases
+  
+    \item {\bf Idea:} we add regressors when we have more data, eventually providing an arbitrarily close approximation to the true regression function
+  
+    \item Polynomial Example: $ m(x;\beta_K) = \sum_{j=1}^{K} \hat \beta_j x^j$ 
+    \item Given $K$, \textbf{just estimate model using OLS}
+    \item In practice, you'll want to choose $K$ using leave-one-out cross validation. 
+  \end{itemize}
+  
+  Note that simply polynomials often perform poorly in some parts of the data! 
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Piecewise polynomials}
+  \begin{itemize}
+    \item First consider a single dimensional $X$
+    \item Divide $f$ into contiguous intervals, and pick a function to represent $y$ on each interval 
+    \item A natural starting point would be a piecewise constant function, broken up by boundary points $\xi_1$ and $xi_2$
+    $$ h_1 = I(X < \xi_1) ; h_2 = I(\xi_1 < X < \xi_2); h_3 = I(\xi_2 < X) $$ 
+    \item This predicts the interval average for all $X$
+
+  \end{itemize}
+\end{frame}    
+
+\begin{frame}
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[height=\textheight]{./resources/ESLPiecewise}
+  \end{center}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Piecewise polynomials (cont)}
+  \begin{itemize}
+     \item We can improve this by adding three additional basis functions: $h_{m+3} = h_m(X)X$. 
+    \item We can then make it continuous by 
+    \begin{eqnarray*}
+      h_1 = 1 \\
+      h_2 = X \\
+      h_3 = (X- \xi_1)_+ \\
+      h_4 = (X - \xi_2)_+ 
+    \end{eqnarray*} 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Smooth splines}
+  \begin{itemize}
+    \item We can improve this further by increasing the order of the local polynomial
+    \item A common option is cubic splines: 
+    \begin{eqnarray*}
+      h_1 = 1  ; \quad  h_2 = X  ; \quad h_3 = X^2 \\
+      h_4 = x^ 3  ; \quad h_5 (X- \xi_1)_+^3 ; \quad h_6 = (X - \xi_2)_+^3 
+    \end{eqnarray*} 
+    \item This is a six dimensional space: (3 regions) X (4 parameters per region) - (2 knots) X (3 constraints per knot)
+    \item In practice people never use higher than cubic
+    \item Picking the knots is more subjective (use CV?)
+    \item Also typically use B-splines (see HTF)
+  \end{itemize}
+
+ \end{frame}
+
+ 
+\begin{frame}
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[height=\textheight]{./resources/ESLPiecewiseCubic}
+  \end{center}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Natural Splines}
+  THF: "We know that the behavior of polynomials fit to data tends to be erratic
+  near the boundaries, and extrapolation can be dangerous. The polynomials fit beyond the boundary knots behave even more wildly than the corresponding global polynomials
+  in that region." 
+
+  \alert{Natural Cubic Splines} Add a further constraint that the fitted function is linear beyond the boundary knots
+
+  With K knots is represented by K basis functions:
+\vspace{-8pt}
+  \begin{eqnarray*}
+    h_1 = 1 \\
+    h_2 = X \\
+    h_{k+2} = d_k - d_{K-1}
+  \end{eqnarray*} 
+  where, $$d_k(X) = \frac{(X-\xi_k)_+^3 - (X-\xi_k)_+^3 }{\xi_K - \xi_k} $$
+\end{frame}
+
+
+\begin{frame}{Smoothing Splines}
+Idea: pick knots to minimize RSS 
+
+\[
+\min_{m(.)} \sum_i^N (y_i-f(x_i))^2 +\lambda J \int (f''(x))^2 dx 
+\]
+
+where $\lambda$ is a \textbf{smoothing parameter} and $f(x)$ is any twice differentiable function
+
+Remarkably, THF show that the solution can be represented as a natural cubic spline with knots at $k$ chosen points. 
+
+We'll discuss this \alert{shrinkage} estimator next week.
+\end{frame}
+
+\begin{comment}
+\begin{frame}{Series or sieves}
 
 \begin{itemize}
-  \item This is a \textit{parametric} approximation that becomes more accurate as the sample size increases (series of sieves)
+  \item This is a \textit{parametric} approximation that becomes more accurate as the sample size increases
 
   \item {\bf Idea:} we add regressors when we have more data, eventually providing an arbitrarily close approximation to the true regression function
 
@@ -1029,7 +1407,11 @@ estimate (so that bias is negligible.)
   \item Given $K$, \textbf{just estimate model using OLS}
   \item In practice, you'll want to choose $K$ using leave-one-out cross validation. 
 \end{itemize}
+
+Note that simply polynomials often perform poorly in some parts of the data! 
+
 \end{frame}
+
 
 \begin{frame}{Splines: trading off fit and smoothness}
 
@@ -1040,55 +1422,116 @@ estimate (so that bias is negligible.)
     \item For example, can estimate a linear spline with an intercept and separate slopes depending on whether $x > x_0$
   \end{itemize}
 \end{frame} 
+\end{comment}
 
-\begin{frame}{Cubic Splines}
-
-Another common option is 
-\[
-\min_{m(.)} \sum_i^N (y_i-m(x_i))^2 +\lambda J \int (m''(x))^2 dx 
-\]
-
-where $\lambda$ is a \textbf{smoothing parameter} and $m$ is a cubic polynomial 
-
-Then we ``obtain'' the natural cubic spline with knots=$(x_1,\ldots,x_n)$:
-
-\begin{itemize}[<+->]
-\item $m$ is a cubic polynomial between consecutive $x_i$'s
-\item it is linear out-of-sample
-\item it is $C^2$ everywhere. 
-\end{itemize}
-
-\pause
-
-``Consecutive'' implies one-dimensional\ldots harder to generalize to
-$p_x>1$.
-
-\pause
-
-\textbf{Orthogonal polynomials:} check out Chebyshev, $1, x,
-2x^2-1,4x^3-3x\ldots$ (on $[-1,1]$ here.)
-
-\end{frame}
-
-
-
+%
 \section{Semi-parametrics}
 
-\begin{frame}{Review: What was the point?}
-\begin{itemize}
-\item OLS is lowest variance among linear unbiased estimators.
-\item But there are \alert{nonlinear} estimators and potentially \alert{biased} estimators.
-\begin{itemize}
-\item Everything faces a \alert{bias-variance} tradeoff.
-\item Nearly anything can be written as Kernel.
-\end{itemize}
-\end{itemize}
-
-\section*{References}
-\frame{{Acknowledgements/ References}
-%tk could put this at the end
-}
+\begin{frame}{Semiparametric Regression}
+  \begin{itemize}
+    \item Previous methods placed no structure on the model
+    \item Sometime we're willing to impose \textit{some} structure, typically to isolate a parameter or ratio that we're particularly interested in
+    \item Fully non-parametric methods controlling for other factors not possible due to the curse of dimensionality. 
+  \end{itemize}
 \end{frame}
+
+\begin{frame}
+  \frametitle{Examples}
+  
+  \begin{figure}[htbp]
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/CTSemiPExamples}
+    \label{loclinear2}
+    \end{center}
+  \end{figure}
+
+  For a formal treatment of these and discussion of convergence, see \cite{powell_chapter_1994}.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Partial linear model}
+  We'll focus on the most commonly used model: the \textbf{partial linear model} 
+  $$ y_i = X_i'\beta + g(Z_i) + e_i $$ 
+  
+  We are interested in $\beta$, but $g()$ is an unrestricted (unknown) function of $z$. 
+
+  Identification requires $Cov[X,g(Z)]=0$ 
+
+  \citet{robinson_root-n-consistent_1988} showed that we can concentrate this $g()$ out of the model. 
+
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{Robinson 1988}
+  $$ y_i = X_i'\beta + g(Z_i) + e_i $$ 
+  where $e_i = y_i - E[y_i | X_i,Z_i]$. 
+  
+  Take the conditional expectation
+  $$ E[y_i | Z_i]  = E [X_i | Z_i]'\beta + g(Z_i) + E[e_i | Z_i] $$ 
+  then note that $E[e_i | Z_i] = E[E[e_i | X_i,Z_i]] = 0$ 
+
+  Subtractcing yields 
+
+  $$ y_i - E[y_i | Z_i] = (X_i - E [X_i | Z_i])'\beta + e_i $$
+
+  \framebreak 
+
+  So this suggests a natural procedure: 
+
+  1. Estimate the conditional expectations $m_y(z) = E[y_i | Z_i]$ and $m_x(z) = E[X_i | Z_i]$ separately (and flexibly) \textbf{for each $x$} using the methods discussed in the previous section. 
+
+  2. Estimate $\beta$ using OLS on the residuals 
+  
+  $$y_i - \hat m_y(z_i) =  (X_i - \hat m_x(z_i))'\beta + e_i $$
+
+  \pause 
+
+  Note: Yatchew (1997) suggest step 1 can be avoided entirely by simply sorting on $z$, and running the model in first-differences. 
+
+  For a recent example, Hastings and Shapiro (AER 2018)
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Single-Index Models}
+   
+  \begin{itemize}
+  \item Assume we are willing to specify that the conditional mean is a scalar function of the linear combination of $X's$ 
+  $$ E \left[ y | \mathbf{x} \right] = g(\mathbf{x}'\beta ) $$ 
+  \item Often we'll assume $g()$ as in logit and probit. 
+  \item Instead, note that the conditional mean of a change in $x$ 
+  $$ \delta \equiv E \left[g'(\mathbf{x}'\beta ) \beta_j \right] $$ 
+  
+  \item Suggests the \alert{average derivative estimator} which doesn't require normality assumptions of probit
+  \item Let $m(x_i) = g(x_i'\beta)$. 
+  $$ \hat \delta_{AD} = -\frac{1}{N} \sum_{i=1}^N y_i \frac{f'(x_i)}{f(x_i)} $$
+  where $f(x)$ is the density of $x$
+
+  \item More robust, but potentially less efficient if true distribution of $\varepsilon \sim N(0,1)$.
+ 
+  \item Can use Marginal Rate of Substitution (MRS) to identify $\beta_k / \beta_l$.
+  $$ \frac{ \partial \left[ y | \mathbf{x} \right] / \partial x_j }{ \partial \left[ y | \mathbf{x} \right] / \partial x_k} = \frac{\beta_j}{\beta_k} $$ 
+  
+   \end{itemize}
+\end{frame}
+
+\begin{frame}{Review: What was the point?}
+  \begin{itemize}
+  \item OLS is lowest variance among linear unbiased estimators.
+  \item But there are \alert{nonlinear} estimators and potentially \alert{biased} estimators.
+  \begin{itemize}
+  \item Everything faces a \alert{bias-variance} tradeoff.
+  \item Nearly anything can be written as Kernel.
+  \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[allowframebreaks]
+  \bibliographystyle{jpe}
+  \bibliography{../empirical-methods}
+\end{frame}
+
+\end{document}
 
 %\begin{frame}
 %\frametitle{Additive models}
@@ -1113,8 +1556,8 @@ $p_x>1$.
 %
 
 
-\end{document}
 
+\section*{unused}
 %% OLD / UNUSED (BUT USEFUL) SLIDES
 
 
