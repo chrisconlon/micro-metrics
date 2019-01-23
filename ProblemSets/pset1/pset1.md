@@ -5,11 +5,11 @@ In the Nonparametrics lecture, we discussed a prominent application of nonparame
 
 Guerre, Perrigne and Voung (ECMA 2000) show that the distibution of (unobserved) bidder values can be recovered nonparametrically if we know how the auction works and can estimate the pdf and cdf of bids. 
 
-In this problem, we are going to simulate $N$ auctions, and then try to recover the (known) distribution of valuations ($v$) using GPV. It turns out that except for a couple simple cases, such as when $v$ is uniformly distributed, even generating the resulting equilibrium bid function is non-trivial. 
+In this problem, we are going to simulate $N$ auctions, and then try to recover the (known) distribution of valuations ($v$) using GPV. 
 
-Fortunately, [Hickman (IJIO, 2010)](https://www.sciencedirect.com/science/article/pii/S0167718709001076) provides code to simulate bid functions from several distributions in Matlab. This code, available on [his website](http://home.uchicago.edu/hickmanbr/research.html), has been placed in this directory. 
+[Hickman (IJIO, 2010)](https://www.sciencedirect.com/science/article/pii/S0167718709001076) provides code to simulate bid functions from several distributions in Matlab. This code, available on [his website](http://home.uchicago.edu/hickmanbr/research.html), has been placed in this directory. 
 
-1. Simulate bids from 100 first price auctions with 3 bidders. 
+1. Simulate bids from 100 IPV first price auctions with 3 bidders. 
     - To get the bid function, call the `FPauction.m` function. 
     - Assume the distribution of values is **lognormal**, and that the mean and standard deviation of the underlying normal are $\mu = 1$ and $\sigma = .5$ 
     - Note that in the `FPauction.m` these parameters are $a$ and $b$. Also, to speed things up assume a max bid of `vbar` $= \exp(2.5)$
