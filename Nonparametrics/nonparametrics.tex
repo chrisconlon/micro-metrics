@@ -1299,7 +1299,7 @@ estimate (so that bias is negligible.)
     \item In practice, you'll want to choose $K$ using leave-one-out cross validation. 
   \end{itemize}
   
-  Note that simply polynomials often perform poorly in some parts of the data! 
+  Note that simple polynomials often perform poorly in some parts of the data! 
   
 \end{frame}
 
@@ -1377,20 +1377,24 @@ estimate (so that bias is negligible.)
     h_2 = X \\
     h_{k+2} = d_k - d_{K-1}
   \end{eqnarray*} 
-  where, $$d_k(X) = \frac{(X-\xi_k)_+^3 - (X-\xi_k)_+^3 }{\xi_K - \xi_k} $$
-\end{frame}
+  where, $$d_k(X) = \frac{(X-\xi_k)_+^3 - (X-\xi_K)_+^3 }{\xi_K - \xi_k} $$
 
+\end{frame}
 
 \begin{frame}{Smoothing Splines}
 Idea: pick knots to minimize RSS 
 
 \[
-\min_{m(.)} \sum_i^N (y_i-f(x_i))^2 +\lambda J \int (f''(x))^2 dx 
+\min_{f(.)} \sum_i^N (y_i-f(x_i))^2 +\lambda J \int (f''(x))^2 dx 
 \]
 
 where $\lambda$ is a \textbf{smoothing parameter} and $f(x)$ is any twice differentiable function
 
-Remarkably, THF show that the solution can be represented as a natural cubic spline with knots at $k$ chosen points. 
+If $\lambda = \infty$, this is just OLS ($f''=0$)
+
+\pause
+
+Remarkably, THF show that the solution has a unique finite-dimensional maximizer which can be represented as a natural cubic spline with knots at $N$ chosen points. 
 
 We'll discuss this \alert{shrinkage} estimator next week.
 \end{frame}
@@ -1461,20 +1465,26 @@ Note that simply polynomials often perform poorly in some parts of the data!
 
 \end{frame}
 
-\begin{frame}[allowframebreaks]
-  \frametitle{Robinson 1988}
+\begin{frame}{Robinson 1988}
+  \vspace{-10pt}
   $$ y_i = X_i'\beta + g(Z_i) + e_i $$ 
   where $e_i = y_i - E[y_i | X_i,Z_i]$. 
   
+  \pause 
+  \vspace{10pt}
   Take the conditional expectation
   $$ E[y_i | Z_i]  = E [X_i | Z_i]'\beta + g(Z_i) + E[e_i | Z_i] $$ 
   then note that $E[e_i | Z_i] = E[E[e_i | X_i,Z_i]] = 0$ 
-
+  
+ \pause 
+ \vspace{10pt}
   Subtractcing yields 
 
   $$ y_i - E[y_i | Z_i] = (X_i - E [X_i | Z_i])'\beta + e_i $$
 
-  \framebreak 
+\end{frame}
+
+\begin{frame}{Robinson 1988 II}
 
   So this suggests a natural procedure: 
 
@@ -1497,13 +1507,13 @@ Note that simply polynomials often perform poorly in some parts of the data!
   \item Assume we are willing to specify that the conditional mean is a scalar function of the linear combination of $X's$ 
   $$ E \left[ y | \mathbf{x} \right] = g(\mathbf{x}'\beta ) $$ 
   \item Often we'll assume $g()$ as in logit and probit. 
-  \item Instead, note that the conditional mean of a change in $x$ 
+  \item Instead, note that the conditional mean of a change in $x_j$ 
   $$ \delta \equiv E \left[g'(\mathbf{x}'\beta ) \beta_j \right] $$ 
   
   \item Suggests the \alert{average derivative estimator} which doesn't require normality assumptions of probit
   \item Let $m(x_i) = g(x_i'\beta)$. 
   $$ \hat \delta_{AD} = -\frac{1}{N} \sum_{i=1}^N y_i \frac{f'(x_i)}{f(x_i)} $$
-  where $f(x)$ is the density of $x$
+  where $f(x)$ is the density of $x$ (see CT 9.7.4)
 
   \item More robust, but potentially less efficient if true distribution of $\varepsilon \sim N(0,1)$.
  
@@ -1520,6 +1530,8 @@ Note that simply polynomials often perform poorly in some parts of the data!
   \begin{itemize}
   \item Everything faces a \alert{bias-variance} tradeoff.
   \item Nearly anything can be written as Kernel.
+  \item These are easy to implement in big data settings in one or two dimensions, but quickly run into the curse of dimensionality.
+  \item Semiparametric approaches often a useful middle ground.
   \end{itemize}
   \end{itemize}
 

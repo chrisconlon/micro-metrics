@@ -34,11 +34,13 @@
 
 \usepackage{hyperref}
 % Change the setup later on, after loading hyperref
-\hypersetup{colorlinks=true,linkcolor=blue, linktocpage}
+\hypersetup{colorlinks=true, urlcolor=blue, linkcolor=blue, linktocpage}
 
 % Bib stuff
 
 \usepackage{natbib}
 \usepackage{bibentry}
 \renewcommand{\cite}{\citet}
+%\let\oldcite=\cite                                                          %\renewcommand{\cite}[1]{\textcolor[rgb]{0,0,1}{\oldcite{#1}}}
+%\renewcommand{\cite}{\citet}
 
