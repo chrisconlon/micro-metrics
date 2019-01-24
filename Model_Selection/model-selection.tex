@@ -1,34 +1,24 @@
-\documentclass[xcolor=pdftex,dvipsnames,table,mathserif]{beamer}
-\usetheme{default}
-%\usetheme{Darmstadt}
-%\usepackage{times}
-%\usefonttheme{structurebold}
+\input{../slideHeader}
 
-\usepackage[english]{babel}
-%\usepackage[table]{xcolor}
-\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
-\usepackage{amsmath,amssymb,setspace,centernot}
-\usepackage[latin1]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{relsize}
-\usepackage{pdfpages}
-\usepackage[absolute,overlay]{textpos} 
+\title{Model Selection}
+\author{Richard L. Sweeney}
+\institute{based on slides by Chris Conlon}
+\date{Empirical Methods \\ Spring 2019}
 
-
-\newenvironment{reference}[2]{% 
-  \begin{textblock*}{\textwidth}(#1,#2) 
-      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
-
+\setbeamerfont{equation}{size=\tiny}
 \DeclareMathSizes{10}{10}{6}{6} 
 
 \begin{document}
-\title{Part 2: Model Selection}
-\author{Chris Conlon}
-\institute{Microeconometrics}
-\date{\today}
 
-\frame{\titlepage}
+\begin{frame}
+    \titlepage
+\end{frame}
 
+\begin{frame}
+    \tableofcontents  
+\end{frame}
+    
+   
 \section{Intro}
 \frame{\frametitle{Overview}
 How many components should we include in our model?
@@ -41,6 +31,8 @@ How do we choose?
 \item $X$ variables.
 \item Instrumental Variables.
 \end{itemize}
+
+In these notes we'll talk about these in the context of linear regression. 
 }
 
 
@@ -57,10 +49,9 @@ How do we choose?
 \end{frame}
 
 
-
 \begin{frame}
 \frametitle{What we teach undergrads}
-Two traditional ways to select the number of components in a model:\\
+Traditional ways to select the number of components ($p$) in a model:\\
 \begin{eqnarray*}
 \overline{R}^2  &=& 1-SSR(p)/TSS - SSR(p)/TSS \cdot \frac{p}{N-p-1} \\
 AIC(p) &=& \ln\left(\frac{SSR(p)}{N}\right) + (p+1)\frac{2}{N}\\
@@ -75,80 +66,16 @@ y_t = \alpha_0 + \sum_{k=1}^p \alpha_k y_{t-k} + \varepsilon_t
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Review AIC/BIC}
-\begin{itemize}
-\item AIC tends to select larger models than BIC since it penalizes the number of parameters less heavily.
-\item These usually depend on ordering potential models by $p$ the number of components and then sequentially fitting them.
-\item AIC is not consistent: as $N \rightarrow \infty$ it may still select too many parameters.
-\item BIC is consistent: as $N \rightarrow \infty$ it will select the correct number of parameters.
-\item Of course for finite-sample $N < \infty$ anything can happen.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Where does it come from?}
-How do we come up with these penalized regressions?
-\begin{itemize}
-\item AIC/BIC arise from considering the likelihood ratio test (LRT) of a maximum likelihood estimator and making a lot of assumptions.
-\item AIC arises from minimizing the Expected KLIC.
-\begin{eqnarray*}
-KLIC(f,g) &=& \int  f(y) \log(f(y)) \partial y - \int  f(y) \log(g(y)) \partial y  \\
-&=& C_f - E  \log(g(y))
-\end{eqnarray*}
-\item Low values of KLIC mean the models are similar.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Where does it come from?}
-How do we come up with these penalized regressions?
-\begin{itemize}
-\item Recall that OLS is a ML estimator in the case where $\varepsilon$ is normally distributed.
-\begin{eqnarray*}
-D = - 2 \ln \left (\frac{\mbox{Likelihood  } H_0}{\mbox{ Likelihood  }H_a} \right) = -2 \ln \underbrace{\left(\frac{(\sup L(\theta | x) : \theta \in \Theta_0)}{(\sup L(\theta | x) : \theta \in \Theta)}\right)}_{\Lambda(x)}
-\end{eqnarray*}
-\item If the models are \alert{nested} then $\Theta_0 \subset \Theta$ and $\dim(\Theta) -\dim(\Theta_0) = q$ then as $N\rightarrow \infty$ we have that $D \rightarrow^d \chi^2(q)$.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Non-nested cases}
-Many cases we are interested in are \alert{not strictly nested}
-\begin{itemize}
-\item Should I include $x_2$ OR $x_3$ in my regression? (partially overlapping)
-\item Is the correct distribution $f(y | x, \theta)$ normal or log-normal? (non-overlapping)
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Non-nested cases}
-\begin{itemize}
-\item Cox (1961) suggested the following (often infeasible solution) by assuming that $F_{\theta}$ is the true model.
-\begin{eqnarray*}
-LR(\hat{\theta},\hat{\gamma}) = L_f(\hat{\theta}) - L_g (\hat{\gamma}) = \sum_{i=1}^N \ln \frac{f(y_i | x_i, \hat{\theta})}{g(y_i | x_i, \hat{\gamma})}
-\end{eqnarray*}
-\item Depending on which the true model is you could reject $F_{\theta}$ for $G_{\gamma}$ and vice versa!
-\item Deriving the test statistic is hard (and specific to $F_{\theta}$) because we must obtain $E_f [\ln \frac{f(y_i | x_i, \hat{\theta})}{g(y_i | x_i, \hat{\gamma})}]$.
-\item Similar to AIC in that we are minimizing KLIC over $F_{\theta}$.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Vuong Test}
-\begin{eqnarray*}
-H_0: E_{h(y|x)} \left[ \frac{ f(y | x,\theta) }{g(y | x, \gamma)} \right] = 0  \\
-\rightarrow E_h[\ln(h/g)] - E_h[\ln (h/f)] = 0
-\end{eqnarray*}
-\begin{itemize}
-\item Instead of taking expectation with respect to one of two distributions, we take it with respect to $h(y |x)$ the unknown but \alert{true distribution}.
-\item Same as testing whether two densities $(f,g)$ have same KLIC.
-\item The main result is that (details in 8.5 of CT):
-\begin{eqnarray*}
-\frac{1}{\sqrt{N}} LR(\hat{\theta},\hat{\gamma}) \rightarrow^d N [0,\omega_{*}^2]\\
-\omega_{*}^2 =  V_0 \left[ \ln \frac{f(y| x, \hat{\theta})}{g(y| x, \hat{\gamma})}  \right]
-\end{eqnarray*}
-\end{itemize}
+\begin{frame}{These aren't all that helpful in applied micro}
+    \begin{itemize}
+        \item Rely on LRT and a bunch of assumptions (see \hyperlink{sec:info}{backup}). No clear "best" method.
+        \item Only make sense for "nested" models
+        \begin{itemize}
+            \item Should you include $x_1$ and $x_2$, or just $x_1$?
+            \item Not should you include $x_2$ \textit{or} $x_3$?
+        \end{itemize}
+        \item Some tests (Cox, Vuong) can handle non-nested case, but rarely used
+    \end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -160,44 +87,78 @@ H_0: E_{h(y|x)} \left[ \frac{ f(y | x,\theta) }{g(y | x, \gamma)} \right] = 0  \
  \item Which $x$'s do we include?
  \item Which $x$'s do we leave out?
  \item It is not clear that BIC/AIC or Vuong test tells us what we should do in practice.
- \item If you have $K$ potential regressors you could consider all $2^K$ possible regressions.
- \item Or you could could consider all $K \choose P$ possible combinations with $p$ parameters.
- \item This sounds very time consuming
+ \item Helpful to review what we're really getting out of multivariate regression. [Much of this section taken from HTF]
+\end{itemize}
+\end{frame}
+
+\section{Orthogonality}
+
+\begin{frame}
+    \frametitle{Univariate Regression}
+    \begin{itemize}
+    \item Consider a univarite model (with no intercept)
+    $$ Y= X'\beta + \epsilon $$
+    \item Let $\langle\, x, y \rangle = \sum_i^N x_i y_i$ be the inner product between these two variables in our sample.
+    \item Then the least squares estimate and residuals are 
+    \begin{eqnarray*}
+        \hat \beta = \frac{\langle x , y \rangle}{\langle x, x \rangle} \\
+        r = y - x \hat \beta
+    \end{eqnarray*}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{What about the case of multiple regression?}
+    \begin{itemize}
+        \item Suppose we had inputs $x1,x2,...,x_p$
+        \item If they are all \textbf{orthogonal}, ie $\langle\, x_j, x_k \rangle =0$, we can show that estimates can be recovered using the exact same univariate procedure. 
+        \item Since they're orthogonal, including them has no impact. 
+        \item Outside of controlled experiments, this is not going to be applicable. 
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Minimizing SSR/AIC: all possible regressions}
-\begin{center}
-\includegraphics[width=4in]{./resources/subsetsaic}
-\end{center}
+    \frametitle{OLS with correlated inputs}
+    \begin{itemize}
+    \item Imagine if we include an intercept along with our $x$ of interest.
+    \item Then the least squares estimate becomes 
+    \begin{eqnarray*}
+        \hat \beta = \frac{\langle x - \bar x , y \rangle}{\langle x - \bar x , x - \bar x \rangle}
+    \end{eqnarray*}
+    \item Note that $x - \bar x $ are just the residuals from a projection $x$ on to our $x_0= 1$
+    \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{What is orthogonality?}
+\frametitle{Getting back to orthogonality}
 \begin{itemize}
-\item We can think about a world where $\langle\, x_j, x_k \rangle =0$ for $j \neq k$.
-\item In this world I can get $\beta_j$ by regressing $y$ on $x_j$ by simple linear regression.
-\item I could do this for each $j$ and the resulting vector $\beta$ would be the same as running multiple regression.
-\item We could try and transform $X$ so that it forms an \alert{orthogonal basis}.
+\item This suggests a simple procdure 
+\begin{enumerate}
+    \item Orthogonalize $x_1$ by projecting it onto $x_0$
+    \item Regress $y$ onto this residual $z_1$ to get $\hat \beta_1$
+\end{enumerate}
+\item This generalizes to the case of $p$ inputs, where for each $x_p$ you project onto the residuals from the previous $p-1$ x's. 
 \item Unless we are running regressions by hand this doesn't seem tremendously helpful.
 \item However, in practice this is often what your software does!
 \end{itemize}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[allowframebreaks]
 \frametitle{Gram-Schmidt/QR Decomposition}
 \begin{enumerate}
 \item Let $x_0 = z_0 = 1$
 \item For $j = 1,2,\ldots p$: Regress $x_j$ on $z_0,z_1,\ldots,z_{j-1}$  to give you $\hat{\gamma_{jl}} = \langle\, z_l, x_j \rangle/\langle\, z_l, x_l \rangle$ and residual $z_j = x_j  - \sum_{k=0}^{j-1} \hat{\gamma_{kj}} z_k$.
 \item With your transformed orthogonal basis $\mathbf{z}$ you can now regress $y$ on $z_p$ one by one to obtain $\hat{\beta}_p$.
 \end{enumerate}
+
+\framebreak 
+
 What does this do?
 \begin{itemize}
 \item The resulting vector $\hat{\beta}$ has been adjusted to deliver the marginal contribution of $x_j$ on $y$ after adjusting for all $x_{-j}$.
 \item If $x_j$ is highly correlated with other $x_k$'s then the residual $z_j$ will be close to zero and the coefficient will be unstable.
 \item This will be true for any variables $x_l$ within a set of correlated variables.
-\item We can delete any one of them to resolve this issue.
+\item We can delete any one of them to "resolve" this issue.
+\item However we should pause to appreciate that our estimate, and its stability, is mechanically linked to the other $x_s$ we do or don't include. 
 \end{itemize}
 \end{frame}
 
@@ -231,6 +192,29 @@ What are people likely doing in practice:
 \item These procedures actually make some sense if the columns of $X$ are \alert{linearly independent} or \alert{orthogonal}.
 \item In practice our regressors are often correlated (sometimes highly so).
 \end{itemize}
+\end{frame}
+    
+
+\section{Subset Selection}
+
+\begin{frame}
+    \frametitle{Subset selection}
+    \begin{itemize}
+    \item In practice we often start with a functional form like:\\
+     $y_i = \beta_0 + \sum_{k=1}^p \beta_k x_{i,k} + \varepsilon_{i}$
+     \item Which $x$'s do we include?
+     \item Which $x$'s do we leave out?
+     \item If you have $K$ potential regressors you could consider all $2^K$ possible regressions.
+     \item Or you could could consider all $K \choose P$ possible combinations with $p$ parameters.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Minimizing SSR/AIC: all possible regressions}
+\vspace{-10pt}
+\begin{center}
+\includegraphics[width=\textwidth]{./resources/subsetsaic}
+\end{center}
 \end{frame}
 
 
@@ -801,5 +785,131 @@ r_i = b_0 + b_1 f_1 + b_2 f_2 + \ldots b_p f_p + e_i
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[allowframebreaks]
+    \bibliographystyle{jpe}
+    \bibliography{../empirical-methods}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Backup}
+\subsection*{Info criteria}\label{sec:info}
+
+\begin{frame}
+    \frametitle{Review AIC/BIC}
+    \begin{itemize}
+    \item AIC tends to select larger models than BIC since it penalizes the number of parameters less heavily.
+    \item These usually depend on ordering potential models by $p$ the number of components and then sequentially fitting them.
+    \item AIC is not consistent: as $N \rightarrow \infty$ it may still select too many parameters.
+    \item BIC is consistent: as $N \rightarrow \infty$ it will select the correct number of parameters.
+    \item Of course for finite-sample $N < \infty$ anything can happen.
+    \end{itemize}
+\end{frame}
+    
+\begin{frame}
+    \frametitle{Where does it come from?}
+    How do we come up with these penalized regressions?
+    \begin{itemize}
+    \item AIC/BIC arise from considering the likelihood ratio test (LRT) of a maximum likelihood estimator and making a lot of assumptions.
+    \item AIC arises from minimizing the Expected KLIC.
+    \begin{eqnarray*}
+    KLIC(f,g) &=& \int  f(y) \log(f(y)) \partial y - \int  f(y) \log(g(y)) \partial y  \\
+    &=& C_f - E  \log(g(y))
+    \end{eqnarray*}
+    \item Low values of KLIC mean the models are similar.
+    \end{itemize}
+\end{frame}
+    
+\begin{frame}
+    \frametitle{Where does it come from?}
+    How do we come up with these penalized regressions?
+    \begin{itemize}
+    \item Recall that OLS is a ML estimator in the case where $\varepsilon$ is normally distributed.
+    \begin{eqnarray*}
+    D = - 2 \ln \left (\frac{\mbox{Likelihood  } H_0}{\mbox{ Likelihood  }H_a} \right) = -2 \ln \underbrace{\left(\frac{(\sup L(\theta | x) : \theta \in \Theta_0)}{(\sup L(\theta | x) : \theta \in \Theta)}\right)}_{\Lambda(x)}
+    \end{eqnarray*}
+    \item If the models are \alert{nested} then $\Theta_0 \subset \Theta$ and $\dim(\Theta) -\dim(\Theta_0) = q$ then as $N\rightarrow \infty$ we have that $D \rightarrow^d \chi^2(q)$.
+    \end{itemize}
+\end{frame}
+    
+
+\begin{frame}
+\frametitle{Non-nested cases}
+Many cases we are interested in are \alert{not strictly nested}
+\begin{itemize}
+\item Should I include $x_2$ OR $x_3$ in my regression? (partially overlapping)
+\item Is the correct distribution $f(y | x, \theta)$ normal or log-normal? (non-overlapping)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Non-nested cases}
+\begin{itemize}
+\item Cox (1961) suggested the following (often infeasible solution) by assuming that $F_{\theta}$ is the true model.
+\begin{eqnarray*}
+LR(\hat{\theta},\hat{\gamma}) = L_f(\hat{\theta}) - L_g (\hat{\gamma}) = \sum_{i=1}^N \ln \frac{f(y_i | x_i, \hat{\theta})}{g(y_i | x_i, \hat{\gamma})}
+\end{eqnarray*}
+\item Depending on which the true model is you could reject $F_{\theta}$ for $G_{\gamma}$ and vice versa!
+\item Deriving the test statistic is hard (and specific to $F_{\theta}$) because we must obtain $E_f [\ln \frac{f(y_i | x_i, \hat{\theta})}{g(y_i | x_i, \hat{\gamma})}]$.
+\item Similar to AIC in that we are minimizing KLIC over $F_{\theta}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Vuong Test}
+\begin{eqnarray*}
+H_0: E_{h(y|x)} \left[ \frac{ f(y | x,\theta) }{g(y | x, \gamma)} \right] = 0  \\
+\rightarrow E_h[\ln(h/g)] - E_h[\ln (h/f)] = 0
+\end{eqnarray*}
+\begin{itemize}
+\item Instead of taking expectation with respect to one of two distributions, we take it with respect to $h(y |x)$ the unknown but \alert{true distribution}.
+\item Same as testing whether two densities $(f,g)$ have same KLIC.
+\item The main result is that (details in 8.5 of CT):
+\begin{eqnarray*}
+\frac{1}{\sqrt{N}} LR(\hat{\theta},\hat{\gamma}) \rightarrow^d N [0,\omega_{*}^2]\\
+\omega_{*}^2 =  V_0 \left[ \ln \frac{f(y| x, \hat{\theta})}{g(y| x, \hat{\gamma})}  \right]
+\end{eqnarray*}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Non-nested cases}
+Many cases we are interested in are \alert{not strictly nested}
+\begin{itemize}
+\item Should I include $x_2$ OR $x_3$ in my regression? (partially overlapping)
+\item Is the correct distribution $f(y | x, \theta)$ normal or log-normal? (non-overlapping)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Non-nested cases}
+\begin{itemize}
+\item Cox (1961) suggested the following (often infeasible solution) by assuming that $F_{\theta}$ is the true model.
+\begin{eqnarray*}
+LR(\hat{\theta},\hat{\gamma}) = L_f(\hat{\theta}) - L_g (\hat{\gamma}) = \sum_{i=1}^N \ln \frac{f(y_i | x_i, \hat{\theta})}{g(y_i | x_i, \hat{\gamma})}
+\end{eqnarray*}
+\item Depending on which the true model is you could reject $F_{\theta}$ for $G_{\gamma}$ and vice versa!
+\item Deriving the test statistic is hard (and specific to $F_{\theta}$) because we must obtain $E_f [\ln \frac{f(y_i | x_i, \hat{\theta})}{g(y_i | x_i, \hat{\gamma})}]$.
+\item Similar to AIC in that we are minimizing KLIC over $F_{\theta}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Vuong Test}
+\begin{eqnarray*}
+H_0: E_{h(y|x)} \left[ \frac{ f(y | x,\theta) }{g(y | x, \gamma)} \right] = 0  \\
+\rightarrow E_h[\ln(h/g)] - E_h[\ln (h/f)] = 0
+\end{eqnarray*}
+\begin{itemize}
+\item Instead of taking expectation with respect to one of two distributions, we take it with respect to $h(y |x)$ the unknown but \alert{true distribution}.
+\item Same as testing whether two densities $(f,g)$ have same KLIC.
+\item The main result is that (details in 8.5 of CT):
+\begin{eqnarray*}
+\frac{1}{\sqrt{N}} LR(\hat{\theta},\hat{\gamma}) \rightarrow^d N [0,\omega_{*}^2]\\
+\omega_{*}^2 =  V_0 \left[ \ln \frac{f(y| x, \hat{\theta})}{g(y| x, \hat{\gamma})}  \right]
+\end{eqnarray*}
+\end{itemize}
+\end{frame}
 
 \end{document}
