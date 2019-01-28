@@ -32,7 +32,7 @@ How do we choose?
 \item Instrumental Variables.
 \end{itemize}
 
-In these notes we'll talk about these in the context of linear regression. 
+In these notes we'll talk about these in the context of linear regression. (ESL Ch 3)
 }
 
 
@@ -87,7 +87,7 @@ y_t = \alpha_0 + \sum_{k=1}^p \alpha_k y_{t-k} + \varepsilon_t
  \item Which $x$'s do we include?
  \item Which $x$'s do we leave out?
  \item It is not clear that BIC/AIC or Vuong test tells us what we should do in practice.
- \item Helpful to review what we're really getting out of multivariate regression. [Much of this section taken from HTF]
+ \item Helpful to review what we're really getting out of multivariate regression. [Much of this section taken from ESL]
 \end{itemize}
 \end{frame}
 
@@ -200,17 +200,19 @@ What are people likely doing in practice:
 \begin{frame}
     \frametitle{Subset selection}
     \begin{itemize}
-    \item In practice we often start with a functional form like:\\
-     $y_i = \beta_0 + \sum_{k=1}^p \beta_k x_{i,k} + \varepsilon_{i}$
-     \item Which $x$'s do we include?
-     \item Which $x$'s do we leave out?
-     \item If you have $K$ potential regressors you could consider all $2^K$ possible regressions.
-     \item Or you could could consider all $K \choose P$ possible combinations with $p$ parameters.
+    \item Least squares have some undesirable properties
+    \begin{itemize}
+        \item Poor prediction: They are low bias but high variance. By tempering some of the large coefficients, might improve prediction
+        \item Interpretation: Sometimes we just want to know the main factors explaining variation in the data. 
+    \end{itemize} 
+    \item A natural alternative is to restrict models to subsets of the full x's. 
+    \item If you have $K$ potential regressors you could consider all $2^K$ possible regressions.
+    \item Or you could could consider all $K \choose P$ possible combinations with $p$ parameters.
     \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Minimizing SSR/AIC: all possible regressions}
+\frametitle{Minimizing SSR: all possible regressions}
 \vspace{-10pt}
 \begin{center}
 \includegraphics[width=\textwidth]{./resources/subsetsaic}
@@ -256,6 +258,7 @@ We stop when the $x_k$ with the highest t-statistic is below some threshold (oft
 \end{itemize}
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Multiple Testing Problem}
 \begin{itemize}
@@ -269,7 +272,7 @@ We stop when the $x_k$ with the highest t-statistic is below some threshold (oft
 \end{itemize}
 \end{itemize}
 \end{frame}
-
+\end{comment}
 
 
 \begin{frame}
@@ -298,6 +301,7 @@ As an alternative consider:
 \end{center}
 \end{frame}
 
+\section{Shrinkage}
 
 \begin{frame}
 \frametitle{Penalized Regression}
@@ -315,6 +319,51 @@ Suppose we fit a regression model and penalized extra variables all in one go, w
 \end{frame}
 
 
+\begin{frame}
+    \frametitle{Ridge Regression}
+    Another popular alternative is the $q=2$ case
+    \begin{eqnarray*}
+    \hat{\beta}^{Ridge} = \arg \min_{\beta} \left[\frac{1}{2} \sum_{i=1}^N (y_i - \beta_0 - \sum_{j=1}^K x_{ij} \beta_j)^2 + \lambda \sum_{j=1}^K | \beta_j|^2 \right]
+    \end{eqnarray*}
+    \begin{itemize}
+    \item Penalty is $L_2$ norm on $\beta$.
+    \item Can re-write as a constriant  $\sum_{j=1}^K | \beta_j|^2 \leq s$
+    \item $\hat{\beta}^{Ridge} = (X'X + \lambda I )^{-1} X' Y$.
+    \item If $X$ is orthonormal then $\hat{\beta}_{j}^{Ridge} =  \hat{\beta}_j /(1 +\lambda )$
+    \item In words: everything gets dampened by a constant factor $\lambda$ (we don't get zeros).
+    \item Adding a constant to the diagonal of $(X'X)$ ensures that the matrix will be invertible even when we have multicollinearity.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{What is rigde doing?}
+    \begin{itemize}
+        \item Consider the \alert{singular value decomposition} (SVD) on the \textbf{centered} input matrix $$\mathbf{X=UDV^T}$$
+        \item \textbf{U} and \textbf{U} are $N \times p$ and $p \times p$ orthogonal matrices spanning the column and rowpace of \textbf{X}. 
+        \item \textbf{D} is a $p \times p$ diagonal matrix with $d_1 > d_2 ...d_p > 0$. 
+        \item Can see that ols is $$ \mathbf{X} \hat\beta^{LS} = \mathbf{UU^Ty} $$
+        \item Then ridge is $$\mathbf{X}\hat\beta^{ridge} = \sum_{j=1}^p \mathbf{u_j}\frac{d_j^2}{d_j^2 + \lambda}\mathbf{u_j^Ty} $$
+     \end{itemize}
+\end{frame} 
+
+\begin{frame}
+    \frametitle{What is rigde doing? II}
+    \begin{itemize}
+        \item Ridge is shrinking the OLS cordinates of y by $d_j^2/(d_j^2 + \lambda)$
+        \item This will have the biggest impact on small $d_j$. What does that mean? 
+        \item Consider the sampler variance $\mathbf{X=X^TX/N}$ 
+        \item It has eigen decomposition $\mathbf{X^TX = VD^2V^T}$, and the eigenvectors $v_j$ are the \alert{principal components} directions of $X$. 
+        \item So this is telling use the ridge is placing more weight on  
+     \end{itemize}
+\end{frame} 
+
+\begin{frame}
+    \frametitle{Ridge Path}
+    \begin{center}
+    \includegraphics[width=3.5in]{./resources/ridgepath}
+    \end{center}
+\end{frame}
+    
 \begin{frame}
 \frametitle{LASSO Regression}
 \begin{eqnarray*}
@@ -346,29 +395,6 @@ But... is choosing $\lambda$ any easier than choosing $p$?
 \frametitle{LASSO Path}
 \begin{center}
 \includegraphics[width=3.5in]{./resources/lassopath}
-\end{center}
-\end{frame}
-
-\begin{frame}
-\frametitle{Ridge Regression}
-Another popular alternative is the $q=2$ case
-\begin{eqnarray*}
-\hat{\beta}^{Ridge} = \arg \min_{\beta} \left[\frac{1}{2} \sum_{i=1}^N (y_i - \beta_0 - \sum_{j=1}^K x_{ij} \beta_j)^2 + \lambda \sum_{j=1}^K | \beta_j|^2 \right]
-\end{eqnarray*}
-\begin{itemize}
-\item Penalty is $L_2$ norm on $\beta$.
-\item Can re-write as a constriant  $\sum_{j=1}^K | \beta_j|^2 \leq s$
-\item $\hat{\beta}^{Ridge} = (X'X + \lambda I )^{-1} X' Y$.
-\item If $X$ is orthonormal then $\hat{\beta}_{j}^{Ridge} =  \hat{\beta}_j /(1 +\lambda )$
-\item In words: everything gets dampened by a constant factor $\lambda$ (we don't get zeros).
-\item Adding a constant to the diagonal of $(X'X)$ ensures that the matrix will be invertible even when we have multicollinearity.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Ridge Path}
-\begin{center}
-\includegraphics[width=3.5in]{./resources/ridgepath}
 \end{center}
 \end{frame}
 
