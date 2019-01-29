@@ -32,7 +32,7 @@ How do we choose?
 \item Instrumental Variables.
 \end{itemize}
 
-In these notes we'll talk about these in the context of linear regression. 
+In these notes we'll talk about these in the context of linear regression. (ESL Ch 3)
 }
 
 
@@ -87,7 +87,7 @@ y_t = \alpha_0 + \sum_{k=1}^p \alpha_k y_{t-k} + \varepsilon_t
  \item Which $x$'s do we include?
  \item Which $x$'s do we leave out?
  \item It is not clear that BIC/AIC or Vuong test tells us what we should do in practice.
- \item Helpful to review what we're really getting out of multivariate regression. [Much of this section taken from HTF]
+ \item Helpful to review what we're really getting out of multivariate regression. [Much of this section taken from ESL]
 \end{itemize}
 \end{frame}
 
@@ -200,17 +200,19 @@ What are people likely doing in practice:
 \begin{frame}
     \frametitle{Subset selection}
     \begin{itemize}
-    \item In practice we often start with a functional form like:\\
-     $y_i = \beta_0 + \sum_{k=1}^p \beta_k x_{i,k} + \varepsilon_{i}$
-     \item Which $x$'s do we include?
-     \item Which $x$'s do we leave out?
-     \item If you have $K$ potential regressors you could consider all $2^K$ possible regressions.
-     \item Or you could could consider all $K \choose P$ possible combinations with $p$ parameters.
+    \item Least squares have some undesirable properties
+    \begin{itemize}
+        \item Poor prediction: They are low bias but high variance. By tempering some of the large coefficients, might improve prediction
+        \item Interpretation: Sometimes we just want to know the main factors explaining variation in the data. 
+    \end{itemize} 
+    \item A natural alternative is to restrict models to subsets of the full x's. 
+    \item If you have $K$ potential regressors you could consider all $2^K$ possible regressions.
+    \item Or you could could consider all $K \choose P$ possible combinations with $p$ parameters.
     \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Minimizing SSR/AIC: all possible regressions}
+\frametitle{Minimizing SSR: all possible regressions}
 \vspace{-10pt}
 \begin{center}
 \includegraphics[width=\textwidth]{./resources/subsetsaic}
@@ -256,6 +258,7 @@ We stop when the $x_k$ with the highest t-statistic is below some threshold (oft
 \end{itemize}
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Multiple Testing Problem}
 \begin{itemize}
@@ -269,7 +272,7 @@ We stop when the $x_k$ with the highest t-statistic is below some threshold (oft
 \end{itemize}
 \end{itemize}
 \end{frame}
-
+\end{comment}
 
 
 \begin{frame}
@@ -298,6 +301,7 @@ As an alternative consider:
 \end{center}
 \end{frame}
 
+\section{Shrinkage}
 
 \begin{frame}
 \frametitle{Penalized Regression}
@@ -306,14 +310,111 @@ Suppose we fit a regression model and penalized extra variables all in one go, w
 \hat{\beta} = \arg \min_{\beta} \left[\frac{1}{2} \sum_{i=1}^N (y_i - \beta_0 - \sum_{j=1}^p x_{ij} \beta_j)^2 + \lambda \sum_{j=1}^p | \beta_j|^{q} \right]
 \end{eqnarray*}
 \begin{itemize}
-\item We can consider the penalty term $\lambda \sum_{j=1}^p | \beta_j|^{q}$ as penalizing models where $\beta$ gets further away from zero.
-\item Similar to placing a \alert{prior distribution} on $\beta_j$ centered at 0.
-\item We definitely want to \alert{standardize} our inputs before using penalized regression methods.
-\item Usually you fix $q$ and then look at how estimates respond to $\gamma$.
-\item There are two famous cases $q=1$ (Lasso) and $q=2$ (Ridge) though in practice there are many possibilities.
+    \item We call $\lambda$ the \alert{regularization} parameter.
+    \item The penalty term $\lambda \sum_{j=1}^p | \beta_j|^{q}$ as penalizes models where $\beta$ gets further away from zero.
+    \item Similar to placing a \alert{prior distribution} on $\beta_j$ centered at 0.
+    \item \textbf{Important:} We definitely want to \alert{standardize} our inputs before using penalized regression methods.
 \end{itemize}
 \end{frame}
 
+\begin{frame}
+    \frametitle{What Penalty Function?}
+    \begin{itemize}
+        \item Usually you fix $q$ and then look at how estimates respond to $\gamma$.
+        \item There are two famous cases $q=1$ (Lasso) and $q=2$ (Ridge) though in practice there are many possibilities.
+        \item We can choose $\lambda$ in a way that minimizes expected prediction error (EPE).
+        \item Recall $EPE(\lambda) = E_x E_{y|x} ([ Y- g(X,\lambda)]^2 | X)$.
+        \item In practice most people look at out of sample prediction error rate on a \alert{cross validated sample}.
+    \end{itemize}
+\end{frame}
+
+\subsection{Ridge}
+
+\begin{frame}
+    \frametitle{Ridge Regression}
+    Another popular alternative is the $q=2$ case
+    \begin{eqnarray*}
+    \hat{\beta}^{Ridge} = \arg \min_{\beta} \left[\frac{1}{2} \sum_{i=1}^N (y_i - \beta_0 - \sum_{j=1}^K x_{ij} \beta_j)^2 + \lambda \sum_{j=1}^K | \beta_j|^2 \right]
+    \end{eqnarray*}
+    \begin{itemize}
+    \item Penalty is $L_2$ norm on $\beta$.
+    \item Can re-write as a constriant  $\sum_{j=1}^K | \beta_j|^2 \leq s$
+    \item $\hat{\beta}^{Ridge} = (X'X + \lambda I )^{-1} X' Y$.
+    \item If $X$ is orthonormal then $\hat{\beta}_{j}^{Ridge} =  \hat{\beta}_j /(1 +\lambda )$
+    \item In words: everything gets dampened by a constant factor $\lambda$ (we don't get zeros).
+    \item Adding a constant to the diagonal of $(X'X)$ ensures that the matrix will be invertible even when we have multicollinearity.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{What is Ridge Doing?}
+    Just like we can diagonalize (some) square matrices, we can take the \alert{singular value decomposition} (SVD) of any matrix $\mathbf{X}$ that is $N \times p$
+    \begin{eqnarray*}
+    \mathbf{X}=\mathbf{U} \mathbf{D} \mathbf{V}'
+    \end{eqnarray*}
+    \begin{itemize}
+    \item $\mathbf{U}, \mathbf{V}$ are $N \times p$ and $p \times p$ orthonormal matrices ($\mathbf{U}$ spans the column space, and $\mathbf{V}$ spans the row space of $X$.)
+    \item $\mathbf{D}$ is a diagonal matrix $p \times p$ with elements corresponding to the singular values of $\mathbf{X}$.
+    \item If $\mathbf{X}$ is a square, diagonalizable matrix the singular values are equal to the eigenvalues.
+    \end{itemize}
+\end{frame}
+    
+\begin{frame}
+    \frametitle{OLS vs Ridge}
+    Can write the least squares solution as
+    \begin{eqnarray*}
+    \mathbf{X} \hat{\beta}^{ols} = \mathbf{X} (\mathbf{X}'\mathbf{X})^{-1} \mathbf{X}' \mathbf{y} = U U' \mathbf{y}.
+    \end{eqnarray*}
+    \vspace{-15 pt}
+
+    \begin{itemize}
+    \item $\mathbf{U}' \mathbf{y}$ maps $\mathbf{y}$ into the orthonormal basis $\mathbf{U}$.
+    \item This looks a lot like $\mathbf{QR}$ except that we have chosen a different basis.
+    \end{itemize}
+
+    \pause 
+
+    And the Ridge solution is:
+    \begin{eqnarray*}
+    \mathbf{X} \hat{\beta}^{ridge} = \mathbf{X} (\mathbf{X}'\mathbf{X} + \lambda \mathbf{I})^{-1} \mathbf{X}' \mathbf{y} &=& \mathbf{U D} (\mathbf{D}^2 + \lambda \mathbf{I})^{-1} \mathbf{D} \mathbf{U}' \mathbf{y}\\
+    &=& \sum_{j=1}^p \mathbf{u}_j  \frac{d_j^2}{d_j^2 + \lambda} \mathbf{u}_j' \mathbf{y}
+    \end{eqnarray*}
+    \begin{itemize}
+    \item Same change of basis. Now we shrink each component by $d_j^2/(d_j^2 + \lambda)$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{What is Ridge Doing? II}
+    \begin{itemize}
+        \item Ridge is shrinking the OLS cordinates of y by $d_j^2/(d_j^2 + \lambda)$
+        \item This will have the biggest impact on small $d_j$. What does that mean? 
+        \item Consider the sample variance $\mathbf{S=X^TX/N}$ 
+        \item It has eigen decomposition $\mathbf{X^TX = VD^2V^T}$, and the eigenvectors $v_j$ are the \alert{principal components} directions of $X$. 
+        \item First component (largest eigenvalue) is $\mathbf{z_1} = \mathbf{X} v_1 = \mathbf{u_1} d_1$.
+        \item Variance is $Var(\mathbf{z_1}) = Var (\mathbf{X} v_1) = \frac{d_1^2}{N}$ ($\mathbf{z_1}$ is first principal component of $\mathbf{X}$).
+        \item So this is telling use the ridge is placing more weight on directions in the columnspace of $\mathbf{X}$ that have larger sample variance 
+     \end{itemize}
+\end{frame} 
+
+\begin{frame}
+   \frametitle{Principal Components}
+   \vspace{-10pt}
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/princompfig}
+    \end{center}
+\end{frame}
+    
+    
+\begin{frame}
+    \frametitle{Ridge Path}
+    \vspace{-15pt}
+    \begin{center}
+    \includegraphics[width=.85\textwidth]{./resources/ridgepath}
+    \end{center}
+\end{frame}
+    
+\subsection{LASSO}
 
 \begin{frame}
 \frametitle{LASSO Regression}
@@ -324,15 +425,16 @@ Suppose we fit a regression model and penalized extra variables all in one go, w
 \item Penalty is $L_1$ norm on $\beta$.
 \item Can re-write as a constriant  $\sum_{j=1}^K | \beta_j| \leq s$
 \item If $X$ is orthonormal then $\hat{\beta}_{j}^{LASSO} = sign(\hat{\beta}_j ) \cdot (| \hat{\beta}_j |- \lambda )_{+}$
-\item In words: we get coefficients that are closer to zero by $\lambda$, but coefficients within $\lambda$ of zero are shrunk to zero.
-\item This leads people to describe LASSO as a \alert{shrinkage} estimator. It produces models that are \alert{sparse}.
-\item Instead of a discrete parameter such as the number of lags $p$ we can continuously penalize additional complexity with $\lambda$.
+\item In words: we get coefficients that are closer to zero by $\lambda$, but coefficients within $\lambda$ of zero are shrunk to zero. It thus produces models that are \alert{sparse}.
 \end{itemize}
 \end{frame}
 
 
 \begin{frame}
-\frametitle{LASSO Regression}
+\frametitle{LASSO vs Subset Selection}
+
+Instead of a discrete parameter such as the number of lags $p$ we can continuously penalize additional complexity with $\lambda$. 
+
 But... is choosing $\lambda$ any easier than choosing $p$?
 \begin{itemize}
 \item We call $\lambda$ the \alert{regularization} parameter.
@@ -344,31 +446,9 @@ But... is choosing $\lambda$ any easier than choosing $p$?
 
 \begin{frame}
 \frametitle{LASSO Path}
+\vspace{-15pt}
 \begin{center}
-\includegraphics[width=3.5in]{./resources/lassopath}
-\end{center}
-\end{frame}
-
-\begin{frame}
-\frametitle{Ridge Regression}
-Another popular alternative is the $q=2$ case
-\begin{eqnarray*}
-\hat{\beta}^{Ridge} = \arg \min_{\beta} \left[\frac{1}{2} \sum_{i=1}^N (y_i - \beta_0 - \sum_{j=1}^K x_{ij} \beta_j)^2 + \lambda \sum_{j=1}^K | \beta_j|^2 \right]
-\end{eqnarray*}
-\begin{itemize}
-\item Penalty is $L_2$ norm on $\beta$.
-\item Can re-write as a constriant  $\sum_{j=1}^K | \beta_j|^2 \leq s$
-\item $\hat{\beta}^{Ridge} = (X'X + \lambda I )^{-1} X' Y$.
-\item If $X$ is orthonormal then $\hat{\beta}_{j}^{Ridge} =  \hat{\beta}_j /(1 +\lambda )$
-\item In words: everything gets dampened by a constant factor $\lambda$ (we don't get zeros).
-\item Adding a constant to the diagonal of $(X'X)$ ensures that the matrix will be invertible even when we have multicollinearity.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Ridge Path}
-\begin{center}
-\includegraphics[width=3.5in]{./resources/ridgepath}
+\includegraphics[width=.85\textwidth]{./resources/lassopath}
 \end{center}
 \end{frame}
 
@@ -381,6 +461,7 @@ Another popular alternative is the $q=2$ case
 
 \begin{frame}
 \frametitle{What is the point?}
+\vspace{-10pt}
 Ridge:
 \begin{itemize}
 \item Ridge doesn't provide sparsity which can be a good thing.
@@ -391,7 +472,7 @@ LASSO:
 \begin{itemize}
 \item LASSO is useful for variable/feature selection.
 \item LASSO does not generally posses the \alert{oracle property} though variants such as \alert{adaptive LASSO} may.
-\item LASSO sometimes has the oracle property for $p \gg N$ and cases where the true $\beta$'s are not too large.
+%\item LASSO sometimes has the oracle property for $p \gg N$ and cases where the true $\beta$'s are not too large.
 \item People sometimes use LASSO to choose components and then OLS for unbiased coefficient estimated.
 \end{itemize}
 We can actually combine them using \alert{elastic net regression}:
@@ -410,12 +491,49 @@ We can actually combine them using \alert{elastic net regression}:
 
 
 \begin{frame}
+    \frametitle{Oracle Property}
+    \begin{itemize}
+    \item An important question with LASSO is whether or not it produces consistent parameter estimates (Generally \alert{no}).
+    \item We think of asymptotics as taking both $N,p\rightarrow \infty$.
+    \item Donohu (2006) shows that for $p > N$ case, when the true model is sparse, LASSO identified correct predictors with high probability (with certain assumptions on $\mathbf{X}$) as we slowly relax the penalty.
+    \item Condition looks like (``good'' variables are not too correlated with ``bad'' variables).
+    \begin{eqnarray*}
+    \max_{j \in S^{c}} || x_j' X_{S} (X_{S}' X_{S})^{-1} ||_{1} \leq (1 -\epsilon) 
+    \end{eqnarray*}
+    \item Where $X_{S}$ are columns corresponding to nonzero coefficients, and $S^{c}$ are set of columns with zero coefficients (at true value).
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Other Extensions}
+    \begin{itemize}
+    \item \textit{Grouped LASSO} for penalzing groups of coefficients at once (like fixed effects)
+    \item \textit{Relaxed LASSO} run LASSO to select coefficients and then run a non-penalized subset regression or LASSO with a less stringent penalty on the subset. (Here CV tends to pick a less strong penalty term $\lambda$ leading to less shrinkage and bias).
+    \item \textit{SCAD: Smoothly Clipped Absolute Deviation}: do less shrinkage on big coefficients but preserve sparsity
+    \begin{eqnarray*}
+    \frac{ d J_a(|beta,\lambda)}{d \beta} = \lambda \cdot sgn(\beta) \left[ I(| \beta| \leq \lambda) + \frac{(a \lambda - | \beta|)_{+}}{(a-1) \lambda} I (| \beta| > \lambda) \right]
+    \end{eqnarray*}
+    \item \textit{Adaptive LASSO} uses  a weighted penalty of the form $\sum_{j=1}^p w_j |\beta_j|$ where $W_j = 1/|\hat{\beta}_j|^{\nu}$ using the OLS estimates as weights. This yields consistent estimates of parameters while retaining the convexity property.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Penalty Comparisons}
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/lassopenalty}
+    \end{center}
+\end{frame}
+    
+
+\begin{frame}
 \frametitle{LAR: Least Angle Regression}
-Remember Forward Stagewise Regression, consider this alternative:
+\vspace{-5pt}
+Consider this alternative to Forward Stagewise Regression:
 \begin{enumerate}
 \item Start with $r= y-\overline{y}$ and $(\beta_1, \ldots, \beta_p) = 0$. (Standardize first!)
 \item Find the predictor $x_j$ most correlated with $r$.
-\item Move $\beta_j$ from 0 to its least-squares estimate $\langle<x_j , r \rangle$ slowly
+\item SLOWLY move $\beta_j$ from 0 to its least-squares estimate 
 \item Update $r \leftarrow r - \delta_j \cdot x_j$.
 \item Keep moving $x_j$ in same direction until $x_k$ has as much correlation with updated $r$,
 \item Continue updating $(\beta_j, \beta_k)$ in direction of \alert{joint} least-squares coefficients until some other competitor $x_l$ has as much correlation with $r$.
@@ -441,24 +559,9 @@ Why do we need LAR?
 \begin{frame}
 \frametitle{LASSO vs LAR}
 \begin{center}
-\includegraphics[width=3.5in]{./resources/lar-lasso}
+\includegraphics[width=\textwidth]{./resources/lar-lasso}
 \end{center}
 \end{frame}
-
-\begin{frame}
-\frametitle{Overall Comparison}
-\begin{center}
-\includegraphics[width=3.5in]{./resources/comparisons}
-\end{center}
-\end{frame}
-
-\begin{frame}
-\frametitle{Overall Comparison}
-\begin{center}
-\includegraphics[width=4in]{./resources/regressiontable}
-\end{center}
-\end{frame}
-
 
 \begin{frame}
 \frametitle{Overall Comparison}
@@ -467,17 +570,7 @@ Why do we need LAR?
 \end{center}
 \end{frame}
 
-\begin{frame}
-\frametitle{Implementation}
-\begin{itemize}
-\item Routines are highly specialized: there are lots of tricks
-\item No hope of coding this up on your own!
-\item In R you can use \texttt{glmnet} or \texttt{lars}.
-\item In Python you can use \texttt{scikit-learn}
-\item In most recent Matlab in Stats toolbox you have \texttt{lasso} and \texttt{ridge}.
-\item In STATA you can download \texttt{.ado} files from Christian Hansen's website (Chicago).
-\end{itemize}
-\end{frame}
+\section{Dimension Reduction}
 
 \begin{frame}
 \frametitle{Other Data Reduction Techniques}
@@ -553,6 +646,7 @@ How many components?
 
 \begin{frame}
 \frametitle{Principal Components}
+\vspace{-10pt}
 \begin{itemize}
 \item We can run a regression on principal components $Z$'s and then recover the betas of the $X$'s
 \begin{eqnarray*}
@@ -568,78 +662,12 @@ How many components?
 \item This is similar to ridge which shrinks $\beta$'s for components with small eigenvalues.
 \end{itemize}
 \end{frame}
-\begin{frame}
-\frametitle{Principal Components And Ridge}
-\begin{itemize}
-\item Think about the variance matrix $X'X/n$ or $X' X = V D^2 V'$.
-\item First component (largest eigenvalue) is $\mathbf{z_1} = \mathbf{X} v_1 = \mathbf{u_1} d_1$.
-\item Variance is $Var(\mathbf{z_1}) = Var (\mathbf{X} v_1) = \frac{d_1^2}{N}$ ($\mathbf{z_1}$ is first principal component of $\mathbf{X}$).
-\end{itemize}
-\end{frame}
 
 
 \begin{frame}
 \frametitle{Principal Components}
 \begin{center}
-\includegraphics[width=4in]{./resources/princompfig}
-\end{center}
-\end{frame}
-
-
-
-
-\begin{frame}
-\frametitle{Principal Components And Ridge}
-Consider the objective function that Ridge minimizes:
-\begin{eqnarray*}
-RSS(\lambda) = (\mathbf{y} - \mathbf{X} \beta)'  (\mathbf{y} - \mathbf{X} \beta)' + \lambda \beta' \beta
-\end{eqnarray*}
-And the solution (which addresses multicolinearity!)
-\begin{eqnarray*}
-\hat{\beta}_{ridge} = (\mathbf{X}' \mathbf{X} + \lambda \mathbf{I})^{-1} \mathbf{X}' \mathbf{y}
-\end{eqnarray*}
-
-\end{frame}
-
-\begin{frame}
-\frametitle{Principal Components And Ridge}
-Just like we can diagonalize (some) square matrices, we can take the \alert{singular value decomposition} (SVD) of any matrix $\mathbf{X}$ that is $N \times p$
-\begin{eqnarray*}
-\mathbf{X}=\mathbf{U} \mathbf{D} \mathbf{V}'
-\end{eqnarray*}
-\begin{itemize}
-\item $\mathbf{U}, \mathbf{V}$ are $N \times p$ and $p \times p$ orthonormal matrices ($\mathbf{U}$ spans the column space, and $\mathbf{V}$ spans the row space of $X$.)
-\item $\mathbf{D}$ is a diagonal matrix $p \times p$ with elements corresponding to the singular values of $\mathbf{X}$.
-\item If $\mathbf{X}$ is a square, diagonalizable matrix the singular values are equal to the eigenvalues.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Principal Components And Ridge}
-Now the least squares solution is simple
-\begin{eqnarray*}
-\mathbf{X} \hat{\beta}^{ols} = \mathbf{X} (\mathbf{X}'\mathbf{X})^{-1} \mathbf{X}' \mathbf{y} = U U' \mathbf{y}.
-\end{eqnarray*}
-\begin{itemize}
-\item $\mathbf{U}' \mathbf{y}$ are the values of $\mathbf{y}$ mapped into the orthonormal basis $\mathbf{U}$.
-\item This looks a lot like $\mathbf{QR}$ except that we have chosen a different basis.
-\end{itemize}
-Ridge is simple too:
-\begin{eqnarray*}
-\mathbf{X} \hat{\beta}^{ridge} = \mathbf{X} (\mathbf{X}'\mathbf{X} + \lambda \mathbf{I})^{-1} \mathbf{X}' \mathbf{y} &=& \mathbf{U D} (\mathbf{D}^2 + \lambda \mathbf{I})^{-1} \mathbf{D} \mathbf{U}' \mathbf{y}\\
-&=& \sum_{j=1}^p \mathbf{u}_j  \frac{d_j^2}{d_j^2 + \lambda} \mathbf{u}_j' \mathbf{y}
-\end{eqnarray*}
-\begin{itemize}
-\item Same change of basis. Now we shrink each component by $d_j^2/(d_j^2 + \lambda)$.
-\end{itemize}
-\end{frame}
-
-
-
-\begin{frame}
-\frametitle{Principal Components}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/pcrridge}
+\includegraphics[width=\textwidth]{./resources/pcrridge}
 \end{center}
 \end{frame}
 
@@ -748,40 +776,48 @@ r_i = b_0 + b_1 f_1 + b_2 f_2 + \ldots b_p f_p + e_i
 \end{itemize}
 \end{frame}
 
+\section{Conclusion}
+
 \begin{frame}
-\frametitle{Oracle Property}
+    \frametitle{Overall Comparison}
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/comparisons}
+    \end{center}
+\end{frame}
+    
+\begin{frame}
+    \frametitle{Overall Comparison}
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/regressiontable}
+    \end{center}
+\end{frame}
+    
+\begin{frame}
+    \frametitle{Paths}
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/ESLshrinkpathPositive}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    \vspace{-10pt}
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/ESLshrinkpathNegative}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Implementation}
 \begin{itemize}
-\item An important question with LASSO is whether or not it produces consistent parameter estimates (Generally \alert{no}).
-\item We think of asymptotics as taking both $N,p\rightarrow \infty$.
-\item Donohu (2006) shows that for $p > N$ case, when the true model is sparse, LASSO identified correct predictors with high probability (with certain assumptions on $\mathbf{X}$) as we slowly relax the penalty.
-\item Condition looks like (``good'' variables are not too correlated with ``bad'' variables).
-\begin{eqnarray*}
-\max_{j \in S^{c}} || x_j' X_{S} (X_{S}' X_{S})^{-1} ||_{1} \leq (1 -\epsilon) 
-\end{eqnarray*}
-\item Where $X_{S}$ are columns corresponding to nonzero coefficients, and $S^{c}$ are set of columns with zero coefficients (at true value).
+\item Routines are highly specialized: there are lots of tricks
+\item No hope of coding this up on your own!
+\item In R you can use \texttt{glmnet} or \texttt{lars}.
+\item In Python you can use \texttt{scikit-learn}
+\item In most recent Matlab in Stats toolbox you have \texttt{lasso} and \texttt{ridge}.
+\item In STATA you can download \texttt{.ado} files from Christian Hansen's website (Chicago).
 \end{itemize}
 \end{frame}
 
-
-\begin{frame}
-\frametitle{Other Extensions}
-\begin{itemize}
-\item \textit{Grouped LASSO} for penalzing groups of coefficients at once (like fixed effects)
-\item \textit{Relaxed LASSO} run LASSO to select coefficients and then run a non-penalized subset regression or LASSO with a less stringent penalty on the subset. (Here CV tends to pick a less strong penalty term $\lambda$ leading to less shrinkage and bias).
-\item \textit{SCAD: Smoothly Clipped Absolute Deviation}: do less shrinkage on big coefficients but preserve sparsity
-\begin{eqnarray*}
-\frac{ d J_a(|beta,\lambda)}{d \beta} = \lambda \cdot sgn(\beta) \left[ I(| \beta| \leq \lambda) + \frac{(a \lambda - | \beta|)_{+}}{(a-1) \lambda} I (| \beta| > \lambda) \right]
-\end{eqnarray*}
-\item \textit{Adaptive LASSO} uses  a weighted penalty of the form $\sum_{j=1}^p w_j |\beta_j|$ where $W_j = 1/|\hat{\beta}_j|^{\nu}$ using the OLS estimates as weights. This yields consistent estimates of parameters while retaining the convexity property.
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Penalty Comparisons}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/lassopenalty}
-\end{center}
-\end{frame}
 
 
 
