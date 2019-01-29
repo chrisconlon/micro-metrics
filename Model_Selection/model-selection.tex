@@ -62,7 +62,6 @@ BIC(p) &=& \ln \left(\frac{SSR(p)}{N} \right) + (p+1)\frac{\ln N}{N}
 \begin{eqnarray*}
 y_t = \alpha_0 + \sum_{k=1}^p \alpha_k y_{t-k} + \varepsilon_t
 \end{eqnarray*}
-\item These are designed for strictly \alert{nested} models.
 \end{itemize}
 \end{frame}
 
@@ -87,7 +86,7 @@ y_t = \alpha_0 + \sum_{k=1}^p \alpha_k y_{t-k} + \varepsilon_t
  \item Which $x$'s do we include?
  \item Which $x$'s do we leave out?
  \item It is not clear that BIC/AIC or Vuong test tells us what we should do in practice.
- \item Helpful to review what we're really getting out of multivariate regression. [Much of this section taken from ESL]
+ \item Helpful to review what we're really getting out of multivariate regression. [Much of this section taken from ESL Ch 3]
 \end{itemize}
 \end{frame}
 
@@ -97,7 +96,7 @@ y_t = \alpha_0 + \sum_{k=1}^p \alpha_k y_{t-k} + \varepsilon_t
     \frametitle{Univariate Regression}
     \begin{itemize}
     \item Consider a univarite model (with no intercept)
-    $$ Y= X'\beta + \epsilon $$
+    $$ Y= X\beta + \epsilon $$
     \item Let $\langle\, x, y \rangle = \sum_i^N x_i y_i$ be the inner product between these two variables in our sample.
     \item Then the least squares estimate and residuals are 
     \begin{eqnarray*}
@@ -165,7 +164,7 @@ What does this do?
 
 \begin{frame}
 \frametitle{QR Decomposition (Technical Details)}
-QR Decomposition has a matrix form which regression software uses:
+QR Decomp has a matrix form which regression software uses:
 
 \begin{eqnarray*}
 \mathbf{X} &=& \mathbf{Z \Gamma} \\
@@ -332,7 +331,7 @@ Suppose we fit a regression model and penalized extra variables all in one go, w
 
 \begin{frame}
     \frametitle{Ridge Regression}
-    Another popular alternative is the $q=2$ case
+    A popular option is the $q=2$ case
     \begin{eqnarray*}
     \hat{\beta}^{Ridge} = \arg \min_{\beta} \left[\frac{1}{2} \sum_{i=1}^N (y_i - \beta_0 - \sum_{j=1}^K x_{ij} \beta_j)^2 + \lambda \sum_{j=1}^K | \beta_j|^2 \right]
     \end{eqnarray*}
@@ -353,7 +352,7 @@ Suppose we fit a regression model and penalized extra variables all in one go, w
     \mathbf{X}=\mathbf{U} \mathbf{D} \mathbf{V}'
     \end{eqnarray*}
     \begin{itemize}
-    \item $\mathbf{U}, \mathbf{V}$ are $N \times p$ and $p \times p$ orthonormal matrices ($\mathbf{U}$ spans the column space, and $\mathbf{V}$ spans the row space of $X$.)
+    \item $\mathbf{U}, \mathbf{V}$ are $N \times p$ and $p \times p$ orthogonal matrices ($\mathbf{U}$ spans the column space, and $\mathbf{V}$ spans the row space of $X$)
     \item $\mathbf{D}$ is a diagonal matrix $p \times p$ with elements corresponding to the singular values of $\mathbf{X}$.
     \item If $\mathbf{X}$ is a square, diagonalizable matrix the singular values are equal to the eigenvalues.
     \end{itemize}
@@ -471,7 +470,7 @@ Ridge:
 LASSO:
 \begin{itemize}
 \item LASSO is useful for variable/feature selection.
-\item LASSO does not generally posses the \alert{oracle property} though variants such as \alert{adaptive LASSO} may.
+%\item LASSO does not generally posses the \alert{oracle property} though variants such as \alert{adaptive LASSO} may.
 %\item LASSO sometimes has the oracle property for $p \gg N$ and cases where the true $\beta$'s are not too large.
 \item People sometimes use LASSO to choose components and then OLS for unbiased coefficient estimated.
 \end{itemize}
