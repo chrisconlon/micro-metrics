@@ -32,7 +32,8 @@ How do we choose?
 \item Instrumental Variables.
 \end{itemize}
 
-In these notes we'll talk about these in the context of linear regression. (ESL Ch 3)
+In these notes we'll talk about these in the context of linear regression. (ESL Ch 3) 
+\nocite{friedman2001elements}
 }
 
 
@@ -673,7 +674,7 @@ How many components?
 
 
 \begin{frame}
-\frametitle{Hansen Singleton (1982)}
+\frametitle{\citet{hansen1982generalized}}
 \begin{itemize}
 \item This is the original GMM example, though it comes from macro-finance not microeconometrics
 \begin{eqnarray*}
@@ -817,8 +818,71 @@ r_i = b_0 + b_1 f_1 + b_2 f_2 + \ldots b_p f_p + e_i
 \end{itemize}
 \end{frame}
 
+\section{Example}
 
+\subsection{Belloni et al.}
 
+\begin{frame}
+    \frametitle{<title>}
+
+    High-Dimensional Methods and Inference
+on Structural and Treatment Effects 
+
+Alexandre Belloni, Victor Chernozhukov, Christian Hansen 
+
+\end{frame}
+
+\begin{frame}
+    \vspace{-10pt}
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/QJELevitt}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    \vspace{-10pt}
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/QJELevittScatter}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    \vspace{-10pt}
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/QJELevittTable}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    \frametitle{\citet{belloniJEP}}
+
+    High-Dimensional Methods and Inference
+on Structural and Treatment Effects 
+
+Alexandre Belloni, Victor Chernozhukov, Christian Hansen 
+
+\begin{itemize}
+    \item OL's model is simple diff-in-diff with state and year FEs
+    \item Key identifying assumption: no other trending variables correlated with abortion shift and crime
+    \item OL state: "When we include state-specific time trends, the estimates change somewhat erratically, and the standard errors double for murder and property crime and triple for violent crime."
+    \item Not surprising: Only 600 variables! 
+    \item BCH apply a double LASSO approach (we will discuss this in two weeks) 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+    \vspace{-10pt}
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/BCHLevittVars}
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    \vspace{-10pt}
+    \begin{center}
+    \includegraphics[width=\textwidth]{./resources/BCHLevittTable}
+    \end{center}
+\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[allowframebreaks]
