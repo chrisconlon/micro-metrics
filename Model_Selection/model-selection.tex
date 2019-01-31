@@ -446,7 +446,7 @@ But... is choosing $\lambda$ any easier than choosing $p$?
 
 \begin{frame}
 \frametitle{LASSO Path}
-\vspace{-15pt}
+\vspace{-25pt}
 \begin{center}
 \includegraphics[width=.85\textwidth]{./resources/lassopath}
 \end{center}
@@ -534,7 +534,7 @@ Consider this alternative to Forward Stagewise Regression:
 \item Start with $r= y-\overline{y}$ and $(\beta_1, \ldots, \beta_p) = 0$. (Standardize first!)
 \item Find the predictor $x_j$ most correlated with $r$.
 \item SLOWLY move $\beta_j$ from 0 to its least-squares estimate 
-\item Update $r \leftarrow r - \delta_j \cdot x_j$.
+\item Update $r \leftarrow r - \beta_j \cdot x_j$.
 \item Keep moving $x_j$ in same direction until $x_k$ has as much correlation with updated $r$,
 \item Continue updating $(\beta_j, \beta_k)$ in direction of \alert{joint} least-squares coefficients until some other competitor $x_l$ has as much correlation with $r$.
 \item Continue until all $p$ predictors have entered. After $\min[N-1,p]$ steps we arrive at full OLS solution.
@@ -780,6 +780,7 @@ r_i = b_0 + b_1 f_1 + b_2 f_2 + \ldots b_p f_p + e_i
 
 \begin{frame}
     \frametitle{Overall Comparison}
+    \vspace{-15pt}
     \begin{center}
     \includegraphics[width=\textwidth]{./resources/comparisons}
     \end{center}
@@ -818,19 +819,33 @@ r_i = b_0 + b_1 f_1 + b_2 f_2 + \ldots b_p f_p + e_i
 \end{itemize}
 \end{frame}
 
-\section{Example}
+\section{Examples}
 
-\subsection{Belloni et al.}
+\subsection{Trade}
+%baxter2017robust
+\begin{frame}
+    \vspace{-10pt}
+    \begin{center}
+    \includegraphics[height=\textheight]{./resources/BaxterAbstract}
+    \end{center}
+    \nocite{baxter2017robust}
+\end{frame}
 
 \begin{frame}
-    \frametitle{<title>}
-
-    High-Dimensional Methods and Inference
-on Structural and Treatment Effects 
-
-Alexandre Belloni, Victor Chernozhukov, Christian Hansen 
-
+    \vspace{-10pt}
+    \begin{center}
+    \includegraphics[height=\textheight]{./resources/BaxterOLS}
+    \end{center}
 \end{frame}
+
+\begin{frame}
+    \vspace{-10pt}
+    \begin{center}
+    \includegraphics[height=\textheight]{./resources/BaxterLassoPath}
+    \end{center}
+\end{frame}
+
+\subsection{Crime}
 
 \begin{frame}
     \vspace{-10pt}
@@ -854,18 +869,14 @@ Alexandre Belloni, Victor Chernozhukov, Christian Hansen
 \end{frame}
 
 \begin{frame}
-    \frametitle{\citet{belloniJEP}}
-
-    High-Dimensional Methods and Inference
-on Structural and Treatment Effects 
-
-Alexandre Belloni, Victor Chernozhukov, Christian Hansen 
+    \frametitle{Belloni, Chernozhukov, and Hansen (JEP 2014)}
+    \nocite{belloniJEP}
+    ``High-Dimensional Methods and Inference \\ on Structural and Treatment Effects ''
 
 \begin{itemize}
     \item OL's model is simple diff-in-diff with state and year FEs
     \item Key identifying assumption: no other trending variables correlated with abortion shift and crime
     \item OL state: "When we include state-specific time trends, the estimates change somewhat erratically, and the standard errors double for murder and property crime and triple for violent crime."
-    \item Not surprising: Only 600 variables! 
     \item BCH apply a double LASSO approach (we will discuss this in two weeks) 
 \end{itemize}
 \end{frame}
@@ -884,7 +895,7 @@ Alexandre Belloni, Victor Chernozhukov, Christian Hansen
     \end{center}
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[allowframebreaks]
     \bibliographystyle{jpe}
     \bibliography{../empirical-methods}
@@ -893,6 +904,7 @@ Alexandre Belloni, Victor Chernozhukov, Christian Hansen
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Backup}
 \subsection*{Info criteria}\label{sec:info}
+
 
 \begin{frame}
     \frametitle{Review AIC/BIC}
