@@ -1,52 +1,34 @@
-\documentclass[xcolor=pdftex,dvipsnames,table,mathserif]{beamer}
-\usetheme{default}
-\setbeamersize{text margin left=.3in,text margin right=.3in} 
+\input{../slideHeader}
 
-%\usetheme{Darmstadt}
-%\usepackage{times}
-%\usefonttheme{structurebold}
+\title{Treatment Effects}
+\author{Richard L. Sweeney}
+\institute{based on slides by Chris Conlon}
+\date{Empirical Methods \\ Spring 2019}
 
-\usepackage[english]{babel}
-%\usepackage[table]{xcolor}
-\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
-\usepackage{amsmath,amssymb,setspace,centernot}
-\usepackage[latin1]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{relsize}
-\usepackage{pdfpages}
-\usepackage[absolute,overlay]{textpos} 
-
-
-\newenvironment{reference}[2]{% 
-  \begin{textblock*}{\textwidth}(#1,#2) 
-      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
-
+\setbeamerfont{equation}{size=\tiny}
 \DeclareMathSizes{10}{10}{6}{6} 
 
 \begin{document}
-\title{Part 3: Treatment Effects}
-\author{Chris Conlon}
-\institute{Microeconometrics}
-\date{\today}
 
-\frame{\titlepage}
+\begin{frame}
+    \titlepage
+\end{frame}
 
-\section{Intro}
+\begin{frame}
+    \tableofcontents  
+\end{frame}
+
 \frame{\frametitle{Overview}
-This Lecture will cover (roughly) the following papers:\\
-Theory:
+
+This lecture draw heavily upon 
 \begin{itemize}
-\item Angrist and Imbens (1994)
-\item Heckman Vytlacil (2005/2007)
-\item Abadie and Imbens (2006)
-\end{itemize}
-And draw heavily upon notes by 
-\begin{itemize}
-\item Guido Imbens
-\item Richard Blundell and Costas Meghir
+\item 2012 AEA continuing education lectures by Imbens and Woodldridge (full materials available \href{https://www.aeaweb.org/webcasts/2012/}{here}.)
+\item \citet{AbadieCattaneoAnRev2018}
 \end{itemize}
 
 }
+
+\section{Setup}
 
 \begin{frame}
 \frametitle{The Evaluation Problem}
@@ -68,101 +50,180 @@ And draw heavily upon notes by
 \end{frame}
 
 \begin{frame}
-\frametitle{The Evaluation Problem}
-\begin{itemize}
-\item Define an outcome variable $Y_i$ for each individual
-\item Two \alert{potential outcomes} for each person $\{Y_i(1), Y_i(0)\}$ depending on whether they receive treatment or not.
-\item Call $Y_i(1)- Y_i(0) = \beta_i$ the \alert{Treatment effect}.
-\item Two major problems:
-\begin{itemize}
-\item All individuals have different treatment effects (\alert{heterogeneity}).
-\item We don't actually observe any one person's treatment effect ! (Missing Data problem)
+  \frametitle{Setup}
+  Typically attributed to Rubin
+  \begin{itemize}
+  \item Observe $N$ units, indexed by $i$, drawn randomly from a larger population
+  \item Postulate two \alert{potential outcomes} for each unit $\{Y_i(1), Y_i(0)\}$ depending on whether they receive treatment or not.
+  \item Observe additional \textit{exogenous} covariates $X_i$
+  \item Consider a binary treatment $W_i$ such that 
+  \begin{equation*}
+    Y_{i} \equiv Y_i(W_i) = 
+      \begin{cases}
+        Y_i(0) & \text{if $W_i=0$}\\
+        Y_i(1) & \text{if $W_i=0$}
+      \end{cases}       
+  \end{equation*}
 \end{itemize}
-\item We need strong assumptions in order to recover $f(\beta_i)$ from data.
-\item Instead we can characterize simpler functions such as $E[\beta_i]$ (ATE) or $E[\beta_i | T_i = 1]$ (ATT) or $E[\beta_i | T_i = 0]$ (ATC)  with fewer restrictions.
-\end{itemize}
+
+\pause 
+
+  Note there is already an important assumption embedded in this setup, the stable unit treatment value assumption (\alert{SUTVA}). 
+  
+  This is likely to fail in many important settings. Examples?
+
 \end{frame}
 
 \begin{frame}
-\frametitle{More Difficulties}
-What is hard here?
-\begin{itemize}
-\item Heterogeneous effect of $\beta_i$ in population.
-\item Selection in treatment may be endogenous. That is $T_i$ depends on $Y_i(1),Y_i(0)$.
-\item Fisher or Roy (1951) model:
-\begin{eqnarray*}
-Y_i = (Y_i(1) - Y_i(0)) T_i + Y_i(0)= \alpha + \beta_i T_i + u_i
-\end{eqnarray*}
-\item Agents usually choose $T_i$ with $\beta_i$ or $u_i$ in mind.
-\item Can't necessarily pool across individuals since $\beta_i$ is not constant.
-\end{itemize}
-\end{frame}
-
-
-
-
-\begin{frame}
-\frametitle{Structural vs. Reduced Form}
-\begin{itemize}
-\item Usually we are interested in one or two parameters of the distribution of $\beta_i$ (such as the average treatment effect or average treatment on the treated).
-\item Most program evaluation approaches seek to identify one effect or the other effect. This leads to these as being described as \alert{reduced form} or \alert{quasi-experimental}.
-\item The \alert{structural} approach attempts to recover the entire joint $f(\beta_i,u_i)$ distribution but generally requires more assumptions, but then we can calculate whatever we need.
-\end{itemize}
+  \frametitle{The Evaluation Problem}
+  \begin{itemize}
+  \item Two major problems:
+  \begin{itemize}
+  \item All individuals have different treatment effects (\alert{heterogeneity}).
+  \item We don't actually observe any one person's treatment effect ! (Missing Data problem)
+  \item Individual treatment effects $\tau_i = Y_{1i} - Y_{0i}$ are never observed (FPOCI)
+  \end{itemize}
+  \item We need strong assumptions in order to recover $f(\beta_i)$ from data.
+  \item Instead we often focus on simpler estimands.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Start with Easy Cases}
-\begin{itemize}
-\item Let's start with the easy cases: run OLS and see what happens.
-\item OLS compares mean of treatment group with mean of control group (possibly controlling for other $X$)
-\begin{eqnarray*}
-\beta^{OLS} &=& E(Y_i | T_i =1) - E(Y_i | T_i=0) \\
-&=& \underbrace{E[\beta_i | T_i =1]}_{\mbox{ATT}} + \left(\underbrace{E[u_i | T_i =1 ] - E[u_i | T_i=0] }_{\mbox{selection bias}}  \right)
-\end{eqnarray*}
-\item Even in absence of heterogeneity $\beta_i = \beta$ we can still have selection bias. 
-\item $Y_i^0 = \alpha + u_i$ may vary within the population (this is quite common).
-\end{itemize}
+  \frametitle{Treatment Effects}
+  \begin{itemize}
+    \item Population average treatment effect (PATE)
+      $$ \tau_P = E \left[ Y_i(1) - Y_i(0) \right] $$
+    \item Population average treatment effect for treated units (PATT)
+      $$ \tau_{P,T} = E \left[ Y_i(1) - Y_i(0) | W = 1 \right] $$
+    \item Sample average treatment effect (SATE)
+      $$ \tau_S = \frac{1}{N} \sum_{i=1}^N ( Y_i(1) - Y_i(0) ) $$
+    \item Sample average treatment effect for treated units (SATT)
+      $$ \tau_{S,T} = \frac{1}{N_T} \sum_{i \in W_i=1} ( Y_i(1) - Y_i(0) ) $$
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Solutions}
-\begin{enumerate}
-\item Matching
-\item Instrumental Variables
-\item Diference in Difference and Natural Experiments
-\item RCTs
-\item Structural Models
-\end{enumerate}
-\begin{itemize}
-\item Key distinction: the treatment effect of some program (a number) from understanding how and why things work (the mechanism).
-\item Models let us link numbers to mechanisms.
-\end{itemize}
+  \frametitle{More Difficulties}
+  What is hard here?
+  \begin{itemize}
+  \item Heterogeneous effect of $\beta_i$ in population.
+  \item Selection in treatment may be endogenous. That is $T_i$ depends on $Y_i(1),Y_i(0)$.
+  \item Fisher or Roy (1951) model:
+  \begin{eqnarray*}
+  Y_i = (Y_i(1) - Y_i(0)) T_i + Y_i(0)= \alpha + \beta_i T_i + u_i
+  \end{eqnarray*}
+  \item Agents usually choose $T_i$ with $\beta_i$ or $u_i$ in mind.
+  \item Can't necessarily pool across individuals since $\beta_i$ is not constant.
+  \end{itemize}
 \end{frame}
+
+\begin{frame}
+  \frametitle{Structural vs. Reduced Form}
+  \begin{itemize}
+  \item Usually we are interested in one or two parameters of the distribution of $\beta_i$ (such as the average treatment effect or average treatment on the treated).
+  \item Most program evaluation approaches seek to identify one effect or the other effect. This leads to these as being described as \alert{reduced form} or \alert{quasi-experimental}.
+  \item The \alert{structural} approach attempts to recover the entire joint $f(\beta_i,u_i)$ distribution but generally requires more assumptions, but then we can calculate whatever we need.
+  \end{itemize}
+\end{frame}
+  
+\begin{frame}
+  \frametitle{Solutions}
+  \begin{enumerate}
+  \item Matching
+  \item Instrumental Variables
+  \item Diference in Difference and Natural Experiments
+  \item RCTs
+  \item Structural Models
+  \end{enumerate}
+  \begin{itemize}
+  \item Key distinction: the treatment effect of some program (a number) from understanding how and why things work (the mechanism).
+  \item Models let us link numbers to mechanisms.
+  \end{itemize}
+\end{frame}
+  
+  
+
+\subsection{Conditional Independence}
+
+%TK add abadia DAG here. 
+\begin{frame}
+  \frametitle{Confounding}
+  \begin{itemize}
+  \item Consider the \textit{association} 
+  $$ \tau = E \left[ Y | W= 1 \right] - E \left[ Y | W= 0 \right] $$
+  \item Then $ \tau = \tau_{ATE} + b_{ATE} $
+  \item Where $b$ is the \textit{bias}
+  \begin{multline*}
+    b_{ATE} =  ( E \left[ Y_1 | W= 1 \right] - E \left[ Y_1 | W= 0 \right])Pr(W=0) \\ 
+              + ( E \left[ Y_0 | W= 1 \right] - E \left[ Y_0 | W= 1 \right])Pr(W=1) 
+  \end{multline*}
+  \item So the bias disapears only if the potential outcomes are independent of treatment assignment. 
+  \item This is called \textbf{unconfoundedness}. 
+  \end{itemize}
+\end{frame}
+  
+\begin{frame}
+  \frametitle{Estimation under unconfoundedness}
+   \textbf{Assumption: 1 } $$ \left(Y_i(0),Y_i(1) \right) \perp W_i | X_i $$
+  \begin{itemize}
+  \item Sometimes called ``conditional independence assumption'' or ``selection on observables''. 
+  \item Can see this is implicit in the regression $Y_i = \alpha + \tau W_i + X_i'\beta + \epsilon_i$ where $\epsilon_i \perp X_i$ 
+  under the assumption of a constant treatment effect (otherwise this is not the same)
+  \end{itemize}
+
+  \textbf{Assumption 2  (Overlap)} $$ 0 < Pr(W_i = 1 | X_i) < 1 $$
+\end{frame}
+  
+\begin{frame}
+  \frametitle{How useful are these assumptions?}
+  Guido has a good discussion on this. Suggests following motivations: 
+  \begin{itemize}
+    \item This is a natural starting point. Compare treatment and control units, after adjusting for observables. Need not be the last word! 
+    \item \textit{All} comparisons involve comparing treated to untreated units. Absent RCT, its up to researcher to invstigate which comparisons to emphasize
+    \item Often specifying a model can clarify how sensible this is. Guido has a good example on costs in the paper. 
+  \end{itemize} 
+\end{frame}
+
+\begin{frame}
+  \frametitle{Under these assumptions, can we just use regression?}
+  \begin{itemize}
+    \item Let $\mu_w(x) = E [Y_i(w) | X_i = x] $
+    \item A regression estimate of $\tau$ is then 
+     $$ \hat \tau_{reg} = \frac{1}{N} \sum_i W_i(Y_i - \hat \mu_0(X_i)) + (1-W_i)(\hat \mu_1(X_i) -  Y_i ) $$
+    \item Typically estimate $$ Y_i = \alpha  + \beta'X_i + \tau W_i + \epsilon_i $$ which assumes $\mu_w(x) = \beta' x + \tau*w $ 
+    \item Could easily also compute $$\mu_w(x) = \beta_w'x$$
+    \item Key point is that this estimator can be viewed as a missing data problem, where predictions are computed using regression. 
+  \end{itemize} 
+\end{frame}
+
+\begin{frame}
+  \frametitle{When is this likely to be a problem?}
+  \begin{itemize}
+    \item Note $\mu_0(x)$ is used to predict the "missing" control outcomes for the treated observations.
+    \item Want this predition at the average treated covariates $\bar X_T$
+    \item With linear regression, our average control prediction for the treated observations is going to be $\bar Y_C + \hat \beta'(\bar X_T - \bar X_C)$ 
+    \item Ok if: 
+    \begin{enumerate}
+      \item $\mu()$ is properly specified
+      \item treated and control observations are similar
+    \end{enumerate}
+    \item First is untestable, but in practice predictions are often sensitive to functional form
+    \item Leads to a big emphasis on covariate balance. 
+  \end{itemize} 
+\end{frame}
+
+\section{Matching}
 
 \begin{frame}
 \frametitle{Matching}
 \begin{itemize}
-\item Compare treated individuals to un-treated individuals with identical observable characteristics $X_i$.
-\item Key assumption: everything about $Y_i(1) - Y_i(0)$ is captured in $X_i$; or $u_i$ is randomly assigned conditional on $X_i$.
-\item Basic idea: The treatment group and the control group don't have the same distribution of observed characteristics as one another. 
+\item Regression imputes missing potential outcomes using regression. 
+\item Matching imputes using the \textit{realized} outcome of (nearly) identical units in the opposite assignment group. 
+\item Remember, we're in a world where we've assumed unconfoundedness. Only challenge is that the treatment group and the control group don't have the same distribution of $X$'s. 
 \item \alert{Re-weight} the un-treated population so that it resembles the treated population.
 \item Once distribution of $X_i$ is the same for both groups $ X_i | T_i \sim X_i$ then we assume all other differences are irrelevant and can just compare means.
-\item Matching assumes \alert{all selection is on observables}.
 \end{itemize}
 \end{frame}
-
-\begin{frame}
-\frametitle{Matching}
-\begin{itemize}
-\item Formally the key assumption is the \alert{Conditional Independence Assumption (CIA)}
-\begin{eqnarray*}
-\{Y_i^1,Y_i^0\}  \perp T_i | X_i
-\end{eqnarray*}
-\item Once we know $X_i$ allocation to treatment $T_i$ is as if it is random.
-\item The only difference between treatment and control is composition of the sample.
-\end{itemize}
-\end{frame}
-
 
 \begin{frame}
 \frametitle{Matching}
@@ -277,14 +338,13 @@ Notes: Control weeks are selected through the-neighbor matching using four contr
 
 
 \begin{frame}
-\frametitle{Higher Dimensions}
-So matching works great in dimension 1. But what if $dim(X) > 1$?
+\frametitle{How do you actually do this?}  
 \begin{itemize}
-\item True high-dimensional matching may be infeasible. There may be no set of weights such that:
-$f(X_i | T_i=1) \equiv \int w_i f(X_i | T_i=0) \partial w_i $.
-\item One solution is the nearest-neighbor approach in Abadie Imbens (2006).
-\item This is still cursed in that our nearest neighbors get further away as the dimension grows.
-\item Suppose instead we had a \alert{sufficient statistic}
+  \item One dimension is easy: just sort 
+  \item In multiple dimensions, there are a variety of built in nearest neighbor packages (Abadie Imbens (2006))
+  \item What's nice about these is that the reasearcher only has to pick the number of matches (although the default tolerances not always innocuous)
+  \item This is still cursed in that our nearest neighbors get further away as the dimension grows.
+  \item Suppose instead we had a \alert{sufficient statistic}
 \end{itemize}
 \end{frame}
 
@@ -293,124 +353,102 @@ $f(X_i | T_i=1) \equiv \int w_i f(X_i | T_i=0) \partial w_i $.
 \begin{itemize}
 \item Rosenbaum and Rubin propose the \alert{propensity score}
 \begin{eqnarray*}
-P(T_i  = 1 | X_i) \equiv P(X_i)
+e(x) = Pr(W_i  = 1 | X_i) = E[W_i | X_i = x]
 \end{eqnarray*}
-\item They prove that the propensity score and any function of $X$, $b(X)$ which is finer serves as a \alert{balancing score}.
-\item Finer implies that:
-\begin{eqnarray*}
-b(X^1) = b(X^2) &\implies& P(X^1) = P(X^2)\\
-P(X^1) = P(X^2) & \centernot \implies & b(X^1) = b(X^2)
-\end{eqnarray*}
+\item They prove that under the assumption of unconfoundedness, 
+  $$ (Y_i(0),Y_i(1)) \perp W_i | e(X_i) $$ 
+\item So even if $X$ is high dimensional, it is sufficient to condition on a scalar function 
+\item Of course, the true propensity score is not known... 
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{This suggests an attractive weigthing}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/imbensAEAPsWeight}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Approaches now look similar}
+  \begin{itemize}
+  \item One option is "inverse probability weighting" 
+  \item Nonparametrically estimate $e(x)$, the compute 
+  $$ \hat \tau = \sum_i^N \frac{W_i Y_i}{\hat e(X_i)} / \sum_i^N \frac{W_i}{\hat e(X_i)} - \sum_i^N \frac{(1-W_i) Y_i}{1 - \hat e(X_i)} / \sum_i^N \frac{(1-W_i)}{1 - \hat e(X_i)} $$ 
+  where this is slightly more complicated than just plugging in $\hat e()$ because in your sample the weights won't necessarily sum to one (Hirano, Imbens and Ridder (2003))
+  \item Alternatively we could flexibly estimate $\mu_w$ then plug in these predictions for each observation manually. 
+  \item With discrete covariates, these will be equivalent! 
+  \item Otherwise there finite sample propoerties will vary depending on the smoothness of the regression and propensity score functions. 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What about matching on the (estimated) propensity score?}
+  \begin{itemize}
+  \item VERY widely used approach 
+  \item Large sample properties not known 
+  \item "Why Propensity Scores Should Not Be Used for Matching" \citep{KingNielsonPSM}
+  \item Show this performs poorly in simulations compared to matching on X's directly. 
+  \item One alternative from the same author's: Coarsened Exact Matching
+  \end{itemize}
+\end{frame}
+  
+\begin{frame}
+  \frametitle{CEM has many uses}
+  \begin{itemize}
+  \item Linh To's JMP: 
+  \item Question: by how much did "marginal" mothers extend leave when benefits extended in Denmark
+  \item Convincing RD: restrict to sample already pregnant when law announced 
+  \item Challenge: Only see mothers in one group or the other (2 pre, 3 post)
+  \item Solution: Match each pre period mother using their closest post-period counterpart, and assign her to that post-group. 
+  \end{itemize}
+\end{frame}
+
+%TK Copy susan's jep suggested readings here. 
+\begin{frame}
+  \frametitle{What can ML add here?}
+  \begin{itemize}
+  \item Estimating the propensity score is a pure \textbf{prediction} problem. We don't care what causes someone to be treated in this setup
+  \item This is a natural place for ML (decision trees, random forests). 
+  \item What should we use to predict? 
+  \end{itemize}
 \end{frame}
 
 
 \begin{frame}
-\frametitle{Propensity Score}
+\frametitle{Assessing Unconfoundedness}
 \begin{itemize}
-\item Main result: If treatment assignment is strongly ignorable conditional on $X$ (CIA) then it is strongly ignorable $Y(1),Y(0) \perp T | X$ given any balancing score $b(X)$ including the propensity score:
-\begin{align*}
-Pr(T=1 | Y(1), Y(0),P(X))&= E[Pr(T=1| Y(1),Y(0),X) | P(X)] \\
-&= E[Pr(T=1 | x) | P(X) ] = P(X)
-\end{align*}
-\item Also we require that $0 < P(X) < 1$ at each $X$ which is known as the \alert{support condition}.
-\item The theorem implies that given $P(X)$ we have as if random assignment.
+\item This assumption is fundamentally untestable
+\item However people have proposed a number of tests which, if failed, might be \textit{inconsistent} with unconfoundedness. 
+\item One option is to look for an "effect" on an untreated group. 
+\item Imagine you had one sample of "eligible" units, some who were treated and some who weren't. And another sample of "ineligible" units, all of whom are also untreated by construction. 
+\item You could estimate a difference in outcomes within the two untreated groups. If eligible but untreated units look different than uneligible, that should be worrisome. 
+\item Imbens lecture does this with the Lalonde data and the CPS. 
+\item Another natural approach is to use "psuedo outcomes", like lagged Y. 
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Propensity Score}
-\begin{itemize}
-\item Instead of matching on $K$ dimensional $X$ we can now match on a one-dimensional propensity score
-\item Thus the propensity score provides \alert{dimension reduction}
-\item We still have to estimate the propensity score which is a high dimensional problem without \textit{ad-hoc} parametric restrictions.
-\item Let us begin by assuming a can-opener.
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Propensity Score}
-Just like in the matching case the problem arises because we do not observe the counterfactual mean:
-\begin{eqnarray*}
- E_{F^1(x)} [E(Y(0) | T=1,X)] 
-\end{eqnarray*}
-With conditional independence and the propensity score:
-\begin{eqnarray*}
- E_{F^1(x)} [E(Y(0) | T=1,X)]  &=&  E_{F^1(x)} [E(Y(0) | T=0,X)] \\
- &=&  E_{F^1(x)} [E(Y(0) | T=0,P(X))] 
-\end{eqnarray*}
+  \frametitle{Assessing Overlap}
+  \begin{itemize}
+  \item Obviously want to start with a summary table comparing the means of your treatment and control groups. 
+  \item What's a big difference? t-stats reflective of sample size 
+  \item Instead report the normalized difference in covariates. According to Imbens, a an average difference bigger than 0.25 standard deviations is worrisome. 
+  \item Another alternative is to plot the propensity score for the two groups. 
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Kernel Matching}
-How do we implement?
-\begin{itemize}
-\item Kernels are an obvious choice
-\begin{eqnarray*}
-\widehat{ATT} = \frac{1}{N_1} \sum_{i \in T=1} \left[Y_i - \frac{\sum_{j \in T=0} Y_j K\left(P(X_i) - P(X_j) \right) }{\sum_{s \in T=0}  K\left(P(X_i) - P(X_s) \right)}   \right]
-\end{eqnarray*}
- where $N_1$ is the sample size of the treatment group \\
- and $K(u)$ is a valid Kernel weight (people tend to use Gaussian Kernels here)
-\item As your propensity score gets further away from observation $i$ you get less weight
-\item As $h \rightarrow 0$  (or $\sigma_h$) the window gets smaller and we use fewer neighbors.
-\end{itemize}
+  \frametitle{Matching wrapup}
+  \begin{itemize}
+  \item Even under unconfoundedness, very important to ensure overlap
+  \item Restrict your sample so that its balanced, using exact matching if low dimensional, coarse or propensity score otherwise
+  \item Assess unconfoundedness using a psuedo-outcome if possible 
+  \item Run regression on your matched sample 
+  \end{itemize}
 \end{frame}
 
-
-\begin{frame}
-\frametitle{Kernel Matching}
-\begin{itemize}
-\item The usual caveats apply: $h$ determines the \alert{bias-variance} tradeoff
-\item Choice of Kernel effects finite-sample properties
-\item Here the \alert{common support} is important. We can only learn about cases where $P(X) \neq 1$ and $P(X) \neq 0$. If you always get treated (or not-treated) we cannot learn from this observation.
-\item We also have to be careful in choosing $X$ so as not to violate CIA (too many $X$'s , too few $X$'s) $\rightarrow$ have to think carefully!
-\item If you use propensity scores you will need a slide convincing us you have thought about why CIA holds for you!
-\end{itemize}
-\end{frame}
-
-
-
-\begin{frame}
-\frametitle{Gotcha!}
-Under CIA we know
-\begin{eqnarray*}
-G(Y(1),Y(0) | X, T) = G(Y(1),Y(0) | X)
-\end{eqnarray*}
-Suppose we add in $Z$, then we require that:
-\begin{eqnarray*}
-G(Y(1),Y(0) | X, Z, T) = G(Y(1),Y(0) | X, Z)
-\end{eqnarray*}
-However,
-\begin{eqnarray*}
-G(Y(1),Y(0) | X, T) = \int G(Y(1),Y(0) | X, Z, T) dF(Z | X,T) \\
-= G(Y(1),Y(0) | X)
-\end{eqnarray*}
-where the last part follows by CIA.
-\begin{itemize}
-\item Thus each element can depend on $T$ conditional on $Z,X$ but the average may not.
-\item Mindless applications of matching can give you biased results!
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Matching and OLS}
-\begin{itemize}
-\item Recall that OLS is a special case of Kernel regression (and hence matching!)
-\item Think about
-\begin{eqnarray*}
-Y  = \alpha + \beta T_i + u
-\end{eqnarray*}
-\item Assume that $E(u | T,X) = E(u | X)$ which is a conditional mean independence assumption
-\item The we can get $\beta$ consistently (but not other variables) by running the following:
-\begin{eqnarray*}
-Y = \alpha + \beta T_i + \gamma X + v
-\end{eqnarray*}
-\item Again we are in the homogenous treatment world
-\end{itemize}
-\end{frame}
-
+\section{IV}
 
 \begin{frame}
 \frametitle{What about IV}
@@ -605,7 +643,7 @@ Finally, we need to understand what monotonicity means in terms of restrictions 
 \end{itemize}
 \end{frame}
 
-
+\section{DiD}
 \begin{frame}{Further approaches to evaluation of program effects: \\
 {\small Difference in Differences } }
 \begin{itemize}
@@ -795,7 +833,7 @@ assuming that the probability of training in the first period is zero.
 \end{itemize}              
 \end{frame}
 
-\section*{RDD}
+\section{RDD}
 \begin{frame}{Regression Discontinuity Design}
 \begin{itemize}
 \item Another popular research design is the \alert{Regression Discontinuity Design}.
@@ -976,6 +1014,7 @@ An important extension in the \alert{Fuzzy RD}.   Back to where we started:
 \end{itemize}
 \end{frame}
 
+\section{MTE}
 \begin{frame}{One quantity to rule them all: MTE}
 Heckman and Vytlacil provide a unifying non-parametric framework to categorize treatment effects. Their approach is known as the \alert{marginal treatment effect} or MTE
 \begin{itemize}
@@ -1165,5 +1204,14 @@ D_{jk}(p_j,p_{-j}) = \left| \frac{\partial q_k}{\partial p_j}(p_j,p_{-j}) /  \fr
 \end{itemize}
 \end{itemize}
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[allowframebreaks]
+  \bibliographystyle{jpe}
+  \bibliography{../empirical-methods}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Backup}
 
 \end{document}
