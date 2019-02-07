@@ -61,17 +61,34 @@ This lecture draw heavily upon
     Y_{i} \equiv Y_i(W_i) = 
       \begin{cases}
         Y_i(0) & \text{if $W_i=0$}\\
-        Y_i(1) & \text{if $W_i=0$}
+        Y_i(1) & \text{if $W_i=1$}
       \end{cases}       
   \end{equation*}
 \end{itemize}
+\end{frame}
 
-\pause 
+\begin{frame}
+  \frametitle{SUTVA}
+  \begin{itemize}
+  \item Note there is already an important assumption embedded in this setup, the stable unit treatment value assumption (\alert{SUTVA}). 
+  \item Assume that the outcome, in either state for unit $i$ does not depend on the assignment of other units.   
+  \item This is likely to fail in many important settings. Examples?
+\end{itemize}
+\end{frame}
 
-  Note there is already an important assumption embedded in this setup, the stable unit treatment value assumption (\alert{SUTVA}). 
-  
-  This is likely to fail in many important settings. Examples?
-
+\begin{frame}
+  \frametitle{Methods}
+  \begin{enumerate}
+  \item Matching
+  \item Instrumental Variables
+  \item Difference in Difference and Natural Experiments
+  \item RCTs
+  \item Structural Models
+  \end{enumerate}
+  \begin{itemize}
+  \item Key distinction: the treatment effect of some program (a number) from understanding how and why things work (the mechanism).
+  \item Models let us link numbers to mechanisms.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -84,12 +101,37 @@ This lecture draw heavily upon
   \item Individual treatment effects $\tau_i = Y_{1i} - Y_{0i}$ are never observed (FPOCI)
   \end{itemize}
   \item We need strong assumptions in order to recover $f(\beta_i)$ from data.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{More Difficulties}
+  What is hard here?
+  \begin{itemize}
+  \item Heterogeneous effect of $\beta_i$ in population.
+  \item Selection in treatment may be endogenous. That is $W_i$ depends on $Y_i(1),Y_i(0)$.
+  \item Fisher or Roy (1951) model:
+  \begin{eqnarray*}
+  Y_i = (Y_i(1) - Y_i(0)) W_i + Y_i(0)= \alpha + \beta_i W_i + u_i
+  \end{eqnarray*}
+  \item Agents usually choose $W_i$ with $\beta_i$ or $u_i$ in mind.
+  \item Can't necessarily pool across individuals since $\beta_i$ is not constant.
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Structural vs. Reduced Form}
+  \begin{itemize}
+  \item Usually we are interested in one or two parameters of the distribution of $\beta_i$ (such as the average treatment effect or average treatment on the treated).
+  \item Most program evaluation approaches seek to identify one effect or the other effect. This leads to these as being described as \alert{reduced form} or \alert{quasi-experimental}.
+  \item The \alert{structural} approach attempts to recover the entire joint $f(\beta_i,u_i)$ distribution but generally requires more assumptions, but then we can calculate whatever we need.
   \item Instead we often focus on simpler estimands.
   \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Treatment Effects}
+  \frametitle{Common Objects of Interest}
   \begin{itemize}
     \item Population average treatment effect (PATE)
       $$ \tau_P = E \left[ Y_i(1) - Y_i(0) \right] $$
@@ -101,47 +143,6 @@ This lecture draw heavily upon
       $$ \tau_{S,T} = \frac{1}{N_T} \sum_{i \in W_i=1} ( Y_i(1) - Y_i(0) ) $$
   \end{itemize}
 \end{frame}
-
-\begin{frame}
-  \frametitle{More Difficulties}
-  What is hard here?
-  \begin{itemize}
-  \item Heterogeneous effect of $\beta_i$ in population.
-  \item Selection in treatment may be endogenous. That is $T_i$ depends on $Y_i(1),Y_i(0)$.
-  \item Fisher or Roy (1951) model:
-  \begin{eqnarray*}
-  Y_i = (Y_i(1) - Y_i(0)) T_i + Y_i(0)= \alpha + \beta_i T_i + u_i
-  \end{eqnarray*}
-  \item Agents usually choose $T_i$ with $\beta_i$ or $u_i$ in mind.
-  \item Can't necessarily pool across individuals since $\beta_i$ is not constant.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Structural vs. Reduced Form}
-  \begin{itemize}
-  \item Usually we are interested in one or two parameters of the distribution of $\beta_i$ (such as the average treatment effect or average treatment on the treated).
-  \item Most program evaluation approaches seek to identify one effect or the other effect. This leads to these as being described as \alert{reduced form} or \alert{quasi-experimental}.
-  \item The \alert{structural} approach attempts to recover the entire joint $f(\beta_i,u_i)$ distribution but generally requires more assumptions, but then we can calculate whatever we need.
-  \end{itemize}
-\end{frame}
-  
-\begin{frame}
-  \frametitle{Solutions}
-  \begin{enumerate}
-  \item Matching
-  \item Instrumental Variables
-  \item Diference in Difference and Natural Experiments
-  \item RCTs
-  \item Structural Models
-  \end{enumerate}
-  \begin{itemize}
-  \item Key distinction: the treatment effect of some program (a number) from understanding how and why things work (the mechanism).
-  \item Models let us link numbers to mechanisms.
-  \end{itemize}
-\end{frame}
-  
-  
 
 \subsection{Conditional Independence}
 
@@ -176,10 +177,10 @@ This lecture draw heavily upon
   
 \begin{frame}
   \frametitle{How useful are these assumptions?}
-  Guido has a good discussion on this. Suggests following motivations: 
+  \citet{imbens2015matching} has a good discussion on this. Suggests following motivations: 
   \begin{itemize}
     \item This is a natural starting point. Compare treatment and control units, after adjusting for observables. Need not be the last word! 
-    \item \textit{All} comparisons involve comparing treated to untreated units. Absent RCT, its up to researcher to invstigate which comparisons to emphasize
+    \item \textit{All} comparisons involve comparing treated to untreated units. Absent RCT, its up to researcher to investigate which comparisons to emphasize
     \item Often specifying a model can clarify how sensible this is. Guido has a good example on costs in the paper. 
   \end{itemize} 
 \end{frame}
@@ -191,8 +192,8 @@ This lecture draw heavily upon
     \item A regression estimate of $\tau$ is then 
      $$ \hat \tau_{reg} = \frac{1}{N} \sum_i W_i(Y_i - \hat \mu_0(X_i)) + (1-W_i)(\hat \mu_1(X_i) -  Y_i ) $$
     \item Typically estimate $$ Y_i = \alpha  + \beta'X_i + \tau W_i + \epsilon_i $$ which assumes $\mu_w(x) = \beta' x + \tau*w $ 
-    \item Could easily also compute $$\mu_w(x) = \beta_w'x$$
-    \item Key point is that this estimator can be viewed as a missing data problem, where predictions are computed using regression. 
+    \item Could easily also compute $$\mu_w(x) = \alpha_w + \beta_w'x$$
+    \item Key point is that this estimator can be viewed as a \alert{missing data} problem, where predictions are computed using regression. 
   \end{itemize} 
 \end{frame}
 
@@ -205,9 +206,9 @@ This lecture draw heavily upon
     \item Ok if: 
     \begin{enumerate}
       \item $\mu()$ is properly specified
-      \item treated and control observations are similar
+      \item treated and control observations are similar (in $X$)
     \end{enumerate}
-    \item First is untestable, but in practice predictions are often sensitive to functional form
+    \item First condition is untestable, but in practice predictions are often sensitive to functional form
     \item Leads to a big emphasis on covariate balance. 
   \end{itemize} 
 \end{frame}
@@ -221,7 +222,7 @@ This lecture draw heavily upon
 \item Matching imputes using the \textit{realized} outcome of (nearly) identical units in the opposite assignment group. 
 \item Remember, we're in a world where we've assumed unconfoundedness. Only challenge is that the treatment group and the control group don't have the same distribution of $X$'s. 
 \item \alert{Re-weight} the un-treated population so that it resembles the treated population.
-\item Once distribution of $X_i$ is the same for both groups $ X_i | T_i \sim X_i$ then we assume all other differences are irrelevant and can just compare means.
+\item Once distribution of $X_i$ is the same for both groups $ X_i | W_i \sim X_i$ then we assume all other differences are irrelevant and can just compare means.
 \end{itemize}
 \end{frame}
 
@@ -268,7 +269,7 @@ Major problem was that there was a ton of heterogeneity in the overall level of 
 \item Based on total sales our average over treatment weeks was in the 74th percentile of all weeks.
 \item This was after removing a product, so we know sales should have gone down!
 \item How do we fix this without running the experiment for an entire year!
-\item Can't use shares instead of quantities. Why?
+%\item Can't use shares instead of quantities. Why?
 \end{itemize}
 \end{frame}
 
@@ -390,6 +391,10 @@ e(x) = Pr(W_i  = 1 | X_i) = E[W_i | X_i = x]
   \item "Why Propensity Scores Should Not Be Used for Matching" \citep{KingNielsonPSM}
   \item Show this performs poorly in simulations compared to matching on X's directly. 
   \item One alternative from the same author's: Coarsened Exact Matching
+  \begin{itemize}
+    \item Available in R and Stata from \href{https://gking.harvard.edu/cem}{Gary King's website}
+    \item The idea: temporarily coarsen each variable into substantively meaningful groups, exact match on these coarsened data, and then retain only the original (uncoarsened) values of the matched data.
+  \end{itemize}
   \end{itemize}
 \end{frame}
   
@@ -397,11 +402,26 @@ e(x) = Pr(W_i  = 1 | X_i) = E[W_i | X_i = x]
   \frametitle{CEM has many uses}
   \begin{itemize}
   \item Linh To's JMP: 
-  \item Question: by how much did "marginal" mothers extend leave when benefits extended in Denmark
+  \item Question: Is there a signal value to parental leave? 
+  \item Theory: many PBNE's. In practice depends on pooling. 
+  \item Setting: Extension of leave in Denmark. 
+  \item Look for response among three types of women: 
+  \begin{enumerate}
+    \item pool, pool
+    \item pool, separate
+    \item separate, separate
+  \end{enumerate}
   \item Convincing RD: restrict to sample already pregnant when law announced 
-  \item Challenge: Only see mothers in one group or the other (2 pre, 3 post)
+  \item Challenge: Only see mothers in one group or the other
   \item Solution: Match each pre period mother using their closest post-period counterpart, and assign her to that post-group. 
   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Results}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/ToPooling}
+  \end{center}  
 \end{frame}
 
 %TK Copy susan's jep suggested readings here. 
@@ -414,6 +434,28 @@ e(x) = Pr(W_i  = 1 | X_i) = E[W_i | X_i = x]
   \end{itemize}
 \end{frame}
 
+\begin{frame}[allowframebreaks]
+  \frametitle{Some recent ML proposals}
+  Belloni, Chernozhukov, Fernández, and Hansen (2013) \nocite{belloni2015program}
+  \begin{itemize}
+    \item "double selection" procedure
+    \item use LASSO to select $X$ which predict $Y$, and another LASSO to find $X$ that predict $W$ 
+    \item then do OLS on the union of the two sets of covariates
+    \item show this performs better than simple regularized regression of outcome on treatment and covariates in one step 
+  \end{itemize}
+  
+  \framebreak
+
+  Athey, Imbens, and Wager (2016) \nocite{athey2016efficient} \\
+  ``Approximate Residual Balancing: De-Biased Inference of Average Treatment Effects in High Dimensions)''
+  \begin{itemize}
+    \item Idea: In order to predict the counterfactual outcomes that the treatment
+    group would have had in the absence of the treatment, it is necessary to extrapolate from control
+    \item This is confounded by imbalance. 
+    \item AIW construct weights so these samples are equivalent, and run penalized regression to compute $\tau$ 
+  \end{itemize}
+
+\end{frame}
 
 \begin{frame}
 \frametitle{Assessing Unconfoundedness}
