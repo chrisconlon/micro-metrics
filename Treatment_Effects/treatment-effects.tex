@@ -491,18 +491,16 @@ e(x) = Pr(W_i  = 1 | X_i) = E[W_i | X_i = x]
 \end{frame}
 
 \section{IV}
+\subsection{Basics}
 
 \begin{frame}
-\frametitle{What about IV}
-So what does IV do?
-\begin{itemize}
-\item Let's assume a binary instrument $Z_i = 1$
-\item $Y_i(1),Y_i(0)$ depends on the value of $T_i$
-\item But now we endogenize $T_i(1) ,T_i(0)$ where the argument is the value of $Z_i$.
-\item We observe $\{Z_i, T_i = T_i(Z_i), Y_i = Y_i(T_i(Z_i)) \}$.
-\end{itemize}
+\frametitle{Instrumental Varibales}
+
+See Guido Imben's \href{https://www.nber.org/WNE/slides_5_late7-30-07.pdf}{NBER Slides}.
+
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{IV Assumptions}
 So what does IV do?
@@ -575,6 +573,8 @@ Angrist and Imbens give some idea how close to the ATE the LATE is:
 \item When these are close then possibly $ATE \approx LATE$.
 \end{itemize}
 \end{frame}
+\end{comment}
+
 
 \begin{frame}
 \frametitle{How Close to ATE?}
@@ -684,6 +684,89 @@ Finally, we need to understand what monotonicity means in terms of restrictions 
 \item On the other hand there are no magical solutions to identifying effects when endogeneity/selection is present; this problem is exacerbated when the effects are heterogeneous and individuals select into treatment on the basis of the returns.
 \end{itemize}
 \end{frame}
+
+\subsection{Example: Dobbie et al}
+
+\begin{frame}{Example: Pretrial Detention}
+  \begin{itemize}
+  \item In US, innocent until proven guilty. 
+  \item Some defendants are detained prior to trial. 
+  \item Extreme cases are obvious, but lots of discretion in the middle. 
+  \item What are the impacts on: 
+    \begin{itemize}
+      \item time served
+      \item future crime
+      \item rehabilitation in to workforce
+    \end{itemize}  
+  \end{itemize}
+  \nocite{DobbieGoldinYangBail}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example: Pretrial Detention}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/DobbieAbstract}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Means for detained vs released defendants}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/DobbieStats}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{First stage: Judges Matter}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/DobbieFirstStageGraph}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Is assignment random?}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/DobbieRandomization}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Results}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/DobbieResults}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Interpretation: Who is marginal here?}
+  \pause 
+  \begin{itemize}
+    \item Instrument isn't binary here
+    \item Thought experiment is the same though: identify which defendants get out under the most lenient judge minus those that get out under the strictest judge 
+   \end{itemize}
+   \includegraphics[width=.9\textwidth]{./resources/DobbieCompliers} 
+\end{frame}
+
+\begin{frame}
+  \frametitle{Who are the compliers?}
+  \pause 
+  \begin{itemize}
+    \item Follow strategy of Dahl et al (QJE 2014)
+    \item Estimate complier share by subgroup
+   \end{itemize}
+   \includegraphics[width=.9\textwidth]{./resources/DobbieCompliers} 
+\end{frame}
+
+\begin{frame}
+  \frametitle{Interpretation: Who is marginal here?}
+  \pause 
+  \begin{itemize}
+    \item Instrument isn't binary here
+    \item Thought experiment is the same though: identify which defendants get out under the most lenient judge minus those that get out under the strictest judge 
+   \end{itemize}
+   \includegraphics[width=.9\textwidth]{./resources/DobbieComplierStats} 
+\end{frame}
+
 
 \section{DiD}
 \begin{frame}{Further approaches to evaluation of program effects: \\
