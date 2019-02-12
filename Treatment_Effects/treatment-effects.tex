@@ -768,6 +768,67 @@ Finally, we need to understand what monotonicity means in terms of restrictions 
 \end{frame}
 
 
+\begin{frame}
+  \frametitle{Weak instruments}
+  \begin{itemize}
+    \item So far we have assumed that the instrument is \alert{relevant}
+    $$ cov(Z,W) > 0 $$
+    \item Intuitively, if there are no ``compliers'', we can't learn anything from IV. 
+    \item In applications, instruments are sometimes barely
+    relevant, i.e. $\hat Cov( d z, x) \neq 0$, but it's close.
+    \item This leads to: 
+    \begin{itemize}
+      \item Large finite sample bias of $\hat \beta^{2SLS}$
+      \item Inference issues: 
+    (wrong standard error, incorrect p-values, incorrect
+    confidence intervals)
+    \end{itemize} 
+   \end{itemize}
+\end{frame}
+
+%http://econ.lse.ac.uk/staff/spischke/ec533/Weak%20IV.pdf
+\begin{frame}
+  \frametitle{Weak instruments}
+  \begin{itemize}
+    \item This is an active area of research. See Angrist and Pischke (Ch. 4); or Stock and Andrews 2018 \href{https://www.nber.org/econometrics_minicourse_2018/}{NBER minicourse} for a recent treatment. 
+    \item Always report first stage F statistic for significance of
+    coefficients on instruments - rule of thumb: F $\ge$ 10 is
+    okay (under weak instrument asymptotics, bias
+    of 2SLS and is < 10\% when F $\ge$ 10.)
+    \item In general, adding weak instruments makes it worse! 
+    \item Estimates approach OLS. If instrument doesn't satistfy exclusion restriction, this could be even worse!
+   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{LASSO for selecting instruments}
+  \begin{itemize}
+    \item Data often gives us many plausibly relevant instruments that satisfy the exclusion restriction. Which should we use?
+    \item We know that adding many weak instruments is problematic. 
+    \item Intuitively we want something this is highly \textit{predictive} of the endogenous variable. This is what Lasso is good at. \citep{belloni2012sparse}
+   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Application: Eminent Domain}
+  \begin{itemize}
+    \item How do changes in the governments ability to appropriate property affect property markets?
+    \item Challenge: Changes likely endogenous to the strength of those markets and other economic factors
+    \item Instrument: Judges
+    \item IV Challenge: What's a ``good'' judge? Unlike Dobbie case, don't have large N of other cases. 
+    \item But do observe many judge characteristics. 
+   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Results}
+  \vspace{-10pt}
+  \begin{center}
+    \includegraphics[width=1\textwidth]{./resources/belloniTakingsResults}
+  \end{center}  
+\end{frame}
+
+
 \section{DiD}
 \begin{frame}{Further approaches to evaluation of program effects: \\
 {\small Difference in Differences } }
