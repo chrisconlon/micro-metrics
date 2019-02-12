@@ -599,7 +599,7 @@ LATE = ATE + \frac{Cov(\beta_{1i},\pi_{1i})}{E[\pi_{1i}]}
 \item Can be influential for different members of the population.
 \item Using $Z_1$, TSLS will estimate the treatment effect for people whose probability of treatment $X$ is most influenced by $Z_1$
 \item The LATE for $Z_1$ might differ from the LATE for $Z_2$
-\item A J-statistic might reject even if both $Z_1$ and $Z_2$ are exogenous! (Why?).
+%\item A J-statistic might reject even if both $Z_1$ and $Z_2$ are exogenous! (Why?).
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -674,7 +674,7 @@ participation in higher education.
 \end{frame}
 
 
-
+\begin{comment}
 \begin{frame}{Local Average Treatment Effect}
 Finally, we need to understand what monotonicity means in terms of restrictions on economic theory. 
 \begin{itemize}
@@ -684,6 +684,7 @@ Finally, we need to understand what monotonicity means in terms of restrictions 
 \item On the other hand there are no magical solutions to identifying effects when endogeneity/selection is present; this problem is exacerbated when the effects are heterogeneous and individuals select into treatment on the basis of the returns.
 \end{itemize}
 \end{frame}
+\end{comment}
 
 \subsection{Example: Dobbie et al}
 
@@ -749,24 +750,37 @@ Finally, we need to understand what monotonicity means in terms of restrictions 
 
 \begin{frame}
   \frametitle{Who are the compliers?}
-  \pause 
   \begin{itemize}
     \item Follow strategy of Dahl et al (QJE 2014)
     \item Estimate complier share by subgroup
    \end{itemize}
-   \includegraphics[width=.9\textwidth]{./resources/DobbieCompliers} 
-\end{frame}
-
-\begin{frame}
-  \frametitle{Interpretation: Who is marginal here?}
-  \pause 
-  \begin{itemize}
-    \item Instrument isn't binary here
-    \item Thought experiment is the same though: identify which defendants get out under the most lenient judge minus those that get out under the strictest judge 
-   \end{itemize}
    \includegraphics[width=.9\textwidth]{./resources/DobbieComplierStats} 
 \end{frame}
 
+\begin{frame}
+  \frametitle{How useful is LATE here?}
+  \begin{itemize}
+    \item What can you do with this estimate?
+    \item Is it of policy importance?
+   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example: Dams}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/DamsAbstract}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Example: Dams}
+  \begin{itemize}
+    \item What is the exclusion restriction here? 
+    \item How useful is this LATE?
+  \end{itemize}
+\end{frame}
+
+\subsection{Weak IVs}
 
 \begin{frame}
   \frametitle{Weak instruments}
@@ -785,6 +799,20 @@ Finally, we need to understand what monotonicity means in terms of restrictions 
     \end{itemize} 
    \end{itemize}
 \end{frame}
+
+\begin{frame}{}
+  \begin{center}
+    \includegraphics[width=1\textwidth]{./resources/StockNBERIV}
+  \end{center}  
+\end{frame}
+
+
+\begin{frame}{}
+  \begin{center}
+    \includegraphics[width=1\textwidth]{./resources/StockNBER2sls}
+  \end{center}  
+\end{frame}
+
 
 %http://econ.lse.ac.uk/staff/spischke/ec533/Weak%20IV.pdf
 \begin{frame}
@@ -812,11 +840,35 @@ Finally, we need to understand what monotonicity means in terms of restrictions 
 \begin{frame}
   \frametitle{Application: Eminent Domain}
   \begin{itemize}
-    \item How do changes in the governments ability to appropriate property affect property markets?
+    \item How do changes in the government's ability to appropriate property affect property markets?
     \item Challenge: Changes likely endogenous to the strength of those markets and other economic factors
+    \item Even if law changes are endogenous, much of the real world variation comes from court rulings. 
     \item Instrument: Judges
-    \item IV Challenge: What's a ``good'' judge? Unlike Dobbie case, don't have large N of other cases. 
-    \item But do observe many judge characteristics. 
+   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{IV Challenge: Which judges are more inclined to rule for/ against eminent domain?}
+  \begin{itemize}
+    \item Unlike pretrial detention example, don't have large N of other cases. 
+    \item Many judge characteristics: gender, race, religion, political affiliation, whether the judge's bachelor's degree was obtained in-state, whether the bachelor's degree is from a public university, whether the JD was obtained from a public university, and whether the judge was elevated from a district court. 
+    \item All are randomly assigned. Which ones are \textit{relevant}? 
+   \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{How do we typically proceed here?}
+  \begin{itemize}
+    \item Pick the ones that make the most sense on intuitive grounds. 
+    \item In another paper, Chen and Yeh do exactly this, using  
+    \begin{enumerate}
+      \item whether a judge did not report a religious affiliation
+      \item whether the judge earned her law degree from a public instutition
+    \end{enumerate}
+    \item Could try other instruments and see if results are "robust" (should they be?)
+    \item Could try everything: data mining/ not feasible
+    \item Belloni et al. create 140 first stage vars, and let LASSO decide.
+    \item Since all satisfy the exclusion restriction (by assumption), this first stage selection has no bearing on second stage intepretation. 
    \end{itemize}
 \end{frame}
 
