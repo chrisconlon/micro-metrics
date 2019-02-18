@@ -967,6 +967,12 @@ Y_i = f(x_i) + \tau D_i  + \epsilon_i
   \end{center}
 \end{frame}
 
+\begin{frame}{Bias}
+  \begin{center}
+  \includegraphics[width=\textwidth]{./resources/CatteneoBias}
+  \end{center}
+\end{frame}
+
 \begin{comment}
 \begin{frame}{Higher order polynomials can be dangerous}
   \begin{center}
@@ -1034,13 +1040,6 @@ Read Lee and Lemieux (2010) before you get started.
   \end{center}
 \end{frame}
 
-
-\begin{frame}{Bias}
-  \begin{center}
-  \includegraphics[width=\textwidth]{./resources/CatteneoBias}
-  \end{center}
-\end{frame}
-
 \begin{frame}{Show other covariates smooth at cutoff}
   \begin{center}
   \includegraphics[width=\textwidth]{./resources/CatteneoPredetermined}
@@ -1059,40 +1058,6 @@ Read Lee and Lemieux (2010) before you get started.
   \includegraphics[width=\textwidth]{./resources/CatteneoLocal}
   \end{center}
 \end{frame}
-
-
-\begin{comment}
-\begin{frame}{Application: Lee (2008)}
-Looked at incumbency advantage in the US House of Representatives
-\begin{itemize}
-\item Running variable was vote share in previous election
-\begin{itemize}
-\item Problem of naive approach: good candidates get lots of votes!
-\item Compare outcomes of districts with barely $D$ to barely $R$.
-\end{itemize}
-\item First we plot bin-scatter plots and quartic (from each side) polynomials.
-\item Discussion about how to choose bin-scatter bandwidth (CV).
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Lee (2008)}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/binscatter1}
-\end{center}
-\end{frame}
-
-\begin{frame}{Lee (2008)}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/binscatter2}
-\end{center}
-\end{frame}
-
-\begin{frame}{Lee (2008)}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/ll-fig4}
-\end{center}
-\end{frame}
-\end{comment}
 
 \begin{frame}{Other Examples}
 Luca on Yelp
@@ -1318,6 +1283,36 @@ where $Z$ is an instrument which determines training eligibility say but does no
 assuming that the probability of training in the first period is zero.
 \end{itemize}              
 \end{frame}
+
+\section{Synthetic Controls}
+
+\begin{frame}{Synthetic Controls}
+  \begin{itemize}
+    \item DiD methods compare two groups before and after some change. 
+    \item Challenge: What's a good comparison group? Even if you pick the best available option, might not track eachother that closely even in the pre-period. 
+    \item Moreover, if we don't have another untreated group that is well balanced against the treatment group, are we stuck?
+    \item Synthetic control methods pick weighted averages from control population to construct better comparisons \citep{abadie2003economic, abadie2010synthetic}
+    \item \citet{athey2017state} call this ``arguably the most important innovation in the policy evaluation literature in the past 15 years''.
+  \end{itemize}              
+\end{frame}
+
+\begin{frame}{Initial motivation: Case studies}
+  \begin{itemize}
+    \item Often we're interested in the aggregate effects of large, singular policies. 
+    \begin{itemize}
+      \item What was the impact of MassHealth?
+      \item Fukushima 
+      \item Newtown, CT / Columbine, CO 
+      \item Terrorism 
+    \end{itemize}  
+    \item What would a rigorous "case study" of these look like?
+  \end{itemize}              
+\end{frame}
+
+%AbadieBasqueAbstract
+%AbadieBasqueSumstats
+%AbadieBasqueGDP
+%AbadieBasqueGap
 
 
 \section{MTE}
