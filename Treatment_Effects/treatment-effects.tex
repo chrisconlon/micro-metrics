@@ -967,6 +967,12 @@ Y_i = f(x_i) + \tau D_i  + \epsilon_i
   \end{center}
 \end{frame}
 
+\begin{frame}{Bias}
+  \begin{center}
+  \includegraphics[width=\textwidth]{./resources/CatteneoBias}
+  \end{center}
+\end{frame}
+
 \begin{comment}
 \begin{frame}{Higher order polynomials can be dangerous}
   \begin{center}
@@ -1034,13 +1040,6 @@ Read Lee and Lemieux (2010) before you get started.
   \end{center}
 \end{frame}
 
-
-\begin{frame}{Bias}
-  \begin{center}
-  \includegraphics[width=\textwidth]{./resources/CatteneoBias}
-  \end{center}
-\end{frame}
-
 \begin{frame}{Show other covariates smooth at cutoff}
   \begin{center}
   \includegraphics[width=\textwidth]{./resources/CatteneoPredetermined}
@@ -1059,40 +1058,6 @@ Read Lee and Lemieux (2010) before you get started.
   \includegraphics[width=\textwidth]{./resources/CatteneoLocal}
   \end{center}
 \end{frame}
-
-
-\begin{comment}
-\begin{frame}{Application: Lee (2008)}
-Looked at incumbency advantage in the US House of Representatives
-\begin{itemize}
-\item Running variable was vote share in previous election
-\begin{itemize}
-\item Problem of naive approach: good candidates get lots of votes!
-\item Compare outcomes of districts with barely $D$ to barely $R$.
-\end{itemize}
-\item First we plot bin-scatter plots and quartic (from each side) polynomials.
-\item Discussion about how to choose bin-scatter bandwidth (CV).
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Lee (2008)}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/binscatter1}
-\end{center}
-\end{frame}
-
-\begin{frame}{Lee (2008)}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/binscatter2}
-\end{center}
-\end{frame}
-
-\begin{frame}{Lee (2008)}
-\begin{center}
-\includegraphics[width=4.5in]{./resources/ll-fig4}
-\end{center}
-\end{frame}
-\end{comment}
 
 \begin{frame}{Other Examples}
 Luca on Yelp
@@ -1130,8 +1095,7 @@ An important extension in the \alert{Fuzzy RD}.   Back to where we started:
 \end{frame}
 
 \section{DiD}
-\begin{frame}{Further approaches to evaluation of program effects: \\
-{\small Difference in Differences } }
+\begin{frame}{Difference in Differences }
 \begin{itemize}
 \item Sometimes we may feel we can impose more structure on the problem.
 \item Suppose in particular that we can write the outcome equation as
@@ -1149,7 +1113,7 @@ E[Y_{i2}^0 - Y_{i1}^0 | T] = E[Y_{i2}^0 - Y_{i1}^0]
 \end{frame}
 
 \begin{frame}{Before and After} 
-An even simpler estimator is the \alert{before and after} or \alert{event study}.
+An even simpler estimator is the \alert{event study}.
 \begin{itemize}
 \item We look an outcome before or after an event
 \begin{itemize}
@@ -1167,6 +1131,15 @@ E[Y_{i2} - Y_{i1} | T_{i2}=1] & = E[Y_{i2}^1 - Y_{i1}^1 | T_{i2}=1] \\
 \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \vspace{-10pt}
+  \begin{figure}
+  \centering
+  \includegraphics[height=1.05\textheight]{./resources/gasTaxes}
+  \end{figure}
+\end{frame}
+
+
 \begin{frame}{Difference in Differences} 
 Let's try and estimate $d_2- d_1$ directly and then difference it out. Here we use \alert{parallel trends}:
 \begin{align*}
@@ -1180,61 +1153,72 @@ E[\beta_{i}| T_{i2}=1]  = E[Y_{i2} - Y_{i1} | T_{i2}=1] - E[Y_{i2} - Y_{i1} | T_
 which can be estimated by the difference in the growth between the treatment and the control group.
 \end{frame}
 
-\begin{frame}{Parallel Trends}
+\begin{frame}{Parallel trends solves a "missing data" problem}
 \begin{figure}
 \centering
-\includegraphics[width=3.5in]{./resources/parallel-trends}
+\includegraphics[width=.9\textwidth]{./resources/myDiD}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Difference in Differences}
-Now consider the following problem:
-\begin{itemize}
-\item Suppose we wish to evaluate a training program for those with low
-earnings. Let the threshold for eligibility be $B$.
-\item We have a panel of individuals and those with low earnings qualify for
-training, forming the treatment group.
-\item Those with higher earnings form the control group. 
-\item Now the low earning group is low for two reasons
-\begin{enumerate}
-\item They have low permanent earnings ($\alpha_i$ is low) - this is accounted for by diff in diffs.
-\item They have a negative transitory shock ($u_{i1}$ is low) - this is not accounted for by diff in diffs.
-\end{enumerate} 
-\end{itemize}
-\end{frame} 
+\begin{frame}{Example: Minimum Wage}
 
-\begin{frame}{Difference in Differences}
-\begin{itemize}
-\item  \#2 above violates the assumption {\small $E[Y_{i2}^0 - Y_{i1}^0 | T] = E[Y_{i2}^0 - Y_{i1}^0]$}. 
-\item To see why note that those participating into the program are such
-that {\small $Y_{i0}^0 < B$}. Assume for simplicity that the shocks {\small $u$} are {\small $iid$}. Hence {\small $u_{i1} < B- \alpha_i - d_1$}. 
-This implies: 
-{\small $$E[Y_{i2}^0 - Y_{i1}^0 | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} <  B-\alpha_i - d_1]$$}
-For the control group:
-{\small $$E[Y_{i2}^0 - Y_{i1}^0 | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} >  B-\alpha_i - d_1]$$}
-\item Hence
-\begin{align*}
-& E[Y_{i2}^0 - Y_{i1}^0 | T=1] - E[Y_{i2}^0 - Y_{i1}^0 | T=0] =\\
-&  E[u_{i1} | u_{i1} >  B-\alpha_i - d_1] - E[u_{i1} | u_{i1} < B-\alpha_i - d_1]  >0
-  \end{align*}
- \item This is effectively regression to the mean: those unlucky enough to have a bad shock recover and show greater growth relative to those with a good shock. The nature of the bias depends on the stochastic properties of the shocks and how individuals select into training.
-\end{itemize}
-\end{frame} 
-
-\begin{frame}{Difference in Differences}
-Ashefelter (1978) was one of the first to consider difference in differences to evaluate training programs.
-\includegraphics[scale=1]{./resources/ashefelter1.pdf}
+\includegraphics[width=\textwidth]{./resources/CKAbstract}
 \end{frame}
 
-\begin{frame}{Difference in Differences}
-Ashenfelter (1978) reports the following results.
-\begin{figure}
-\centering
-\includegraphics[scale=.85]{./resources/ashefelter2.pdf}
-\end{figure}
+\begin{frame}{Example: Minimum Wage}
+
+  \includegraphics[width=\textwidth]{./resources/CKSumStats}
+\end{frame}
+  
+\begin{frame}
+  \vspace{-10pt}
+  \includegraphics[height=1.1\textheight]{./resources/CKwages}
+\end{frame}
+  
+\begin{frame}
+  \includegraphics[width=\textwidth]{./resources/CKResults}
 \end{frame}
 
+
 \begin{frame}{Difference in Differences}
+  Now consider the following problem:
+  \begin{itemize}
+  \item Suppose we wish to evaluate a training program for those with low
+  earnings. Let the threshold for eligibility be $B$.
+  \item We have a panel of individuals and those with low earnings qualify for
+  training, forming the treatment group.
+  \item Those with higher earnings form the control group. 
+  \item Now the low earning group is low for two reasons
+  \begin{enumerate}
+  \item They have low permanent earnings ($\alpha_i$ is low) - this is accounted for by diff in diffs.
+  \item They have a negative transitory shock ($u_{i1}$ is low) - this is not accounted for by diff in diffs.
+  \end{enumerate} 
+  \item \#2 above violates the assumption {\small $E[Y_{i2}^0 - Y_{i1}^0 | T] = E[Y_{i2}^0 - Y_{i1}^0]$}. 
+  \item This is effectively regression to the mean: those unlucky enough to have a bad shock recover and show greater growth relative to those with a good shock. The nature of the bias depends on the stochastic properties of the shocks and how individuals select into training.
+  \end{itemize}
+  \end{frame} 
+  
+\begin{comment}
+  \begin{frame}{Difference in Differences}
+  \begin{itemize}
+  \item  \#2 above violates the assumption {\small $E[Y_{i2}^0 - Y_{i1}^0 | T] = E[Y_{i2}^0 - Y_{i1}^0]$}. 
+  \item To see why note that those participating into the program are such
+  that {\small $Y_{i0}^0 < B$}. Assume for simplicity that the shocks {\small $u$} are {\small $iid$}. Hence {\small $u_{i1} < B- \alpha_i - d_1$}. 
+  This implies: 
+  {\small $$E[Y_{i2}^0 - Y_{i1}^0 | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} <  B-\alpha_i - d_1]$$}
+  For the control group:
+  {\small $$E[Y_{i2}^0 - Y_{i1}^0 | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} >  B-\alpha_i - d_1]$$}
+  \item Hence
+  \begin{align*}
+  & E[Y_{i2}^0 - Y_{i1}^0 | T=1] - E[Y_{i2}^0 - Y_{i1}^0 | T=0] =\\
+  &  E[u_{i1} | u_{i1} >  B-\alpha_i - d_1] - E[u_{i1} | u_{i1} < B-\alpha_i - d_1]  >0
+    \end{align*}
+   \item This is effectively regression to the mean: those unlucky enough to have a bad shock recover and show greater growth relative to those with a good shock. The nature of the bias depends on the stochastic properties of the shocks and how individuals select into training.
+  \end{itemize}
+  \end{frame} 
+\end{comment}
+  
+\begin{frame}{Who get's treated?}
 \begin{itemize}
 \item The assumption on growth of the non-treatment outcome being independent of assignment to treatment may be violated, but it may still be true conditional on $X$.
 \item Consider the assumption
@@ -1245,9 +1229,9 @@ which allows for differential trends in the non-treatment growth depending on $X
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Difference in Differences with Repeated Cross Sections}
+\begin{frame}{DiD with Repeated Cross Sections}
 \begin{itemize}
-\item Suppose we do not have available panel data but just a random sample from the relevant population in a pre-treatment and a post-treatment period. We can still use difference in differences.
+\item Suppose we do not have available panel data but just a random sample from the relevant population in a pre-treatment and a post-treatment period.
 \item First consider a simple case where {\small $E[Y_{i2}^0- Y_{i1}^0 | T] = E[Y_{i2}^0- Y_{i1}^0]$}.
 \item We need to modify slightly the assumption to
 \vspace{-.5pc}
@@ -1255,8 +1239,7 @@ which allows for differential trends in the non-treatment growth depending on $X
 E[Y_{i2}^0| \text{\tiny Group receiving training}]&-E[Y_{i1}^0| \text{\tiny Group receiving training in the next period}] \\
 &= E[Y_{i2}^0-Y_{i1}^0]  
 \end{align*}
-which requires, in addition to the original independence
-assumption that conditioned on particular individuals that population we will be sampling from does not change composition.
+which requires additional assumption that the population we will be sampling from does not change composition.
 \item We can then obtain immediately an estimator for ATT as
 \begin{align*}
 &E[\beta_i |T_{i2}=1] \\ 
@@ -1292,6 +1275,41 @@ where $\alpha_g$ is a dummy for the treatment of comparison group, and $\beta (X
 \end{itemize}
 \end{frame}
 
+\begin{frame}{DiD vs Fixed Effects}
+  \begin{itemize}
+  \item What if we have a long panel with many similar changes? 
+  \begin{itemize}
+    \item Greenstone (2002): Counties move in and out of Clean Air Act
+    \item Evans, Ringel, and Stech (1999): Since 1975, more than 200 state cigarette tax changes 
+  \end{itemize}
+  \item Fixed effects generalize DD with $T > 2$ periods and $J > 2$ groups
+  \item Advantage relative to DD: more precise estimates by pooling several
+  changes
+  \item Disadvantage: fixed effects is a black-box regression, more difficult to
+  check trends non-parametrically as with a single change
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{The best DiD's can be seen graphically}
+  \begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{./resources/muehlegger_dying}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{What about triple differencing?}
+  \begin{itemize}
+  \item Sometime we might use a "placebo" DD to make parallel trends more convincing
+  \item Example: Imagine a policy which offered STEM outreach to high school girls in Massachusetts 
+  \begin{itemize}
+    \item Natural DiD control group: boys in MA 
+    \item However over time there could be general shifts in the relative outcomes of boys and girls everywhere
+    \item Suggest looking at how the difference between boys and girls in MA changed relative to the changes in other states (say RI)
+  \end{itemize}
+  \item Logically sound, but much harder to see/ validate visually
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{Difference in Differences and Selection on Unobservables}
 \begin{itemize}
 \item Suppose we relax the assumption of \emph{no selection} on unobservables. 
@@ -1318,6 +1336,177 @@ where $Z$ is an instrument which determines training eligibility say but does no
 assuming that the probability of training in the first period is zero.
 \end{itemize}              
 \end{frame}
+
+\section{Synthetic Controls}
+
+\begin{frame}{Synthetic Controls}
+  \begin{itemize}
+    \item DiD methods compare two groups before and after some change. 
+    \item Challenge: What's a good comparison group? Even if you pick the best available option, might not track eachother that closely even in the pre-period. 
+    \item Moreover, if we don't have another untreated group that is well balanced against the treatment group, are we stuck?
+    \item Synthetic control methods pick weighted averages from control population to construct better comparisons \citep{abadie2003economic, abadie2010synthetic}
+    \item \citet{athey2017state} call this ``arguably the most important innovation in the policy evaluation literature in the past 15 years''.
+  \end{itemize}              
+\end{frame}
+
+\begin{frame}{Initial motivation: Case studies}
+  \begin{itemize}
+    \item Often we're interested in the aggregate effects of large, singular policies. 
+    \begin{itemize}
+      \item What was the impact of MassHealth?
+      \item Fukushima 
+      \item Terrorism 
+      \item German Re-unification
+    \end{itemize}  
+    \item What would a rigorous "case study" of these look like?
+  \end{itemize}              
+\end{frame}
+
+\begin{frame}{ADH (JASA 2010)}
+  \begin{itemize}
+  \item Consider a panel with $J+1$ units observed for $t=1,2,...,T$ periods.
+  \item Unit 1 exposed to treatment in period $T_0$ (continues to $T$)
+  \item Synthetic control estimator is 
+  $$ \hat \alpha_{1t} = Y_{1t} - \sum^{J+1}_{j=2}w_j^{*}Y_{jt} $$ where $w$ is a collection of weights. 
+  \item In \cite{abadie2010synthetic} the (non-negative) weights are chosen to minimize the distance between some chosen vector of preintervention characteristics (and sum to one). 
+  \item Subsequent literature has relaxed these. 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{ADH Example: CA Prop 99}
+  \begin{itemize}
+  \item Anti cigarette law in CA in 1988
+  \begin{itemize}
+    \item increased state excise tax by 25 cents per pack
+    \item earmarked the tax revenues to health and anti-smoking education budgets
+    \item funded anti-smoking media campaigns
+    \item spurred local clean indoor-air ordinances throughout the state
+  \end{itemize}
+  \item What was the net effect on sales?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Sales were trending down everywhere}
+  \begin{center}
+    \includegraphics[width=.85\textwidth]{./resources/ADHCAvsUS}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{What does synthetic CA look like?}
+  \vspace{-15pt}
+  \begin{center}
+    \includegraphics[height=.95\textheight]{./resources/ADHWeights}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Balance Acheived}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/ADHSumStats}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/ADHCAsynth}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Parallel trends acheived by contstruction}
+  \vspace{-10pt}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/ADHSdifftrends}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{What about inference}
+  \begin{itemize}
+    \item SE's typically reported reflect uncertainty in sample relative to aggregate population. 
+    \item ADH propose using a placebo test to assess null of no change in CA.
+    \item Steps:
+      \begin{enumerate}
+        \item Randomly select one of the other $J$ control units / time cutoffs and declare it treated. 
+        \item Construct synthetic controls and estimate ATT. 
+        \item Repeat many times
+      \end{enumerate}
+    \item Since none of these units are actually treated, this test distribution simulates distribution of the differences relative to the synthetic control under the true null of no effect. 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{}
+  \begin{center}
+    \includegraphics[width=.85\textwidth]{./resources/ADHPlacebo}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/ADHPredictionErrors}
+  \end{center}  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{A synthesis of approaches}
+  \begin{itemize}
+    \item \citet{DoudchenkoImbensSynth} attempt to synthesize several of the approaches discussed so far balancing (matching), regression, DiD, synthetic controls. 
+    \item These methods can be recast as trying to impute the untreated outcome for treated unit $0$ to estimate $\hat \tau_{0,T} = Y_{0,T}(1) - \hat Y_{0,T}(0)$
+    \item many impose the linear structure $$ \hat Y_{0,T}(0) = \mu + \sum_{i}^{N}w_i \dot Y_{i,T}^{obs} $$
+  \end{itemize}
+\end{frame}
+    
+\begin{frame}
+    \frametitle{DI consider a series of contstraints}
+  \begin{enumerate}
+    \item no intercept: $\mu = 0$
+    \item adding up: $ \sum_i^N w_i = 1$
+    \item non-negativity: $w_i > 0$ 
+    \item exact balancing: $Y_{t,pre}^{obs} = \mu + w^T\mathbf{Y_{c,pre}^{obs}}$
+    \item constant weights: $w_i = \bar w$ 
+  \end{enumerate}
+
+  \begin{itemize}
+    \item Assumptions 1-3 are imposed by ADH 
+    \item No intercept actually precludes defining feature of DiD
+    \item Contstant weights implicit when number of control units is large
+    \item Other useful features of an objective function:
+    \begin{itemize}
+      \item match pre period \textit{outcomes} well 
+      \item small number of features 
+      \item non-disperse set of parameters
+    \end{itemize}
+    \item All of these generally suggest regularization. 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{}
+  \begin{center}
+    \includegraphics[width=\textwidth]{./resources/DI_CAweights}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{}
+  \begin{center}
+    \includegraphics[width=\textwidth]{./resources/DI_CA_trends}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{}
+  \begin{center}
+    \includegraphics[width=\textwidth]{./resources/DI_CAstates}
+  \end{center}  
+\end{frame}
+
 
 
 \section{MTE}
