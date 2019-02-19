@@ -1153,68 +1153,72 @@ E[\beta_{i}| T_{i2}=1]  = E[Y_{i2} - Y_{i1} | T_{i2}=1] - E[Y_{i2} - Y_{i1} | T_
 which can be estimated by the difference in the growth between the treatment and the control group.
 \end{frame}
 
-\begin{frame}{Parallel Trends}
+\begin{frame}{Parallel trends solves a "missing data" problem}
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth]{./resources/myDiD}
+\includegraphics[width=.9\textwidth]{./resources/myDiD}
 \end{figure}
 \end{frame}
 
-\begin{frame}{The best DiD's can be seen graphically}
-  \begin{figure}
-  \centering
-  \includegraphics[width=\textwidth]{./resources/muehlegger_dying}
-  \end{figure}
+\begin{frame}{Example: Minimum Wage}
+
+\includegraphics[width=\textwidth]{./resources/CKAbstract}
 \end{frame}
 
-\begin{frame}{Difference in Differences}
-Now consider the following problem:
-\begin{itemize}
-\item Suppose we wish to evaluate a training program for those with low
-earnings. Let the threshold for eligibility be $B$.
-\item We have a panel of individuals and those with low earnings qualify for
-training, forming the treatment group.
-\item Those with higher earnings form the control group. 
-\item Now the low earning group is low for two reasons
-\begin{enumerate}
-\item They have low permanent earnings ($\alpha_i$ is low) - this is accounted for by diff in diffs.
-\item They have a negative transitory shock ($u_{i1}$ is low) - this is not accounted for by diff in diffs.
-\end{enumerate} 
-\end{itemize}
-\end{frame} 
+\begin{frame}{Example: Minimum Wage}
 
-\begin{frame}{Difference in Differences}
-\begin{itemize}
-\item  \#2 above violates the assumption {\small $E[Y_{i2}^0 - Y_{i1}^0 | T] = E[Y_{i2}^0 - Y_{i1}^0]$}. 
-\item To see why note that those participating into the program are such
-that {\small $Y_{i0}^0 < B$}. Assume for simplicity that the shocks {\small $u$} are {\small $iid$}. Hence {\small $u_{i1} < B- \alpha_i - d_1$}. 
-This implies: 
-{\small $$E[Y_{i2}^0 - Y_{i1}^0 | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} <  B-\alpha_i - d_1]$$}
-For the control group:
-{\small $$E[Y_{i2}^0 - Y_{i1}^0 | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} >  B-\alpha_i - d_1]$$}
-\item Hence
-\begin{align*}
-& E[Y_{i2}^0 - Y_{i1}^0 | T=1] - E[Y_{i2}^0 - Y_{i1}^0 | T=0] =\\
-&  E[u_{i1} | u_{i1} >  B-\alpha_i - d_1] - E[u_{i1} | u_{i1} < B-\alpha_i - d_1]  >0
-  \end{align*}
- \item This is effectively regression to the mean: those unlucky enough to have a bad shock recover and show greater growth relative to those with a good shock. The nature of the bias depends on the stochastic properties of the shocks and how individuals select into training.
-\end{itemize}
-\end{frame} 
-
-\begin{frame}{Difference in Differences}
-Ashefelter (1978) was one of the first to consider difference in differences to evaluate training programs.
-\includegraphics[scale=1]{./resources/ashefelter1.pdf}
+  \includegraphics[width=\textwidth]{./resources/CKSumStats}
+\end{frame}
+  
+\begin{frame}
+  \vspace{-10pt}
+  \includegraphics[height=1.1\textheight]{./resources/CKwages}
+\end{frame}
+  
+\begin{frame}
+  \includegraphics[width=\textwidth]{./resources/CKResults}
 \end{frame}
 
-\begin{frame}{Difference in Differences}
-Ashenfelter (1978) reports the following results.
-\begin{figure}
-\centering
-\includegraphics[scale=.85]{./resources/ashefelter2.pdf}
-\end{figure}
-\end{frame}
 
 \begin{frame}{Difference in Differences}
+  Now consider the following problem:
+  \begin{itemize}
+  \item Suppose we wish to evaluate a training program for those with low
+  earnings. Let the threshold for eligibility be $B$.
+  \item We have a panel of individuals and those with low earnings qualify for
+  training, forming the treatment group.
+  \item Those with higher earnings form the control group. 
+  \item Now the low earning group is low for two reasons
+  \begin{enumerate}
+  \item They have low permanent earnings ($\alpha_i$ is low) - this is accounted for by diff in diffs.
+  \item They have a negative transitory shock ($u_{i1}$ is low) - this is not accounted for by diff in diffs.
+  \end{enumerate} 
+  \item \#2 above violates the assumption {\small $E[Y_{i2}^0 - Y_{i1}^0 | T] = E[Y_{i2}^0 - Y_{i1}^0]$}. 
+  \item This is effectively regression to the mean: those unlucky enough to have a bad shock recover and show greater growth relative to those with a good shock. The nature of the bias depends on the stochastic properties of the shocks and how individuals select into training.
+  \end{itemize}
+  \end{frame} 
+  
+\begin{comment}
+  \begin{frame}{Difference in Differences}
+  \begin{itemize}
+  \item  \#2 above violates the assumption {\small $E[Y_{i2}^0 - Y_{i1}^0 | T] = E[Y_{i2}^0 - Y_{i1}^0]$}. 
+  \item To see why note that those participating into the program are such
+  that {\small $Y_{i0}^0 < B$}. Assume for simplicity that the shocks {\small $u$} are {\small $iid$}. Hence {\small $u_{i1} < B- \alpha_i - d_1$}. 
+  This implies: 
+  {\small $$E[Y_{i2}^0 - Y_{i1}^0 | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} <  B-\alpha_i - d_1]$$}
+  For the control group:
+  {\small $$E[Y_{i2}^0 - Y_{i1}^0 | T=1] = d_2 = d_1 - E[u_{i1}| u_{i1} >  B-\alpha_i - d_1]$$}
+  \item Hence
+  \begin{align*}
+  & E[Y_{i2}^0 - Y_{i1}^0 | T=1] - E[Y_{i2}^0 - Y_{i1}^0 | T=0] =\\
+  &  E[u_{i1} | u_{i1} >  B-\alpha_i - d_1] - E[u_{i1} | u_{i1} < B-\alpha_i - d_1]  >0
+    \end{align*}
+   \item This is effectively regression to the mean: those unlucky enough to have a bad shock recover and show greater growth relative to those with a good shock. The nature of the bias depends on the stochastic properties of the shocks and how individuals select into training.
+  \end{itemize}
+  \end{frame} 
+\end{comment}
+  
+\begin{frame}{Who get's treated?}
 \begin{itemize}
 \item The assumption on growth of the non-treatment outcome being independent of assignment to treatment may be violated, but it may still be true conditional on $X$.
 \item Consider the assumption
@@ -1225,9 +1229,9 @@ which allows for differential trends in the non-treatment growth depending on $X
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Difference in Differences with Repeated Cross Sections}
+\begin{frame}{DiD with Repeated Cross Sections}
 \begin{itemize}
-\item Suppose we do not have available panel data but just a random sample from the relevant population in a pre-treatment and a post-treatment period. We can still use difference in differences.
+\item Suppose we do not have available panel data but just a random sample from the relevant population in a pre-treatment and a post-treatment period.
 \item First consider a simple case where {\small $E[Y_{i2}^0- Y_{i1}^0 | T] = E[Y_{i2}^0- Y_{i1}^0]$}.
 \item We need to modify slightly the assumption to
 \vspace{-.5pc}
@@ -1235,8 +1239,7 @@ which allows for differential trends in the non-treatment growth depending on $X
 E[Y_{i2}^0| \text{\tiny Group receiving training}]&-E[Y_{i1}^0| \text{\tiny Group receiving training in the next period}] \\
 &= E[Y_{i2}^0-Y_{i1}^0]  
 \end{align*}
-which requires, in addition to the original independence
-assumption that conditioned on particular individuals that population we will be sampling from does not change composition.
+which requires additional assumption that the population we will be sampling from does not change composition.
 \item We can then obtain immediately an estimator for ATT as
 \begin{align*}
 &E[\beta_i |T_{i2}=1] \\ 
@@ -1270,6 +1273,41 @@ Y_{it} = \alpha_g + d_t + \beta (X_{it}) T_{it} + \gamma' X_{it} + u_{it}
 where $\alpha_g$ is a dummy for the treatment of comparison group, and $\beta (X_{it})$ can be parameterized as $\beta(X_{it}) = \beta' X_{it}$. The ATT can then be estimated as the average of $\beta' X_{it}$ over the (empirical) distribution of $X$.
 \item A non parametric alternative is offered by Blundell, Dias, Meghir and van Reenen (2004).
 \end{itemize}
+\end{frame}
+
+\begin{frame}{DiD vs Fixed Effects}
+  \begin{itemize}
+  \item What if we have a long panel with many similar changes? 
+  \begin{itemize}
+    \item Greenstone (2002): Counties move in and out of Clean Air Act
+    \item Evans, Ringel, and Stech (1999): Since 1975, more than 200 state cigarette tax changes 
+  \end{itemize}
+  \item Fixed effects generalize DD with $T > 2$ periods and $J > 2$ groups
+  \item Advantage relative to DD: more precise estimates by pooling several
+  changes
+  \item Disadvantage: fixed effects is a black-box regression, more difficult to
+  check trends non-parametrically as with a single change
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{The best DiD's can be seen graphically}
+  \begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{./resources/muehlegger_dying}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{What about triple differencing?}
+  \begin{itemize}
+  \item Sometime we might use a "placebo" DD to make parallel trends more convincing
+  \item Example: Imagine a policy which offered STEM outreach to high school girls in Massachusetts 
+  \begin{itemize}
+    \item Natural DiD control group: boys in MA 
+    \item However over time there could be general shifts in the relative outcomes of boys and girls everywhere
+    \item Suggest looking at how the difference between boys and girls in MA changed relative to the changes in other states (say RI)
+  \end{itemize}
+  \item Logically sound, but much harder to see/ validate visually
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Difference in Differences and Selection on Unobservables}
@@ -1352,13 +1390,6 @@ assuming that the probability of training in the first period is zero.
   \frametitle{Sales were trending down everywhere}
   \begin{center}
     \includegraphics[width=.85\textwidth]{./resources/ADHCAvsUS}
-  \end{center}  
-\end{frame}
-
-\begin{frame}
-  \frametitle{Sales predictors}
-  \begin{center}
-    \includegraphics[width=.9\textwidth]{./resources/ADHpredictors}
   \end{center}  
 \end{frame}
 
