@@ -1510,65 +1510,138 @@ assuming that the probability of training in the first period is zero.
 
 
 \section{MTE}
+
+\begin{frame}
+  \frametitle{Treatment effect heterogeneity}
+  \begin{itemize}
+    \item Consider a binary treatment $T_i$
+    \item Potential outcomes
+      \begin{eqnarray*}
+      Y_{0i} &=& \mu_{0}(X_i) + U_{0i} \\
+      Y_{1i} &=& \mu_{1}(X_i) + U_{1i}\\
+      \end{eqnarray*}
+    \item $\mu_j(x)$ represents the average outcome for individuals with observables $x$, and conditional mean zero $U_{ji}$ captures unobserved heterogeneity (assumed to be additively separable)
+    \item Individual treatment effect $\tau_i = Y_{1i} - Y_{0i}$ 
+    \item ATE averages $\tau_i$ over entire population.
+    \item ATT / ATU averges over those who recieved / didn't recieve the treatment (somehow)
+    \item LATE averages for those induced to switch due to an instrument 
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{One quantity to rule them all: MTE}
-Heckman and Vytlacil provide a unifying non-parametric framework to categorize treatment effects. Their approach is known as the \alert{marginal treatment effect} or MTE
+
+ Their approach is known as the \alert{marginal treatment effect} or MTE
 \begin{itemize}
-\item The MTE isn't a number it is a \alert{function}.
+\item \citet{heckman2005structural} provide a unifying non-parametric framework to categorize all of these effects
+\item Key insight is that those are all averages over different margins. 
+\item Define the \alert{marginal treatment effect} as the average treatment effect at the margin. The MTE isn't a number it is a \alert{function}.
 \item All of the other objects (LATE, ATE, ATT, etc.) can be written as integrals (weighted averages) of the MTE.
-\item The idea is to bridge the treatment effect parameters (stuff we get from running regressions) and the structural parameters: features of $f(\beta_i)$.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{One quantity to rule them all: MTE}
-\begin{itemize}
-\item Consider a treatment effect $\beta_i = Y_{i}(1) - Y_{i}(0)$.
-\item Think about a single-index such that $T_i = 1(v_i \leq Z_i' \gamma)$.
-\item Think about the person for whom $v_i = Z_i'\gamma$ (just barely untreated).
-\begin{eqnarray*}
-\Delta^{MTE}(X_i, v_i) = E[\beta_i | X_i, v_i = Z_i'\gamma] 
-\end{eqnarray*}
-\item MTE is average impact of receiving a treatment for everyone with the same $Z' \gamma$.
-\item For any single index model we can rewrite 
-\begin{eqnarray*}
-T_i = 1(v_i \leq Z_i' \gamma) = 1(u_{is} \leq F(Z_i' \gamma)) \mbox{ for }  u_s \in [0,1]
-\end{eqnarray*}
-\item $F$ is just the cdf of $v_i$
-\item Now we can write $P(Z) = Pr(T=1|Z )= F(Z'\gamma)$.
+\item The idea is to bridge the treatment effect parameters (stuff we get from running regressions) and the structural parameters: features of $f(\tau_i)$.
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{MTE: Derivation}
-Now we can write,
-\begin{eqnarray*}
-Y_0 &=& \gamma_0' X + U_0\\
-Y_1 &=& \gamma_1' X + U_1\\
-\end{eqnarray*}
-$P(T=1 | Z) = P(Z)$ works as our instrument with two assumptions:
-\begin{enumerate}
-\item $(U_0, U_1, u_s) \perp P(Z) | X$. (Exogeneity)
-\item Conditional on $X$ there is enough variation in $Z$ for $P(Z)$ to take on all values $\in(0,1)$.
-\begin{itemize}
-\item This is much stronger than typical \alert{relevance} condition. Much more like the \alert{special regressor} method we will discus next time.
-\end{itemize}
-\end{enumerate}
+  \frametitle{Setup: Selection into treatment}
+  \vspace{-8pt}
+  Consider the latent variable discrete choice problem 
+  \begin{itemize}
+    \item Decision utility $$T_i^* = \mu_T(X_i,Z_i) - V_i$$ depends on at least one instrument $Z$ which does not affect potential outcomes. 
+    \item $V_i$ represents the unobserved disutility of decision. 
+    \item $T_i = 1$ if $T_i^* \ge 0$ 
+  \end{itemize}
+  
+  Example: Let $\tau_i$ be lifetime earnings with and without college. 
+    \begin{itemize}
+      \item Costs of attending $C_i = w_0 + \gamma'z_i + v_{i}$
+      \item Rational students attend if $$ \tau_i - [w_0 + \gamma'z_i + v_{i}] > 0$$
+      \item If we could condition on marginal students, 
+          $$v_{i} = \tau_i - [w_0 + \gamma'z_i]$$
+      we'd be able to pin down the treatment effect at a given $Z_i$   
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{HV Roy Model}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/HVRoyModel}
+  \end{center}  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{HV Roy Model}
+  \begin{center}
+    \includegraphics[width=.85\textwidth]{./resources/HVRoyDist}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Propensity score}
+  \begin{itemize}
+    \item Individuals select into treament if the observable portion of their decision utility exceeds their unobserved resistance $V_i$
+    \item Let $F_V$ be the cdf of this resistance. Observed treatment thus implies 
+    $$ F_V(\mu_T(X_i,Z_i)) \ge F_V(V_i)$$ 
+    \item As written, the LHS is just the \alert{propensity score}: the probability of treatment based on observables. 
+    \item The RHS is simply individual $i$'s quantile of the unobserved distaste distribution. Let $u_{si} = F_V(V_i)$. 
+    \item So if an indivdual with a propensity score $P(X_i,Z_i)=p$ selects into treatment, it must be that that individual $V_i$ is in the bottom $p$th percentile of the $V$ distribution. 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Think of the propensity score as an instrument}
+  
+  $P(T=1 | Z) = P(Z)$ works as our instrument with two assumptions:
+  \begin{enumerate}
+  \item $(U_0, U_1, u_s) \perp P(Z) | X$. (Exogeneity)
+  \item $P(Z | X)$ continuous support -- ie conditional on $X$ there is enough variation in $Z$ for $P(Z)$ to take on all values $\in(0,1)$.
+  \begin{itemize}
+  \item This is much stronger than typical \alert{relevance} condition. 
+  \end{itemize}
+  \end{enumerate}
 \end{frame}
 
 \begin{frame}
 \frametitle{MTE: Derivation}
-\footnotesize
-Now we can write,
+For simplicity write 
 \begin{eqnarray*}
-Y &=& \gamma_0' X + T(\gamma_1 - \gamma_0)' X + U_0 + T(U_1 - U_0)\\
-E[Y| X,P(Z)=p] &=& \gamma_0' X + p(\gamma_1 - \gamma_0)'X + E[T(U_1 - U_0)|X,P(Z)=p]
+Y_{0i} &=& \gamma_0' X_i + U_{0i}\\
+Y_{0i} &=& \gamma_1' X_i + U_{1i}\\
 \end{eqnarray*}
-Observe $T=1$ over the interval $u_s = [0,p]$ and zero for higher values of $u_s$. Let $U_1-U_0 \equiv \eta$.
+
+For any individual we observe 
 \begin{eqnarray*}
-E[T(U_1 - U_0) | P(Z) =p,X] &=& \int_{-\infty}^{\infty} \int_{0}^{p} (U_1 - U_0) f((U_1-U_0) | U_s = u_s) d u_s d(U_1 -U_0)\\
-E[T(\eta) | P(Z) =p,X] &=& \int_{-\infty}^{\infty} \int_{0}^{p} \eta f(\eta | U_s = u_s)  d\, \eta d\, u_s\\
+  Y_i &=& \gamma_0' X_i + T_i(\gamma_1 - \gamma_0)' X_i + U_{0i} + T_i(U_{1i} - U_{0i})
 \end{eqnarray*}
+
+\pause 
+
+Take the expectation conditional on $x$ and the instrument
+\begin{multline*}
+  E[Y| X,P(Z)=p] = \gamma_0' X + p(\gamma_1 - \gamma_0)'X \\ + E[T(U_1 - U_0)|X,P(Z)=p] 
+\end{multline*}
+
+\end{frame}
+  
+
+\begin{frame}
+\frametitle{MTE: Derivation}
+Note that $T=1$ over the interval $u_s = [0,p]$ and zero for higher values of $u_s$. 
+\begin{multline*}
+E[T(U_1 - U_0) | P(Z) =p,X] = \\ \int_{-\infty}^{\infty} \int_{0}^{p} (U_1 - U_0) f((U_1-U_0) | U_s = u_s) d u_s d(U_1 -U_0)
+\end{multline*}
+
+Let $U_1-U_0 \equiv \eta$.
+$$ E[T(\eta) | P(Z) =p,X] = \int_{-\infty}^{\infty} \int_{0}^{p} \eta f(\eta | U_s = u_s)  d\, \eta d\, u_s $$
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{MTE: Derivation}
+Can now express the MTE as   
 \begin{eqnarray*}
-\Delta^{MTE}(p) &=& \frac{\partial E[Y | X, P(Z)=p]}{\partial p} = (\gamma_1 - \gamma_0)'X + \int_{-\infty}^{\infty} \eta f(\eta | U_s =p) d\, \eta\\
+\Delta^{MTE}(p) &=& \frac{\partial E[Y | X, P(Z)=p]}{\partial p} \\
+  &=& (\gamma_1 - \gamma_0)'X + \int_{-\infty}^{\infty} \eta f(\eta | U_s =p) d\, \eta\\
 &=& (\gamma_1 - \gamma_0)'X + E[\eta | u_s =p]
 \end{eqnarray*}
 What is $E[\eta | u_s =p]$? The expected unobserved gain from treatment of those people who are on the treatment/no-treatment margin $P(Z)=p$.
@@ -1576,66 +1649,180 @@ What is $E[\eta | u_s =p]$? The expected unobserved gain from treatment of those
 
 \begin{frame}
 \frametitle{How to Estimate an MTE}
-Easy
 \begin{enumerate}
 \item Estimate $P(Z) = Pr(T=1 | Z)$ nonparametrically (include exogenous part of $X$ in $Z$).
-\item Nonparametric regression of $Y$ on $X$ and $P(Z)$ (polynomials?)
+\item Nonparametric regression of $Y$ on $X$ and $P(Z)$ 
+\item For example, 
+$$ E[Y|X, P(Z)p] = \gamma_0' X + \hat p (\gamma_1 - \gamma_0)'X + \kappa(\hat p) $$ 
+where $\kappa()$ is some nonlinear function (polynomials?)
 \item Differentiate w.r.t. $P(Z)$
 \item plot it for all values of $P(Z)=p$.
 \end{enumerate}
 So long as $P(Z)$ covers $(0,1)$ then we can trace out the full distribution of $\Delta^{MTE}(p)$.
 \end{frame}
 
-
-
+\begin{frame}
+  \footnotesize
+  \frametitle{Can now define any average we want in terms of MTE}
+  Calculate the outcome given $(X,Z)$ (actually $X$ and $P(Z)=p$).
+  
+  ATE : This one is obvious. We treat everyone!
+  \begin{eqnarray*}
+  \int_{-\infty}^{\infty} \Delta^{MTE}(p) = (\gamma_1 - \gamma_0)'X + \underbrace{\int_{-\infty}^{\infty} E(\eta | u_s) d\, u_s}_{0}
+  \end{eqnarray*}
+\end{frame}
+    
 \begin{frame}
 \footnotesize
-\frametitle{Everything is an MTE}
-Calculate the outcome given $(X,Z)$ (actually $X$ and $P(Z)=p$).
+\frametitle{What about LATE?}
 \begin{itemize}
-\item ATE : This one is obvious. We treat everyone!
+  \item LATE: Fix an $X$ and $P(Z)$
+  \item Consider a policy which varies probability of treatment for $X$ from $b(X)$ to $a(X)$ with $a > b$. 
+  \item LATE integrates over the compliers with $b(X) \le u_s \le a(X)$.
 \begin{eqnarray*}
-\int_{-\infty}^{\infty} \Delta^{MTE}(p) = (\gamma_1 - \gamma_0)'X + \underbrace{\int_{-\infty}^{\infty} E(\eta | u_s) d\, u_s}_{0}
-\end{eqnarray*}
-\item LATE: Fix an $X$ and $P(Z)$ varies from $b(X)$ to $a(X)$ and we integrated over the area between (compliers).
-\begin{eqnarray*}
-LATE(X)=\int_{-\infty}^{\infty} \Delta^{MTE}(p) =  (\gamma_1 - \gamma_0)'X + \frac{1}{a(X)-b(X)} \int_{b(X)}^{a(X)} E(\eta | u_s) d\, u_s
-\end{eqnarray*}
-
-\item ATT 
-\begin{eqnarray*}
-TT(X)=\int_{-\infty}^{\infty} \Delta^{MTE}(p) \frac{Pr(P(Z | X) > p)}{E[P(Z | X)]} d\,p
+LATE(X) &=& \int_{-\infty}^{\infty} \Delta^{MTE}(p) \\
+        &=&  (\gamma_1 - \gamma_0)'X + \frac{1}{a(X)-b(X)} \int_{b(X)}^{a(X)} E(\eta | u_s) d\, u_s
 \end{eqnarray*}
 
-\item Weights for IV and OLS are a bit more complicated. See the Heckman and Vytlacil paper(s).
+  \item One thing to note is that obviously LATE depends on the margin the policy shifts 
+
+%\item ATT 
+%\begin{eqnarray*}
+%TT(X)=\int_{-\infty}^{\infty} \Delta^{MTE}(p) \frac{Pr(P(Z | X) > p)}{E[P(Z | X)]} d\,p
+%\end{eqnarray*}
+%\item Weights for IV and OLS are a bit more complicated. See the Heckman and Vytlacil paper(s).
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Carneiro, Heckman and Vytlacil (AER 2010)}
-\begin{itemize}
-\item Estimate returns to college (including heterogeneity of returns).
-\item NLSY 1979
-\item $Y = \log(wage)$
-\item Covariates $X$: Experience (years), Ability (AFQT Score), Mother's Education, Cohort Dummies, State Unemployment, MSA level average wage.
-\item Instruments $Z$: College in MSA at age 14, average earnings in MSA at 17 (opportunity cost), avg unemployment rate in state.
-\end{itemize}
+  \footnotesize
+  \frametitle{How does this compare to IV?}
+  [Some of what follows comes from \citet{cornelissen2016late}]
+
+  \begin{itemize}
+    \item Consider the Wald estimator with two points from a continous instrument
+  \begin{eqnarray*}
+    Wald(z,z',x) &=& \frac{E[Y_i|Z_i = z,X_i=x] - E[Y_i|Z_i = z',X_i=x]}{E[T_i|Z_i = z,X_i=x]-E[Y_i|Z_i = z',X_i=x]}
+  \end{eqnarray*}
+    \item We showed this recovers   
+    \begin{eqnarray*}
+      LATE(z,z',x) &=& E[\tau_i | T_{iz} > T_{iz'},X_i=x] \\
+                    &=& E[\tau_i | P(z') < u_s < P(z) ,X_i=x]
+    \end{eqnarray*}
+  \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Consider a discretization of treatment probability distribution}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/CornelissenBins}
+  \end{center}  
+\end{frame}
 
 \begin{frame}
-\frametitle{Carneiro, Heckman and Vytlacil}
+  \frametitle{Grouped IV averages relationship across bins}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/CornelissenGrouped}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \footnotesize
+  \frametitle{How does this compare to IV?}
+  \begin{itemize}
+    \item 2SLS is going to fit a line through these heterogenous effects, and aggregate IV will be the slope. 
+    \item MTE allows slope to vary across very fine bins 
+    \item Looking at the Wald formula, can see that MTE for a given $u_s$ is the limit of LATE as $P(z') \rightarrow P(z)$ 
+    \item Thus the MTE is actually identified from local IV (LIV) using small departures from propensity score at $u_{s} = P(z)$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \footnotesize
+  \frametitle{How does this compare to IV?}
+  \begin{itemize}
+    \item 2SLS is going to fit a line through these heterogenous effects, and aggregate IV will be the slope. 
+    \item MTE allows slope to vary across very fine bins 
+    \item Looking at the Wald formula, can see that MTE for a given $u_s$ is the limit of LATE as $P(z') \rightarrow P(z)$ 
+    \item Thus the MTE is actually identified from local IV (LIV) using small departures from propensity score at $u_{s} = P(z)$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{HV ECMA 2005 show everything is a weighted MTE}
+  \begin{center}
+    \includegraphics[width=\textwidth]{./resources/HVMTEmap}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{HV ECMA 2005 show everything is a weighted MTE}
+  \begin{center}
+    \includegraphics[width=\textwidth]{./resources/HVWeights}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Policy Relevant TE}
+  \begin{center}
+    \includegraphics[width=\textwidth]{./resources/HVPRTE}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{HV Roy Example}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/HVRoyTEs}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{HV Roy Example}
+  \vspace{-10pt}
+  \begin{center}
+    \includegraphics[width=\textwidth]{./resources/HVOLSIVexample}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{\cite{carneiro2011estimating}}
+  \begin{itemize}
+  \item Estimate returns to college (including heterogeneity of returns). $T_i =1$ if ever attended college. 
+  \item NLSY 1979
+  \item $Y = \log(wage)$ in 1991
+  \item Covariates $X$: Experience (years), Ability (AFQT Score), Mother's Education, Cohort Dummies, State Unemployment, MSA level average wage.
+  \item Instruments $Z$: 
+  \begin{itemize}
+    \item Cost shifters: College in MSA ; In state cost
+    \item Opportunity cost: average earnings in MSA and avg unemployment (at 17).
+  \end{itemize}
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Propensity estimate: Logit}
+  \vspace{-10pt}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/CarnieroFirstStage}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Carneiro, Heckman and Vytlacil}
+  \begin{center}
+  \includegraphics[width=4in]{./resources/chv_tab4}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{CHV Normal Selection Model}
+\vspace{-10pt}
 \begin{center}
-\includegraphics[width=4in]{./resources/chv_fig1}
+\includegraphics[width= \textwidth]{./resources/chv_fig1}
 \end{center}
 \end{frame}
 
-\begin{frame}
-\frametitle{Carneiro, Heckman and Vytlacil}
-\begin{center}
-\includegraphics[width=4in]{./resources/chv_tab4}
-\end{center}
-\end{frame}
 
 \begin{frame}
 \frametitle{Carneiro, Heckman and Vytlacil}
@@ -1645,19 +1832,55 @@ TT(X)=\int_{-\infty}^{\infty} \Delta^{MTE}(p) \frac{Pr(P(Z | X) > p)}{E[P(Z | X)
 \end{frame}
 
 \begin{frame}
-\frametitle{Carneiro, Heckman and Vytlacil}
+  \frametitle{CHV Don't Have Full Support}
+  \vspace{-10pt}
+  \begin{center}
+  \includegraphics[width= \textwidth]{./resources/CarnieroSupport}
+  \end{center}
+\end{frame}
+  
+\begin{frame}
+  \frametitle{CHV Local IV MTE}
+\vspace{-20pt}
 \begin{center}
-\includegraphics[width=4in]{./resources/chv_fig4}
+\includegraphics[width= 1.05\textwidth]{./resources/chv_fig4}
 \end{center}
 \end{frame}
 
 \begin{frame}
-\frametitle{Carneiro, Heckman and Vytlacil}
-\begin{center}
-\includegraphics[width=4in]{./resources/chv_fig6}
-\end{center}
+  \frametitle{CHV Local IV MTE}
+  \begin{center}
+  \includegraphics[width=4in]{./resources/chv_fig6}
+  \end{center}
+\end{frame}
+  
+
+\begin{frame}
+  \frametitle{What does this tell us?}
+  \begin{itemize}
+  \item Huge difference in returns
+  \item Negative selection: people with lowest resistance have returns of 40 percent. For those with highest restistance its a 20 percent loss. 
+  \item Suggests people know something we don't when they opt out of college.  
+  \item Obviously ATE would be very misleading here. 
+  
+  \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Selection doesn't have to be positive}
+  Cornellissen 2016: universal pre-K program in Germany. 
+  \begin{center}
+    \includegraphics[width= .9\textwidth]{./resources/CornelissenNegative}
+   \end{center}
+    
+\end{frame}
+
+\begin{frame}
+  \frametitle{Summary: Margins Matter}
+  \begin{center}
+    \includegraphics[width= \textwidth]{./resources/CornelissenSummary}
+   \end{center}
+\end{frame}
 
 \begin{frame}
 \frametitle{Diversion Example}
