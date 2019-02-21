@@ -1514,7 +1514,7 @@ assuming that the probability of training in the first period is zero.
 \begin{frame}
   \frametitle{Treatment effect heterogeneity}
   \begin{itemize}
-    \item Consider a binary treatment $D_i$
+    \item Consider a binary treatment $T_i$
     \item Potential outcomes
       \begin{eqnarray*}
       Y_{0i} &=& \mu_{0}(X_i) + U_{0i} \\
@@ -1558,6 +1558,22 @@ assuming that the probability of training in the first period is zero.
           $$v_{i} = \tau_i - [w_0 + \gamma'z_i]$$
       we'd be able to pin down the treatment effect at a given $Z_i$   
     \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{HV Roy Model}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/HVRoyModel}
+  \end{center}  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{HV Roy Model}
+  \begin{center}
+    \includegraphics[width=.85\textwidth]{./resources/HVRoyDist}
+  \end{center}  
 \end{frame}
 
 \begin{frame}
@@ -1721,9 +1737,55 @@ LATE(X) &=& \int_{-\infty}^{\infty} \Delta^{MTE}(p) \\
   \end{itemize}
 \end{frame}
 
-  
 \begin{frame}
-  \frametitle{Carneiro, Heckman and Vytlacil (AER 2010)}
+  \footnotesize
+  \frametitle{How does this compare to IV?}
+  \begin{itemize}
+    \item 2SLS is going to fit a line through these heterogenous effects, and aggregate IV will be the slope. 
+    \item MTE allows slope to vary across very fine bins 
+    \item Looking at the Wald formula, can see that MTE for a given $u_s$ is the limit of LATE as $P(z') \rightarrow P(z)$ 
+    \item Thus the MTE is actually identified from local IV (LIV) using small departures from propensity score at $u_{s} = P(z)$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{HV ECMA 2005 show everything is a weighted MTE}
+  \begin{center}
+    \includegraphics[width=\textwidth]{./resources/HVMTEmap}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{HV ECMA 2005 show everything is a weighted MTE}
+  \begin{center}
+    \includegraphics[width=\textwidth]{./resources/HVWeights}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Policy Relevant TE}
+  \begin{center}
+    \includegraphics[width=\textwidth]{./resources/HVPRTE}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{HV Roy Example}
+  \begin{center}
+    \includegraphics[width=.9\textwidth]{./resources/HVRoyTEs}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{HV Roy Example}
+  \vspace{-10pt}
+  \begin{center}
+    \includegraphics[width=\textwidth]{./resources/HVOLSIVexample}
+  \end{center}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{\cite{carneiro2011estimating}}
   \begin{itemize}
   \item Estimate returns to college (including heterogeneity of returns). $T_i =1$ if ever attended college. 
   \item NLSY 1979
@@ -1739,7 +1801,8 @@ LATE(X) &=& \int_{-\infty}^{\infty} \Delta^{MTE}(p) \\
 \end{frame}
 
 \begin{frame}
-  \frametitle{Propensity estimate}
+  \frametitle{Propensity estimate: Logit}
+  \vspace{-10pt}
   \begin{center}
     \includegraphics[width=.9\textwidth]{./resources/CarnieroFirstStage}
   \end{center}  
@@ -1778,12 +1841,19 @@ LATE(X) &=& \int_{-\infty}^{\infty} \Delta^{MTE}(p) \\
   
 \begin{frame}
   \frametitle{CHV Local IV MTE}
-\vspace{-10pt}
+\vspace{-20pt}
 \begin{center}
 \includegraphics[width= 1.05\textwidth]{./resources/chv_fig4}
 \end{center}
 \end{frame}
 
+\begin{frame}
+  \frametitle{CHV Local IV MTE}
+  \begin{center}
+  \includegraphics[width=4in]{./resources/chv_fig6}
+  \end{center}
+\end{frame}
+  
 
 \begin{frame}
   \frametitle{What does this tell us?}
@@ -1810,13 +1880,6 @@ LATE(X) &=& \int_{-\infty}^{\infty} \Delta^{MTE}(p) \\
   \begin{center}
     \includegraphics[width= \textwidth]{./resources/CornelissenSummary}
    \end{center}
-\end{frame}
-
-\begin{frame}
-\frametitle{CHV Local IV MTE}
-\begin{center}
-\includegraphics[width=4in]{./resources/chv_fig6}
-\end{center}
 \end{frame}
 
 \begin{frame}
