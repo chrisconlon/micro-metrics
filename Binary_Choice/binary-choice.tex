@@ -193,29 +193,22 @@ Problem with the LPM/OLS is that it requires that \alert{marginal effects are co
 \begin{eqnarray*}
 Pr(Y=1 | X) = \beta_0 + \beta_1 X+ \epsilon
 \end{eqnarray*}
-Some desirable properties:
-\begin{itemize}
-\item Can we restrict our predictions to $[0,1]$?
-\item Can we preserve \alert{monotonicity} so that $Pr(Y=1| X)$ is increasing in $X$ for $\beta_1 >0$?
-\item Some other properties (continuity, etc.) \pause
-\item Want a function $F(z): (-\infty,\infty) \rightarrow [0,1]$.
-\item What function will work?
-\end{itemize}
+
+Want a function $F(z): (-\infty,\infty) \rightarrow [0,1]$.
+
+What function will work?
+
 \end{frame}
 
 \begin{frame}{Choosing a transformation}
-       \begin{eqnarray*}
-       Pr(Y=1 | X) = F(\beta_0 + \beta_1 X)
-       \end{eqnarray*}
        \begin{itemize}
        \item One $F(\cdot)$ that works is $\Phi(z)$ the normal CDF. This is the \alert{probit} model.
        \begin{itemize}
        \item Actually any CDF would work but the normal is convenient.
        \end{itemize}
-       \item One $F(\cdot)$ that works is $\frac{e^z}{1+ e^z}=\frac{1}{1+e^{-z}}$ the logistic function . This is the \alert{logit} model.
+       \item Another $F(\cdot)$ that works is $\frac{e^z}{1+ e^z}=\frac{1}{1+e^{-z}}$ the logistic function . This is the \alert{logit} model.
        \item Both of these give `S'-shaped curves.
-       \item The LPM is $F(\cdot)$ is the \alert{identity function} (which doesn't satisfy my $[0,1]$ property).
-       \item This $F(\cdot)$ is often called a \alert{link function}. Why?
+       \item This $F(\cdot)$ is often called a \alert{link function}. 
        \end{itemize}
 \end{frame}
 
@@ -225,15 +218,21 @@ Some desirable properties:
        \begin{itemize}
        \item LPM prediction departs greatly from CDF long before $[0,1]$ limits.
        \item We get probabilities that are too extreme even for $X\hat{\beta}$ ``in bounds''.
-       \item Some (MHE) argue that though $\hat{Y}$ is flawed, constant marginal effects are still OK.
        \item Logit and Probit are highly similar
        \end{itemize}
        \begin{center}
-       \includegraphics[width=2in]{resources/lpm-probit.jpg}
+       \includegraphics[width=2.5in]{resources/lpm-probit.jpg}
        \end{center}
 \end{frame}
 
+\begin{frame}
+       \frametitle{We really care about marginal effects}
+       \begin{center}
+       \includegraphics[width=\textwidth]{resources/CTmarginals}
+       \end{center}
+\end{frame}
 
+\begin{comment}
 \begin{frame}
        \frametitle{Latent Variables/ Limited Dependent Variables}
        An alternative way to think about this problem is that there is a continuously distributed $Y^{*}$ that we as the econometrician don't observe.
@@ -264,11 +263,12 @@ Some desirable properties:
        \item $Z_i$ is the \alert{index}. if $Z_i = X_i \beta$ we say it is a \alert{linear index} model.
        \end{itemize}
 \end{frame}
+\end{comment}
 
 \begin{frame}
-       \frametitle{Marginal effects}
+       \frametitle{Challenge: Where to evaluate?}
        \begin{eqnarray*}
-       \frac{\partial E[Y_i | X_i] }{\partial X_{ik}} = f (Z_i) \beta_k
+       \frac{\partial E[Y_i | X_i] }{\partial X_{ik}} = f (X_i'\beta) \beta_k
        \end{eqnarray*}
        \begin{itemize}
        \item The whole point was that we wanted marginal effects not to be constant
@@ -277,7 +277,7 @@ Some desirable properties:
        \item Software often plugs in mean or median values for each component
        \item Alternatively we can integrate over $X$ and compute:
        $$
-       E_{X_i}[ f (Z_i) \beta_k]
+       E_{X_i}[ f (X_i'\beta) \beta_k]
        $$
        \item The right thing to do is probably to plot the response surface (either probability) or change in probability over all $X$.
        \end{itemize}
@@ -285,35 +285,68 @@ Some desirable properties:
 \end{frame}
 
 \begin{frame}
-       \frametitle{A word of caution re interaction effects}
-       \begin{itemize}
-       \item Often we want to include interaction effects in our models. 
-       \item A leading example is difference in differences 
-       \item \citet{ai2003interaction} show that the marginal of the interaction term has NO INTERPRETATION!
-       \end{itemize}
+       \frametitle{How to compare across models?}
+
+       Natural to compare log-Likelihood
+
+       $$ L_N(\hat \beta) = \sum_i \left\{ y_i \ln \hat p_i + (1- y_i) \ln (1 - \hat p_i) \right\} $$
+
+       \pause 
+       What about the different marginals?
+       
+       \medskip
+       Coefficients will be different because of the different formulas and normalizations. 
+       
+       \medskip
+       According to CT, this works well for $0.1 < p < 0.9$
+
+       \begin{eqnarray*}
+              \hat \beta_{Logit} &\approx& 4 \hat \beta_{OLS} \\
+              \hat \beta_{Probit} &\approx& 2.5 \hat \beta_{OLS} \\
+              \hat \beta_{Logit} &\approx& 1.6 \hat \beta_{Probit}
+       \end{eqnarray*}
 \end{frame}
 
 \begin{frame}
        \frametitle{A word of caution re interaction effects}
        \begin{itemize}
        \item Often we want to include interaction effects in our models. 
+       $$ Y = \beta_1 x_1 + \beta_2 x_2 + \beta_{12}x_1x_2 + \epsilon $$ 
        \item A leading example is difference in differences 
-       \item \citet{ai2003interaction} show that the marginal of the interaction term has NO INTERPRETATION!
+       \item With LPM, interaction terms directly interpretable as the change in probabilities. 
+       \item Conversely, \citet{ai2003interaction} show that the marginal of the interaction term has NO INTERPRETATION!
        \end{itemize}
 \end{frame}
 
+
 \begin{frame}
-       \frametitle{Ai and Norton Example}
-       \begin{center}
-       \includegraphics[width=\textwidth]{resources/AiSimple}
-       \end{center}
+       \frametitle{Consider the probit}
+
+       $$E[y|X] = \Phi(\beta_1 x_1 + \beta_2 x_2 + \beta_{12}x_1x_2) $$ 
+
+       where $\Phi$ is the standard normal cdf. 
+
+       \medskip
+
+       Consider continuous $x_1$, $x_2$. The true interaction effect is 
+
+       $$ \frac{\partial E[y|X]}{\partial x_1 \partial x_2} = 
+              \beta_{12}\Phi'(\cdot) + (\beta_1 + \beta_{12}x_1)\Phi''(\cdot) $$ 
+
+       \pause 
+       However, most applied economists instead report the marginal effect of the interaction term, 
+       $$\partial \Phi (\cdot)/ \partial (x_1 x_2) = \beta_{12} \Phi'(\cdot) $$
+
+       Note that this can easily give the wrong sign, and that the true partial can be nonzero even if $\beta_{12} = 0$. 
+
 \end{frame}
 
 \section{Endogeneity}
 
 \begin{frame}
 \frametitle{What About Endogeneity?}
-Four possible solutions (maybe there are more?)
+
+\cite{lewbel2012comparing} discuss four ``convenient'' options for binary choice models with endogenous regressors.
 \begin{enumerate}
 \item Close eyes, run the LPM with instruments (Suggested by MHE).
 \item Specify the distribution of errors in first and second stage and do MLE (\texttt{biprobit} in STATA).
@@ -330,7 +363,7 @@ Setup:
 \item $X$ is a vector of observed regressors with coefficient $\beta$ 
 \begin{itemize}
 \item (Can think about $X^e$: endogenous and $X^0$: exogenous).
-\item In an treatment model we might have that $T$ is a binary treatment indicator within $X$
+\item In a treatment model we might have that $T$ is a binary treatment indicator within $X$
 \end{itemize}
 \item $\epsilon$ is unobserved error. Specifying $f(e)$ can give logit/probit.
 \item Threshold Crossing / Latent Variable Model:
@@ -359,11 +392,10 @@ D = \mathbf{1}(X \beta + \epsilon \geq 0)
 \begin{block}{Disadvantages}
 \vspace{-5pt}
 \begin{itemize}
-\item $\hat{F}_D$ is linear not S-shaped
-\item $\hat{F}_D$ can be outside $[0,1]$.
+\item $\hat{F}_D$ is linear not S-shaped; can be outside $[0,1]$.
 \item no element of $X$ can have $\infty$ support (e.g. no normally distributed regressors).
 \item $\varepsilon$ not independent of any regressors  (even the exogenous ones). How do we also get $E[X^0 \varepsilon] =0$ ?
-\item Does not nest probit, logit, etc.. Can't compare efficiency
+%\item Does not nest probit, logit, etc.. Can't compare efficiency
 \end{itemize}
 \end{block}
 \end{frame}
@@ -386,7 +418,7 @@ D = I ( X' \beta + \varepsilon \geq 0 ) \quad \mbox{and} \quad X^e = G(Z,\theta,
 
 \begin{frame}
 \frametitle{Solution \#1 : MLE}
-
+\vspace{-10pt}
 \begin{block}{Advantages}
 \begin{itemize}
 \item Nests logit, probit, etc. as special cases.
@@ -401,7 +433,7 @@ D = I ( X' \beta + \varepsilon \geq 0 ) \quad \mbox{and} \quad X^e = G(Z,\theta,
 \item Need to parametrize everything $G$, $F_{\varepsilon,e|Z}$.
 \item Numerical optimization issues
 \item Many nusiance parameters, sometimes poorly identified, especially with discrete $X^e$, correlation between latent $(\varepsilon,e)$.
-\item Need to know all required instruments $Z$. Omitting just one $Z$ causes inconsistency in $G$. (Not sure if something is exogenous, too bad!).
+\item Need to know all required instruments $Z$. Omitting just one $Z$ causes inconsistency in $G$. %(Not sure if something is exogenous, too bad!).
 \end{itemize}
 \end{block}
 \end{frame}
@@ -415,7 +447,7 @@ Setup:
 \begin{eqnarray*}
 D &=& I ( X' \beta + \varepsilon \geq 0 ) 
 \end{eqnarray*}
-Assume first stage relationship that's identified and invertible in $e$
+Assume first stage relationship identified and invertible in $e$
 \begin{eqnarray*}
 X^e &=& G(Z) +e  \quad \mbox{or}  \quad  X^e = G(Z,e)
 \end{eqnarray*}
@@ -472,7 +504,7 @@ Simple Case:
 \frametitle{Binary CF (Stata Version)}
 \begin{itemize}
 \item \texttt{ivprobit} assumes that $G(Z,e)$ is linear, and $(e,\varepsilon)$ jointly normal, independent of $Z$.
-\item not exactly the semi-parametric flexibility we were looking for...
+%\item not exactly the semi-parametric flexibility we were looking for...
 \item It is actually Control Function not IV
 \end{itemize}
 \begin{eqnarray*}
@@ -481,7 +513,7 @@ D &=& I ( X^e  \beta_e + X^0 \beta_0+ \varepsilon \geq 0 ) \\
 \end{eqnarray*}
 Run first-stage OLS and get residuals $\hat{e}$. Then plug into
 \begin{eqnarray*}
-D &=& I ( X^e  \beta_e + X^0 \beta_0+ + \lambda \hat{e} + U  \geq 0 )
+D &=& I ( X^e  \beta_e + X^0 \beta_0 + \lambda \hat{e} + U  \geq 0 )
 \end{eqnarray*}
 and do a conventional probit estimator.
 \begin{itemize}
@@ -495,8 +527,8 @@ and do a conventional probit estimator.
 \frametitle{Stronger requirements than 2SLS}
 \vspace{-10pt}
 \begin{eqnarray*}
-D &=& I ( X' \beta + \varepsilon \geq 0 ) , \quad  X^e = G(Z,e) ,  \\
-\varepsilon &=& H(U,e) , \quad U \bot X,e
+D &=& I ( X' \beta + \varepsilon \geq 0 ) ; \quad  X^e = G(Z,e) ,  \\
+\varepsilon &=& H(U,e) \quad ; \quad U \bot X,e
 \end{eqnarray*}
 Much stronger requirements that 2SLS
 \begin{itemize}
@@ -520,7 +552,7 @@ Not Quite MLE
 \item Nests logit, probit, etc. as special cases
 \item Requires less parametric information than MLE
 \item Some versions are computationally easy without numerical optimization (Bootstrap!)
-\item Less efficient than MLE due to less restrictions,but can be semiparametrically efficient given information.
+\item Less efficient than MLE due to less restrictions, but can be semiparametrically efficient given information.
 \end{itemize}
 \end{frame}
 
@@ -558,48 +590,40 @@ Why would you ever want to do this..
 \subsection{Special Regressors}
 \begin{frame}
 \frametitle{Solution \#3 : Special Regressor}
-This approach draws on these two papers:
-\begin{itemize}
-\item Lewbel (JoE 2002)
-\item Dong and Lewbel (Econometric Reviews 2015)
-\end{itemize}
-\begin{eqnarray*}
-D &=& I ( X' \beta + V + \varepsilon \geq 0 )
-\end{eqnarray*}
-Special Regressor $V$ has three properties
-\begin{itemize}
-\item Exogenous $E[\varepsilon | V ] =0$
-\item Additively separable in the model
-\item Continuous distribution and large support (such as Normal)
-\item Helpful to have thick-tails (kurtosis). Why? We want to trace $Pr(D | V)$ from $[0,1]$.
-\end{itemize}
-\end{frame}
+This section draws on \cite{dong2015simple}, 
+\pause
 
-\begin{frame}{Learn about SR}
+but there are many other papers on this.... 
+
 \small
 Binary, ordered, and multinomial choice, censored regression, selection, and treatment models (Lewbel 1998, 2000, 2007a), truncated regression models (Khan and Lewbel 2007), binary panel models with FE (Honore and Lewbel 2002), dynamic choice models (Heckman and Navarro 2007, Abbring and Heckman 2007), contingent valuation models (Lewbel, Linton, and McFadden 2008), market equilibrium models of multinomial choice (Berry and Haile 2009a, 2009b), models with (partly) nonseparable errors (Lewbel 2007b, Matzkin 2007, Briesch, Chintagunta, and Matzkin 2009).\\
 Other empirical applications: Anton, Fernandez Sainz, and Rodriguez-Poo (2002), Cogneau and Maurin (2002), Goux and Maurin (2005), Stewart (2005), Lewbel and Schennach (2007), and Tiwari, Mohnen, Palm, and van der Loeff (2007).\\
 Precursors: Matzkin (1992, 1994) and Lewbel (1997).\\
-Recent theory: Magnac and Maurin (2007, 2008), Jacho-Ch�vez (2009), Khan and Tamer (2010), and Khan and Nekipelov (2010a, 2010b).
+Recent theory: Magnac and Maurin (2007, 2008) Khan and Tamer (2010), and Khan and Nekipelov (2010a, 2010b).
 \end{frame}
 
 
 \begin{frame}
-\frametitle{Solution \#3 : Special Regressor}
-Requirements:
+\frametitle{Special Regressor: Requirements}
 \begin{eqnarray*}
 D &=& I ( X' \beta + V + \varepsilon \geq 0 )
 \end{eqnarray*}
+\vspace{-8pt}
 \begin{itemize}
 \item Exogenous $E[\varepsilon | V ] =0$ (Strict Exogeneity) \alert{This is the key!} 
 \item Additively separable in the model
+\begin{itemize}
+       \item NOT interacted with other regressors.
+       \item enters LINEARLY, e.g. $V$ must be continuously distributed after conditioning on other regressors 
+\end{itemize}
 \item Continuous distribution and large support (such as Normal)
-\item NOT interacted with other regressors.
-\item enters LINEARLY, e.g. $V$ must be continuously distributed after conditioning on other regressors
+
+\item Helpful to have thick-tails (kurtosis). Why? We want to trace $Pr(D | V)$ from $[0,1]$.
 \item Can normalize its coefficient to $1$
 \item 2SLS Assumptions: $E[ \varepsilon | Z] = 0$ and $E[Z'X]$ is full rank.
 \end{itemize}
 \end{frame}
+
 
 \begin{comment}
 \begin{frame}
@@ -634,7 +658,15 @@ By properly adjusting $T_i$ we guarantee to stay in $[0,1]$.
        By properly adjusting $T_i$ we guarantee to stay in $[0,1]$.
 \end{frame}
        
-
+\begin{frame}
+       \frametitle{Why does this work?}
+       \begin{itemize}
+       \item $V = S'b + U$ 
+       \item Define $T = [ D - I(V \ge 0 ]/f(U) ] $
+       \item Under these assumptions, can be shown that $T = X'\beta + \tilde \epsilon $ with $E(Z \tilde \epsilon) = 0$
+       \item Therefore $E(ZT) = E(ZX')\beta$ 
+       \end{itemize}
+\end{frame}
 
 \begin{frame}
 \frametitle{Special Regressor Advantages}
