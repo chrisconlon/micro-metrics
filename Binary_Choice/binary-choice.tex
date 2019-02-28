@@ -1,36 +1,22 @@
-\documentclass[xcolor=pdftex,dvipsnames,table,mathserif]{beamer}
-\usetheme{default}
-%\usetheme{Darmstadt}
-%\usepackage{times}
-%\usefonttheme{structurebold}
+\input{../slideHeader}
 
-\usepackage[english]{babel}
-%\usepackage[table]{xcolor}
-\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
-\usepackage{amsmath,amssymb,setspace,centernot}
-\usepackage[latin1]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{relsize}
-\usepackage{pdfpages}
-\usepackage[absolute,overlay]{textpos} 
-\usepackage{listings}
+\title{Binary Choice}
+\author{Richard L. Sweeney}
+\institute{based on slides by Chris Conlon}
+\date{Empirical Methods \\ Spring 2019}
 
-
-
-
-\newenvironment{reference}[2]{% 
-  \begin{textblock*}{\textwidth}(#1,#2) 
-      \footnotesize\it\bgroup\color{red!50!black}}{\egroup\end{textblock*}} 
-
+\setbeamerfont{equation}{size=\tiny}
 \DeclareMathSizes{10}{10}{6}{6} 
 
 \begin{document}
-\title{Part 4: Binary Choice}
-\author{Chris Conlon}
-\institute{Microeconometrics}
-\date{\today}
 
-\frame{\titlepage}
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}
+    \tableofcontents  
+\end{frame}
 
 \section{Intro}
 
@@ -38,70 +24,47 @@
 \frametitle{Binary Choice: Overview}
 Many problems we are interested in look at discrete rather than continuous outcomes.
 \begin{itemize}
-\item We are familiar with limitations of the linear probability model (LPM)
-\begin{itemize}
-\item Predictions outside of $[0,1]$
-\item Estimates of marginal effects need not be consistent.
+       \item To move or not. 
+       \item Entering a market.
+       \item Getting married. 
+       \item Going to college.
 \end{itemize}
-\item What about the case where $Y$ is binary and a regressor $X$ is endogenous?
+In this lecture we will 
+
 \begin{itemize}
-\item The usual 2SLS estimator is \alert{NOT consistent}.
-\item Or we can ignore the fact that $Y$ is binary...
-\item Neither seems like a good option
-\end{itemize}
-\item Suppose we have panel data on repeated binary choices
-\begin{itemize}
-\item Adding FE to the probit model produces biased estimates.
-\end{itemize}
+\item Review the well known limitations of the linear probability model (LPM)
+\item Discuss interpretation of estimates of popular alternatives. 
+\item Discussion options for dealing with endogeneity
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Problem \#1: Endogeneity}
-Four possible solutions (maybe there are more?)
-\begin{enumerate}
-\item Close eyes, run the LPM with instruments (Suggested by MHE).
-\item Specify the distribution of errors in first and second stage and do MLE (\texttt{biprobit} in STATA).
-\item Control Function Estimation
-\item `Special Regressor' Methods
-\end{enumerate}
+\section{LPM}
+
+\begin{frame}{Linear Probability Model}
+       OLS is called the \alert{linear probability model} 
+       \begin{eqnarray*}
+       Y_i  = \beta_0 + \beta_1 X_i + \varepsilon_i 
+       \end{eqnarray*}
+       because:
+       \begin{eqnarray*}
+       E[Y | X] &=& 1 \times Pr(Y=1 | X) + 0 \times Pr(Y=0  | X) \\
+       Pr(Y=1 | X) &=& \beta_0 + \beta_1 X_i + \varepsilon_i
+       \end{eqnarray*}
+       The predicted value is a \alert{probability} and 
+       \begin{eqnarray*}
+       \beta_1 = \frac{Pr(Y=1 | X =x+\Delta x) - Pr(Y=1 | X=x)}{\Delta x}
+       \end{eqnarray*}
+       So $\beta_1$ represents the average change in probability that $Y=1$ for a unit change in $X$.
 \end{frame}
 
-
-
-
-
 \begin{frame}
-\frametitle{Problem \#1: Endogeneity}
-Setup:
-\begin{itemize}
-\item Binary variable $D$: the outcome of interest
-\item $X$ is a vector of observed regressors with coefficient $\beta$ 
-\begin{itemize}
-\item (Can think about $X^e$: endogenous and $X^0$: exogenous).
-\item In an treatment model we might have that $T$ is a binary treatment indicator within $X$
-\end{itemize}
-\item $\epsilon$ is unobserved error. Specifying $f(e)$ can give logit/probit.
-\item Threshold Crossing / Latent Variable Model:
-\begin{eqnarray*}
-D = \mathbf{1}(X \beta + \epsilon \geq 0)
-\end{eqnarray*}
-\item Goal is not usually $\hat{\beta}$ or it's CI, but rather $P(D=1 | X)$ or $\frac{\partial P[D=1 | x] }{\partial X}$ (marginal effects).
-\end{itemize}
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Linear Probability Model}
-Consider the LPM with a single continuous regressor
-\begin{itemize}
-\item LPM prediction departs greatly from CDF long before $[0,1]$ limits.
-\item We get probabilities that are too extreme even for $X\hat{\beta}$ ``in bounds''.
-\item Some (MHE) argue that though $\hat{Y}$ is flawed, constant marginal effects are still OK.
-\end{itemize}
-\begin{center}
-\includegraphics[width=2in]{resources/lpm-probit.jpg}
-\end{center}
+       \frametitle{Well known problems}
+       \begin{itemize}
+       \item Constant marginals 
+       \item Not bounded between 0 and 1
+       \item Relatedly, literally cannot satisfy OLS condition that $\epsilon$ uncorrelated with $X$ for covariates with wide support. 
+       \item Nevertheless .... 
+       \end{itemize}
 \end{frame}
 
 \begin{frame}{Some well known textbooks}
@@ -130,24 +93,7 @@ and continue...
 \end{frame}
 
 \begin{frame}
-\frametitle{Linear Probability Model}
-How does the LPM work?
-\begin{eqnarray*}
-D = X \beta + \varepsilon
-\end{eqnarray*}
-\begin{itemize}
-\item Estimated $\hat{\beta}$ are the MFX.
-\item With exogenous $X$ we have $E[D | X] = Pr[D=1 | X] = X \beta$.
-\item If some elements of $X$ (including treatment indicators) are endogenous or mismeasured they will be correlated with $E$.
-\item In that case we can do IV via 2SLS or IV-GMM given some instruments $Z$.
-\item We need the usual $E[\varepsilon  | X]= 0 $ or $E[\varepsilon | Z] = 0$. \pause
-\item An obvious flaw: Given any $\varepsilon | X  $ must equal either $1- X \beta$ or $-X \beta$ which are functions of $X$
-\item \alert{Only the trivial binary $X$ with no other regressors satisfies this!}
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Alarming Example: Lewbel Dong and Yang (2012)}
+\frametitle{Counter example: Lewbel Dong and Yang (2012)}
 \begin{itemize}
 \item LPM is not just about taste and convenience.
 \item Three treated observations, three untreated % \texttt{Treated=1}
@@ -165,46 +111,47 @@ D = I ( 1 + Treated + R + \varepsilon \geq 0 )
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Alarming Example: Lewbel Dong and Yang (2012)}
+\frametitle{Lewbel Dong and Yang (2012)}
+\vspace{-10pt}
 \tiny
 \begin{semiverbatim}
 . list
-     |     R   Treated   D |
-  1. |  -1.8         0   0 | 
-  2. |   -.9         0   1 |
-  3. |  -.92         0   1 |
-  4. |  -2.1         1   0 |
-  5. | -1.92         1   1 |
-  6. |    10         1   1 |
+|     R   Treated   D |
+1. |  -1.8         0   0 | 
+2. |   -.9         0   1 |
+3. |  -.92         0   1 |
+4. |  -2.1         1   0 |
+5. | -1.92         1   1 |
+6. |    10         1   1 |
 
 . reg D Treated R, robust
 
 Linear regression                               Number of obs     =          6
-                                                F(2, 3)           =       1.02
-                                                Prob > F          =     0.4604
-                                                R-squared         =     0.1704
-                                                Root MSE          =     .60723
+                                          F(2, 3)           =       1.02
+                                          Prob > F          =     0.4604
+                                          R-squared         =     0.1704
+                                          Root MSE          =     .60723
 
 ------------------------------------------------------------------------------
-             |               Robust
-           D |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+       |               Robust
+       D |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-     Treated |  -.1550841   .5844637    -0.27   0.808    -2.015108     1.70494
-           R |   .0484638   .0419179     1.16   0.331    -.0849376    .1818651
-       _cons |   .7251463   .3676811     1.97   0.143    -.4449791    1.895272
+Treated |  -.1550841   .5844637    -0.27   0.808    -2.015108     1.70494
+       R |   .0484638   .0419179     1.16   0.331    -.0849376    .1818651
+_cons |   .7251463   .3676811     1.97   0.143    -.4449791    1.895272
 ------------------------------------------------------------------------------
 . nlcom _b[Treated]/_b[R]
-       _nl_1:  _b[Treated]/_b[R]
+_nl_1:  _b[Treated]/_b[R]
 ------------------------------------------------------------------------------
-           D |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+       D |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-       _nl_1 |       -3.2   10.23042    -0.31   0.754    -23.25125    16.85125
+_nl_1 |       -3.2   10.23042    -0.31   0.754    -23.25125    16.85125
 ------------------------------------------------------------------------------
 \end{semiverbatim}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Alarming Example: Lewbel Dong and Yang (2012)}
+\frametitle{Lewbel Dong and Yang (2012)}
 \begin{itemize}
 \item That went well, except that:
 \begin{itemize}
@@ -223,25 +170,182 @@ Linear regression                               Number of obs     =          6
 . reg D Treated R, robust
 
 Linear regression                               Number of obs     =        180
-                                                F(2, 177)         =      59.93
-                                                Prob > F          =     0.0000
-                                                R-squared         =     0.1704
-                                                Root MSE          =       .433
+                                          F(2, 177)         =      59.93
+                                          Prob > F          =     0.0000
+                                          R-squared         =     0.1704
+                                          Root MSE          =       .433
 
 ------------------------------------------------------------------------------
-             |               Robust
-           D |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+       |               Robust
+       D |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-     Treated |  -.1550841   .0760907    -2.04   0.043    -.3052458   -.0049224
-           R |   .0484638   .0054572     8.88   0.000     .0376941    .0592334
-       _cons |   .7251463    .047868    15.15   0.000     .6306808    .8196117
+Treated |  -.1550841   .0760907    -2.04   0.043    -.3052458   -.0049224
+       R |   .0484638   .0054572     8.88   0.000     .0376941    .0592334
+_cons |   .7251463    .047868    15.15   0.000     .6306808    .8196117
 \end{semiverbatim}
+\end{frame}
+
+\section{Logit/Probit}
+
+
+\begin{frame}{Moving Away from LPM}
+Problem with the LPM/OLS is that it requires that \alert{marginal effects are constant} or that probability can be written as linear function of parameters.
+\begin{eqnarray*}
+Pr(Y=1 | X) = \beta_0 + \beta_1 X+ \epsilon
+\end{eqnarray*}
+Some desirable properties:
+\begin{itemize}
+\item Can we restrict our predictions to $[0,1]$?
+\item Can we preserve \alert{monotonicity} so that $Pr(Y=1| X)$ is increasing in $X$ for $\beta_1 >0$?
+\item Some other properties (continuity, etc.) \pause
+\item Want a function $F(z): (-\infty,\infty) \rightarrow [0,1]$.
+\item What function will work?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Choosing a transformation}
+       \begin{eqnarray*}
+       Pr(Y=1 | X) = F(\beta_0 + \beta_1 X)
+       \end{eqnarray*}
+       \begin{itemize}
+       \item One $F(\cdot)$ that works is $\Phi(z)$ the normal CDF. This is the \alert{probit} model.
+       \begin{itemize}
+       \item Actually any CDF would work but the normal is convenient.
+       \end{itemize}
+       \item One $F(\cdot)$ that works is $\frac{e^z}{1+ e^z}=\frac{1}{1+e^{-z}}$ the logistic function . This is the \alert{logit} model.
+       \item Both of these give `S'-shaped curves.
+       \item The LPM is $F(\cdot)$ is the \alert{identity function} (which doesn't satisfy my $[0,1]$ property).
+       \item This $F(\cdot)$ is often called a \alert{link function}. Why?
+       \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+       \frametitle{A quick comparison}
+       \begin{itemize}
+       \item LPM prediction departs greatly from CDF long before $[0,1]$ limits.
+       \item We get probabilities that are too extreme even for $X\hat{\beta}$ ``in bounds''.
+       \item Some (MHE) argue that though $\hat{Y}$ is flawed, constant marginal effects are still OK.
+       \item Logit and Probit are highly similar
+       \end{itemize}
+       \begin{center}
+       \includegraphics[width=2in]{resources/lpm-probit.jpg}
+       \end{center}
+\end{frame}
+
+
+\begin{frame}
+       \frametitle{Latent Variables/ Limited Dependent Variables}
+       An alternative way to think about this problem is that there is a continuously distributed $Y^{*}$ that we as the econometrician don't observe.
+       \begin{eqnarray*}
+       Y_i =
+       \begin{cases}
+       1 \mbox{ if } Y^{*} >0 \\
+       0 \mbox{ if } Y^{*} \leq 0
+       \end{cases}
+       \end{eqnarray*}
+       \begin{itemize}
+       \item Instead we only see whether $Y^{*}$ exceeds some threshold (in this case $0$).
+       \item We can think about $Y^{*}$ as a \alert{latent variable}.
+       \item Sometimes you will see this description in the literature, everything else is the same!
+       \end{itemize}
+\end{frame}
+       
+       
+\begin{frame}
+       \frametitle{Index Models}
+       We sometimes call these single index models or threshold crossing models
+       \begin{eqnarray*}
+       Z_i = X_i \beta
+       \end{eqnarray*}
+       \begin{itemize}
+       \item We start with a potentially large number of regressors in $X_i$ but $X_i \beta = Z_i$ is a \alert{scalar}
+       \item We can just calculate $F(Z_i)$ for Logit or Probit (or some other CDF).
+       \item $Z_i$ is the \alert{index}. if $Z_i = X_i \beta$ we say it is a \alert{linear index} model.
+       \end{itemize}
+\end{frame}
+
+\begin{frame}
+       \frametitle{Marginal effects}
+       \begin{eqnarray*}
+       \frac{\partial E[Y_i | X_i] }{\partial X_{ik}} = f (Z_i) \beta_k
+       \end{eqnarray*}
+       \begin{itemize}
+       \item The whole point was that we wanted marginal effects not to be constant
+       \item So where do we evaluate?
+       \begin{itemize}
+       \item Software often plugs in mean or median values for each component
+       \item Alternatively we can integrate over $X$ and compute:
+       $$
+       E_{X_i}[ f (Z_i) \beta_k]
+       $$
+       \item The right thing to do is probably to plot the response surface (either probability) or change in probability over all $X$.
+       \end{itemize}
+       \end{itemize}
+\end{frame}
+
+\begin{frame}
+       \frametitle{A word of caution re interaction effects}
+       \begin{itemize}
+       \item Often we want to include interaction effects in our models. 
+       \item A leading example is difference in differences 
+       \item \citet{ai2003interaction} show that the marginal of the interaction term has NO INTERPRETATION!
+       \end{itemize}
+\end{frame}
+
+\begin{frame}
+       \frametitle{A word of caution re interaction effects}
+       \begin{itemize}
+       \item Often we want to include interaction effects in our models. 
+       \item A leading example is difference in differences 
+       \item \citet{ai2003interaction} show that the marginal of the interaction term has NO INTERPRETATION!
+       \end{itemize}
+\end{frame}
+
+\begin{frame}
+       \frametitle{Ai and Norton Example}
+       \begin{center}
+       \includegraphics[width=\textwidth]{resources/AiSimple}
+       \end{center}
+\end{frame}
+
+\section{Endogeneity}
+
+\begin{frame}
+\frametitle{What About Endogeneity?}
+Four possible solutions (maybe there are more?)
+\begin{enumerate}
+\item Close eyes, run the LPM with instruments (Suggested by MHE).
+\item Specify the distribution of errors in first and second stage and do MLE (\texttt{biprobit} in STATA).
+\item Control Function Estimation
+\item `Special Regressor' Methods
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Setup: Endogeneity}
+Setup:
+\begin{itemize}
+\item Binary variable $D$: the outcome of interest
+\item $X$ is a vector of observed regressors with coefficient $\beta$ 
+\begin{itemize}
+\item (Can think about $X^e$: endogenous and $X^0$: exogenous).
+\item In an treatment model we might have that $T$ is a binary treatment indicator within $X$
+\end{itemize}
+\item $\epsilon$ is unobserved error. Specifying $f(e)$ can give logit/probit.
+\item Threshold Crossing / Latent Variable Model:
+\begin{eqnarray*}
+D = \mathbf{1}(X \beta + \epsilon \geq 0)
+\end{eqnarray*}
+\item Goal is not usually $\hat{\beta}$ or it's CI, but rather $P(D=1 | X)$ or $\frac{\partial P[D=1 | x] }{\partial X}$ (marginal effects).
+\end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Solution \#0 : LPM}
-
+\vspace{-10pt}
 \begin{block}{Advantages}
+\vspace{-5pt}       
 \begin{itemize}
 \item Just like 2SLS.
 \item Computationally easy (no numerical searches)
@@ -250,20 +354,22 @@ Linear regression                               Number of obs     =        180
 \item allows general heteroskedasticity (random coefficients)
 \end{itemize}
 \end{block}
+\vspace{-5pt}       
 
 \begin{block}{Disadvantages}
+\vspace{-5pt}
 \begin{itemize}
-\item $\hat{F}_D$ is linear not S-shaped, approximation valid for small range of $X$.
+\item $\hat{F}_D$ is linear not S-shaped
 \item $\hat{F}_D$ can be outside $[0,1]$.
 \item no element of $X$ can have $\infty$ support (e.g. no normally distributed regressors).
 \item $\varepsilon$ not independent of any regressors  (even the exogenous ones). How do we also get $E[X^0 \varepsilon] =0$ ?
 \item Does not nest probit, logit, etc.. Can't compare efficiency
 \end{itemize}
 \end{block}
-
 \end{frame}
 
 
+\subsection{MLE}
 
 \begin{frame}
 \frametitle{Solution \#1 : MLE}
@@ -273,7 +379,7 @@ D = I ( X' \beta + \varepsilon \geq 0 ) \quad \mbox{and} \quad X^e = G(Z,\theta,
 \begin{itemize}
 \item Fully specified $G$ (could be vector). Could be linear if $X^e$ continuous or probit if $X^e$ binary.
 \item Need to fully specify distribution of $(\varepsilon,e, | Z)$, parametrized.
-\item Implementation (see book), \texttt{biprobit} for joint normal in Stata.
+\item Implementation (see CT book), \texttt{biprobit} for joint normal in Stata.
 \end{itemize}
 \end{frame}
 
@@ -300,13 +406,24 @@ D = I ( X' \beta + \varepsilon \geq 0 ) \quad \mbox{and} \quad X^e = G(Z,\theta,
 \end{block}
 \end{frame}
 
+\subsection{Control Functions}
+
+       
 \begin{frame}
 \frametitle{Solution \#2 : Control Functions}
+Setup: 
 \begin{eqnarray*}
-D &=& I ( X' \beta + \varepsilon \geq 0 ) \quad \mbox{and} \\
- X^e &=& G(Z) +e  \quad \mbox{or}  \quad  X^e = G(Z,e) \quad \mbox{ identified and invertible in $e$}\\
-  \varepsilon  &=&\lambda' e + U \quad \mbox{or}  \quad  \varepsilon = H(U,e) \quad \mbox{ with conditions and } U \bot Z,e.
+D &=& I ( X' \beta + \varepsilon \geq 0 ) 
 \end{eqnarray*}
+Assume first stage relationship that's identified and invertible in $e$
+\begin{eqnarray*}
+X^e &=& G(Z) +e  \quad \mbox{or}  \quad  X^e = G(Z,e)
+\end{eqnarray*}
+With conditions $ U \bot Z,e$
+\begin{eqnarray*}
+\varepsilon  &=&\lambda' e + U \quad \mbox{or}  \quad  \varepsilon = H(U,e) 
+\end{eqnarray*}
+       
 Simple Case:
 \begin{itemize}
 \item Estimate a vector of functions $G$ in the $X^e$ models, get estimated errors $\hat{e}$.
@@ -315,10 +432,44 @@ Simple Case:
 \end{itemize}
 \end{frame}
 
+\begin{frame}[allowframebreaks]
+       \frametitle{CF Example: Linear}
+       From Wooldridge. Second stage: 
+       $$y_1 = z_1'\delta + \alpha_1 y_2 + u_1$$ 
 
+       $y_2$ is endogenous, but $E(z'u_1)=0$ 
+
+       \medskip
+       $z$ is L by 1 vector of instruments, with $z_1$ a strict subvector
+
+       \medskip
+       Write reduced form first stage as $$y_2 = z'\pi_2 + v_2$$ with $E(z'v_2)=0$
+
+       \medskip
+       Engogeneity of $y_2$ arises iff $u_1$ and $v_2$ are correlated.  
+
+       \framebreak
+
+       Write the projection $u_1 = \rho_1 v_2 + e_1$ 
+
+       \medskip
+
+       By definition, $E(v_2 e_1)=0$ and by construction $E(z'e_1)=0$ (because $z$ uncorrelated with $u$ and $v$). 
+
+       \medskip
+
+       We now have $$y_1 = z_1'\delta + \alpha_1 y_2 + \rho_1 v_2 + e_1$$
+
+       Procedure
+       \begin{enumerate}
+              \item Regress $y_2$ on $z$ to recover $\hat v_2$ 
+              \item Regress $y_1$ on $z_1, y_2, \mbox{and } \hat v_2$
+       \end{enumerate}
+       This regression is a \alert{control function} estimate. 
+\end{frame}
 
 \begin{frame}
-\frametitle{Solution \#2 : Control Functions (Stata Version)}
+\frametitle{Binary CF (Stata Version)}
 \begin{itemize}
 \item \texttt{ivprobit} assumes that $G(Z,e)$ is linear, and $(e,\varepsilon)$ jointly normal, independent of $Z$.
 \item not exactly the semi-parametric flexibility we were looking for...
@@ -334,18 +485,18 @@ D &=& I ( X^e  \beta_e + X^0 \beta_0+ + \lambda \hat{e} + U  \geq 0 )
 \end{eqnarray*}
 and do a conventional probit estimator.
 \begin{itemize}
-\item If you forget a $Z_2$ the resulting model isn't even probit!
+%\item If you forget a $Z_2$ the resulting model isn't even probit!
 \item God help you if $X^e$ isnt continuous.
 \end{itemize}
 
 \end{frame}
 
-
-
 \begin{frame}
-\frametitle{Solution \#2 : Control Functions}
+\frametitle{Stronger requirements than 2SLS}
+\vspace{-10pt}
 \begin{eqnarray*}
-D &=& I ( X' \beta + \varepsilon \geq 0 ) , \quad X^e = G(Z,e) ,  \varepsilon = H(U,e),  \quad U \bot X,e.
+D &=& I ( X' \beta + \varepsilon \geq 0 ) , \quad  X^e = G(Z,e) ,  \\
+\varepsilon &=& H(U,e) , \quad U \bot X,e
 \end{eqnarray*}
 Much stronger requirements that 2SLS
 \begin{itemize}
@@ -364,21 +515,19 @@ Not Quite MLE
 
 
 \begin{frame}
-\frametitle{Solution \#2 : Control Functions}
-\begin{block}{Advantages}
+\frametitle{Control Functions: Advantages}
 \begin{itemize}
 \item Nests logit, probit, etc. as special cases
 \item Requires less parametric information than MLE
 \item Some versions are computationally easy without numerical optimization (Bootstrap!)
 \item Less efficient than MLE due to less restrictions,but can be semiparametrically efficient given information.
 \end{itemize}
-\end{block}
 \end{frame}
 
 \begin{frame}
-\frametitle{Solution \#2 : Control Functions (Disadvantages: Not well known)}
+\frametitle{Control Functions (Disadvantages: Not well known)}
 \begin{itemize}
-\item Only allows limited heteroskedasticity
+%\item Only allows limited heteroskedasticity
 \item Need to correctly specify vector $G(Z,e)$ including all $Z$. Omitting a $Z$ or misspecified $G$ causes inconsistency because we need to have joint conditions on $(\varepsilon , e)$.
 \item Generally inconsistent for $X^e$ that is discrete, censored, limited, or not continuous.
 \item If you cannot solve for a latent $e$ in $G(Z,e)$ then you can't get $\hat{e}$ for the censored observations (e.g.: $X^e = \max(0, Z'\gamma + e)$.
@@ -406,6 +555,7 @@ Why would you ever want to do this..
 \end{itemize}
 \end{frame}
 
+\subsection{Special Regressors}
 \begin{frame}
 \frametitle{Solution \#3 : Special Regressor}
 This approach draws on these two papers:
@@ -430,7 +580,7 @@ Special Regressor $V$ has three properties
 Binary, ordered, and multinomial choice, censored regression, selection, and treatment models (Lewbel 1998, 2000, 2007a), truncated regression models (Khan and Lewbel 2007), binary panel models with FE (Honore and Lewbel 2002), dynamic choice models (Heckman and Navarro 2007, Abbring and Heckman 2007), contingent valuation models (Lewbel, Linton, and McFadden 2008), market equilibrium models of multinomial choice (Berry and Haile 2009a, 2009b), models with (partly) nonseparable errors (Lewbel 2007b, Matzkin 2007, Briesch, Chintagunta, and Matzkin 2009).\\
 Other empirical applications: Anton, Fernandez Sainz, and Rodriguez-Poo (2002), Cogneau and Maurin (2002), Goux and Maurin (2005), Stewart (2005), Lewbel and Schennach (2007), and Tiwari, Mohnen, Palm, and van der Loeff (2007).\\
 Precursors: Matzkin (1992, 1994) and Lewbel (1997).\\
-Recent theory: Magnac and Maurin (2007, 2008), Jacho-Ch·vez (2009), Khan and Tamer (2010), and Khan and Nekipelov (2010a, 2010b).
+Recent theory: Magnac and Maurin (2007, 2008), Jacho-Chï¿½vez (2009), Khan and Tamer (2010), and Khan and Nekipelov (2010a, 2010b).
 \end{frame}
 
 
@@ -451,6 +601,7 @@ D &=& I ( X' \beta + V + \varepsilon \geq 0 )
 \end{itemize}
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Solution \#3 : Special Regressor: How it works}
 \begin{enumerate}
@@ -462,12 +613,31 @@ D &=& I ( X' \beta + V + \varepsilon \geq 0 )
 Here $\hat{f}_v(V|Z)$ is high dimensional. So will consider some simpler parametric or semi-parametric version of $f_v$.\\
 By properly adjusting $T_i$ we guarantee to stay in $[0,1]$.
 \end{frame}
+\end{comment}
 
-
+% from Dong, Lewbell and Yang
+\begin{frame}
+       \frametitle{A simple SR estimator}
+       \begin{enumerate}
+       \item Demean or center $V$ at zero. 
+       \begin{itemize}
+              \item Project $V$ onto all the instruments $Z$ and regressors $X$ to recover $\hat U_i = V_i - S_i'\hat b$  
+       \end{itemize}
+       \item Sort $n$ observations by $\hat U_i$. Then define $\hat f_i = 2/ \left[(\hat U_i^+ - \hat U_i^-) n \right]$ 
+       \begin{itemize}
+              \item this estimates the density using only the observations on either side of $i$
+              \item alternatively, can use a kernel density estimator
+       \end{itemize}
+       \item Construct $\hat{T}_i = [D_i -  I(V_i \geq 0)]/ \hat{f_i}$
+       \item Linear 2SLS regression of $\hat{T}$ on $X$ using instruments $Z$ to get the estimated coefficients $\hat{\beta}$.
+       \end{enumerate}
+       By properly adjusting $T_i$ we guarantee to stay in $[0,1]$.
+\end{frame}
+       
 
 
 \begin{frame}
-\frametitle{Solution \#3 : Special Regressor Advantages}
+\frametitle{Special Regressor Advantages}
 \begin{itemize}
 \item Unlike LPM it stays ``in bounds'' and is consistent with threshold crossing models.
 \item Unlike MLE and CF, does not require correctly specified first stage model: any valid set of instruments may be used, with only efficiency at stake.
@@ -478,10 +648,7 @@ By properly adjusting $T_i$ we guarantee to stay in $[0,1]$.
 \end{frame}
 
 \begin{frame}
-\frametitle{Solution \#3 : Special Regressor Disadvantages}
-\begin{eqnarray*}
-D &=& I ( X' \beta + V + \varepsilon \geq 0 )
-\end{eqnarray*}
+\frametitle{Special Regressor Disadvantages}
 \begin{itemize}
 \item Because assumptions are weaker we give up a lot of potential efficiency (larger SEs).
 \item Of course this presumes the assumptions were valid and alternatives were consistent.
@@ -620,4 +787,13 @@ Specifications
 \end{frame}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[allowframebreaks]
+       \bibliographystyle{jpe}
+       \bibliography{../empirical-methods}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Backup}
+          
 \end{document}
