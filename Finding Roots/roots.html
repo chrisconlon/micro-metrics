@@ -1,0 +1,712 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Root Finding and Fixed Points</title><meta name="generator" content="MATLAB 9.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-03-11"><meta name="DC.source" content="roots.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Root Finding and Fixed Points</h1><!--introduction--><p>There are many many examples from economics we seek to either find the root or the fixed point to a non-linear of (often many) equations, which cannot be computed analytically.</p><div><ul><li>Many estimation algorithms for equilibrium problems involve a nested structure where there is some root-finding problem in the inner nest: BLP, dynamic discrete choice (rust, labor models), prodction function, trade models.</li><li>You may want to simulate a model and find equilibria using neccessary conditions.</li><li>Model where equilibria may be defined by a simple threshold of a non-linear equation.</li></ul></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Roots</a></li><li><a href="#2">Fixed Points</a></li><li><a href="#5">Examples</a></li><li><a href="#6">Iterative Methods</a></li><li><a href="#7">Bisection Method</a></li><li><a href="#9">Bisection Example</a></li><li><a href="#12">Function iteration</a></li><li><a href="#15">Function Iteration Example</a></li><li><a href="#16">Write our own Function Routine</a></li><li><a href="#18">Function Interation Example (from above)</a></li><li><a href="#20">Newton's Method</a></li><li><a href="#26">Newton Example</a></li><li><a href="#33">Quasi-Newton Methods</a></li><li><a href="#43">Newton Methods in Practice.</a></li></ul></div><h2 id="1">Roots</h2><p>A function <img src="roots_eq18096895394918367257.png" alt="$f$" class="equation" style="width:6px;height:10px;"> from <img src="roots_eq13560274181536256371.png" alt="$R^n$" class="equation" style="width:13px;height:8px;"> to <img src="roots_eq13560274181536256371.png" alt="$R^n$" class="equation" style="width:13px;height:8px;"> is given and one must compute a vector <img src="roots_eq12428413953531653171.png" alt="$x$" class="equation" style="width:6px;height:6px;">  that satifies: <img src="roots_eq14718321166349761702.png" alt="$f(x)=0$" class="equation" style="width:41px;height:11px;">.</p><h2 id="2">Fixed Points</h2><p>A function <img src="roots_eq07585311203459331132.png" alt="$g$" class="equation" style="width:6px;height:8px;"> from <img src="roots_eq13560274181536256371.png" alt="$R^n$" class="equation" style="width:13px;height:8px;"> to <img src="roots_eq13560274181536256371.png" alt="$R^n$" class="equation" style="width:13px;height:8px;"> is given and one must compute a vector <img src="roots_eq12428413953531653171.png" alt="$x$" class="equation" style="width:6px;height:6px;">  that satifies: <img src="roots_eq06095872709414849812.png" alt="$x=g(x)$" class="equation" style="width:41px;height:11px;">.</p><p>Notice that these two forms are equivilent:</p><p><img src="roots_eq01993946421698241061.png" alt="$g(x) = x - f(x)$" class="equation" style="width:76px;height:11px;"></p><p><b>OR</b></p><p><img src="roots_eq07724856974474507245.png" alt="$f(x) = x - g(x)$" class="equation" style="width:75px;height:11px;"></p><p>so we will use the same methods to solve both types of problems.</p><p>
+<br><br><br><br>
+<img src="graph1.png" width="25%"/>
+<br><br><br><br>
+</p><h2 id="5">Examples</h2><div><ul><li>Demand and supply market clearing</li><li>FOCs from an optimization problem (more on this later)</li></ul></div><h2 id="6">Iterative Methods</h2><p>We will consider methods that <b>systematically</b> look over the range of <img src="roots_eq12428413953531653171.png" alt="$x$" class="equation" style="width:6px;height:6px;"> until <img src="roots_eq09851563811330233251.png" alt="$f(x) = 0$" class="equation" style="width:41px;height:11px;"></p><h2 id="7">Bisection Method</h2><p>Intermediate Value Theorem: If a continuous real-valued function assumes two distinct values, then it must assume all values in between.</p><p>If <img src="roots_eq18096895394918367257.png" alt="$f$" class="equation" style="width:6px;height:10px;"> is continuous and <img src="roots_eq04734559138005355634.png" alt="$f(a)$" class="equation" style="width:20px;height:11px;"> and <img src="roots_eq05625443196724791228.png" alt="$f(b)$" class="equation" style="width:19px;height:11px;"> have different signs, then there must be at least one root <img src="roots_eq12428413953531653171.png" alt="$x$" class="equation" style="width:6px;height:6px;"> in <img src="roots_eq13003530951257114622.png" alt="$[a,b]$" class="equation" style="width:19px;height:11px;">.</p><p>Evaluate <img src="roots_eq18096895394918367257.png" alt="$f$" class="equation" style="width:6px;height:10px;"> at the bisection of <img src="roots_eq05508344529756732484.png" alt="$a$" class="equation" style="width:6px;height:6px;"> and <img src="roots_eq02044268985122151499.png" alt="$b$" class="equation" style="width:5px;height:8px;">. Take the new interval to be the bisected interval with endpoints of different signs. Repeat.</p><p>
+<br><br><br><br>
+<img src="graph1.png" width="25%"/>
+<br><br><br><br>
+</p><pre class="codeinput">clear
+close <span class="string">all</span>
+addpath(<span class="string">'~/Dropbox/MATLAB/compecon/CEtools'</span>)
+</pre><h2 id="9">Bisection Example</h2><pre class="codeinput">f = @(x) x.^3;
+a = -6;
+b = 12;
+
+tol = 1e-4;
+s = sign(f(a)); <span class="comment">% sign if the left boundary</span>
+x = (a+b)/2; <span class="comment">% inital midpoint</span>
+d = (b-a)/2;
+xsave=[];
+
+<span class="keyword">while</span> d&gt;tol
+	d=d/2; <span class="comment">% length to cut the next interval</span>
+	xsave = [xsave x];
+	<span class="keyword">if</span> s == sign(f(x))
+		x = x+d;
+	<span class="keyword">else</span>
+		x = x-d;
+	<span class="keyword">end</span>
+<span class="keyword">end</span>
+xsave = [xsave x];
+
+fprintf(<span class="string">'Solution using user written code: %3.9f\n\n\n'</span>,x)
+
+disp(xsave)
+</pre><pre class="codeoutput">Solution using user written code: -0.000022888
+
+
+  Columns 1 through 7
+
+    3.0000   -1.5000    0.7500   -0.3750    0.1875   -0.0938    0.0469
+
+  Columns 8 through 14
+
+   -0.0234    0.0117   -0.0059    0.0029   -0.0015    0.0007   -0.0004
+
+  Columns 15 through 18
+
+    0.0002   -0.0001    0.0000   -0.0000
+
+</pre><p>Alternatively, we can use the <tt>bisect</tt> function from the COMPECON toolbox.</p><pre class="codeinput">x2 = bisect (f,-6,12);  <span class="comment">% (function name, a, b)</span>
+fprintf(<span class="string">'Solution using user bisect code: %3.9f\n'</span>,x2)
+</pre><pre class="codeoutput">Solution using user bisect code: 0.000183105
+</pre><p>Pros and cons of bisection</p><div><ul><li>Pro: Guaranteed to find a root.</li><li>Con: Slow (no gradient information).</li><li>Con: Will only find one root.</li><li>Con: Only good for single variable functions</li><li>Con: Can be very slow b/c it does not use info on shape of function</li></ul></div><h2 id="12">Function iteration</h2><div><ul><li>Supply a guess <img src="roots_eq10425385513753925692.png" alt="$x^0$" class="equation" style="width:10px;height:10px;"></li><li>Use the updating rule <img src="roots_eq10788597617498743978.png" alt="$x^{(t+1)} \leftarrow g(x^(t))$" class="equation" style="width:74px;height:13px;">.</li></ul></div><p>The starting guess must be close to the fixed point where <img src="roots_eq01462368168806805112.png" alt="$||g'(x*)||<1$" class="equation" style="width:59px;height:12px;"></p><p>
+<br><br><br><br>
+<img src="graph2.png" width="25%"/>
+<br><br><br><br>
+</p><h2 id="15">Function Iteration Example</h2><p>From the COMPECON Toolbox:</p><pre class="codeinput">g = @(x) x.^0.5;
+
+xFP1 = fixpoint(g,0.1) <span class="comment">% (function name, starting vlaue)</span>
+xFP2 = fixpoint(g,1.8) <span class="comment">% no start from above the FP</span>
+</pre><pre class="codeoutput">
+xFP1 =
+
+    1.0000
+
+
+xFP2 =
+
+    1.0000
+
+</pre><h2 id="16">Write our own Function Routine</h2><p>and capture the results graphically</p><pre class="codeinput">vidfile = VideoWriter(<span class="string">'html/testmovie-below.mp4'</span>,<span class="string">'MPEG-4'</span>);
+vidfile.FrameRate = 1;
+open(vidfile);
+
+xvalues = 0:.1:2;
+x_init = 0.1;
+xtol = 0.001;
+error = 100;
+niter=0;
+<span class="keyword">while</span> error&gt;xtol &amp;&amp; niter&lt;20
+    niter=niter+1;
+    x_new = g(x_init(end));
+    error = (x_new - x_init(end)).^2;
+    x_init = [x_init x_new];
+
+    f = figure(<span class="string">'visible'</span>,<span class="string">'off'</span>);
+    plot(xvalues,g(xvalues),<span class="string">'LineWidth'</span>,2);
+    hold <span class="string">on</span>
+    plot(xvalues,xvalues,<span class="string">'LineWidth'</span>,2);
+    hold <span class="string">on</span>
+    plot(x_init,x_init,<span class="string">'*'</span>,<span class="string">'LineWidth'</span>,2)
+    hold <span class="string">off</span>
+
+<span class="comment">%     F(niter) = getframe(gcf);</span>
+    F(niter) = getframe(f);
+
+    writeVideo(vidfile, F(niter));
+
+
+<span class="keyword">end</span>
+close(vidfile)
+</pre><p>
+<br><br><br><br>
+<video width="640" height="480" controls>
+<source src="testmovie-below.mp4" type="video/mp4">
+</video>
+<br><br><br><br>
+</p><h2 id="18">Function Interation Example (from above)</h2><pre class="codeinput">vidfile = VideoWriter(<span class="string">'html/testmovie-above.mp4'</span>,<span class="string">'MPEG-4'</span>);
+vidfile.FrameRate = 1;
+open(vidfile);
+
+xvalues = 0:.1:4;
+x_init = 3.8;
+xtol = 0.001;
+error = 100;
+niter=0;
+<span class="keyword">while</span> error&gt;xtol &amp;&amp; niter&lt;20
+    niter=niter+1;
+    x_new = g(x_init(end));
+    error = (x_new - x_init(end)).^2;
+    x_init = [x_init x_new];
+
+    f = figure(<span class="string">'visible'</span>,<span class="string">'off'</span>);
+    plot(xvalues,g(xvalues),<span class="string">'LineWidth'</span>,2);
+    hold <span class="string">on</span>
+    plot(xvalues,xvalues,<span class="string">'LineWidth'</span>,2);
+    hold <span class="string">on</span>
+    plot(x_init,x_init,<span class="string">'*'</span>,<span class="string">'LineWidth'</span>,2)
+    hold <span class="string">off</span>
+
+<span class="comment">%     F(niter) = getframe(gcf);</span>
+    F(niter) = getframe(f);
+
+    writeVideo(vidfile, F(niter));
+
+
+<span class="keyword">end</span>
+close(vidfile)
+</pre><p>
+<br><br><br><br>
+<video width="640" height="480" controls>
+<source src="testmovie-above.mp4" type="video/mp4">
+</video>
+<br><br><br><br>
+</p><h2 id="20">Newton's Method</h2><div><ul><li>Use derivative information</li><li>Probably most common method.</li><li>Sometimes we know the derivative (pen a paper).</li><li>Sometimes we need to approximate the derivative.</li><li>Same thing goes with second derivatives.</li></ul></div><p><b>The idea:</b></p><div><ol><li>guess a point</li><li>linearize the function around that point</li><li>find the root of the linear function using taylor expansion</li><li>use that point as your new guess and repeat</li></ol></div><p>
+<br><br><br><br>
+<img src="graph3.png" width="25%"/>
+<br><br><br><br>
+</p><p>First-order Taylor approximation: <img src="roots_eq14828781075935683709.png" alt="$f(x)\approx f(x^t) + f'(x^t)(x - x^t) = 0$" class="equation" style="width:159px;height:12px;"></p><p>which yields the following iteration rule: <img src="roots_eq00928085840677755707.png" alt="$x^{t+1}\leftarrow x^t - [f'(x^t)]^{-1}f(x^t)$" class="equation" style="width:127px;height:12px;"></p><div><ul><li><b>What do you notice about this iterative method?</b></li><li>We need to know the derivative!</li><li>We will discuss this in detail later.</li></ul></div><p><b>Convergence</b>: Judd Theorem 2.1 (page 130) -- If <img src="roots_eq03784587502535838251.png" alt="$x^1$" class="equation" style="width:10px;height:10px;"> is "sufficiently" close to <img src="roots_eq08097522164358817053.png" alt="$x^*$" class="equation" style="width:10px;height:8px;">, <img src="roots_eq03980196872013069805.png" alt="$f'(x^*)\ne0$" class="equation" style="width:48px;height:12px;"> and <img src="roots_eq03243219793804896857.png" alt="$\mid \frac{f''(x^*)}{f'(x^*)}<\infty$" class="equation" style="width:55px;height:18px;">, then the Newton sequence will converge to <img src="roots_eq08097522164358817053.png" alt="$x^*$" class="equation" style="width:10px;height:8px;">. Also, <img src="roots_eq18096895394918367257.png" alt="$f$" class="equation" style="width:6px;height:10px;"> needs to be "smooth."</p><div><ul><li>Warning: if <img src="roots_eq05067730538701471135.png" alt="$f'(x^t)$" class="equation" style="width:26px;height:12px;"> is close to zero, then it can overshoot and cause problems</li></ul></div><h2 id="26">Newton Example</h2><p>Simple demand function in a separate file:</p><pre class="language-matlab">
+<span class="keyword">function</span> [q, fjac] = simpleFunc(p)
+
+q = -12 + 2*p.^(-3);
+
+fjac = -6*p.^(-4);
+
+<span class="keyword">end</span>
+
+</pre><pre class="codeinput">xvals = .3:.05:.7;
+plot(xvals,simpleFunc(xvals))
+hold <span class="string">on</span>;
+plot(xvals,zeros(size(xvals)))
+hold <span class="string">off</span>;
+</pre><p>Set options for the COMPECON function 'newton':</p><pre class="codeinput">optset(<span class="string">'newton'</span>,<span class="string">'maxit'</span>,20);optset(<span class="string">'newton'</span>,<span class="string">'showiters'</span>,1);
+</pre><p>Now, call the 'newton' routine to find the root of simpleFunc.</p><pre class="codeinput">[fstar,fval,flag] = newton(<span class="string">'simpleFunc'</span>,.1)
+</pre><pre class="codeoutput">   1    1 8.36e+02
+   2    1 3.49e+02
+   3    1 1.44e+02
+   4    1 5.79e+01
+   5    1 2.16e+01
+   6    1 6.78e+00
+   7    1 1.36e+00
+   8    1 8.67e-02
+   9    1 4.13e-04
+  10    1 9.49e-09
+
+fstar =
+
+    0.5503
+
+
+fval =
+
+   9.4909e-09
+
+
+flag =
+
+     0
+
+</pre><p>What happens if we pick a <i>weird</i> starting vlaue?</p><pre class="codeinput">xvals = 0:.05:.7;
+plot(xvals,simpleFunc(xvals))
+hold <span class="string">on</span>;
+plot(xvals,zeros(size(xvals)))
+hold <span class="string">off</span>;
+</pre><pre class="codeinput">[fstar,fval,flag] = newton(<span class="string">'simpleFunc'</span>,0)
+</pre><pre class="codeoutput">
+fstar =
+
+     0
+
+
+fval =
+
+   Inf
+
+
+flag =
+
+     2
+
+</pre><h2 id="33">Quasi-Newton Methods</h2><p>Many times we do not have an analytical derivative:</p><div><ul><li>It is difficult to compute analytically.</li><li>Potentially make mistakes in coding.</li><li>In general humans make mistakes.</li></ul></div><p>Quasi-Newton methods are the same as the Newton method, except with an approximation of the jacobian.</p><p><i>Secant Method</i></p><p>Univariate Newton method with Jacobian approximation.</p><p>Replace <img src="roots_eq04775078851561449222.png" alt="$f'$" class="equation" style="width:9px;height:11px;"> with an approximation from the last two function values:</p><p><img src="roots_eq08816241047998744067.png" alt="$f'(x^t) \approx \frac{f(x^t) - f(x^{t-1})}{x^t - x^{t-1}}$" class="equation" style="width:92px;height:16px;"></p><p>which yields the following update rule:</p><p><img src="roots_eq04157130510930976553.png" alt="$x^{t+1} \leftarrow x^t - \frac{ x^t - x^{t-1} }{ f(x^t) - f(x^{t-1}) } f(x^t)$" class="equation" style="width:134px;height:17px;"></p><p>You are constructing the approximating line through the two points <img src="roots_eq11650204626646214762.png" alt="$(x^t,f(x^t))$" class="equation" style="width:46px;height:12px;"> and <img src="roots_eq03651213009677706404.png" alt="$(x^{t-1},f(x^{t-1}))$" class="equation" style="width:66px;height:12px;">.</p><p>
+<br><br><br><br><br><br>
+</p><pre>[GRAPH]</pre><p>
+<br><br><br><br><br><br>
+</p><p><i>Broyden's Method</i></p><p>Multivariate version of the secant method.</p><div><ul><li>Generate a sequence of vectors <img src="roots_eq11844218467620637472.png" alt="$x^t$" class="equation" style="width:9px;height:10px;"> and matrices <img src="roots_eq04984826340078182477.png" alt="$A^t$" class="equation" style="width:11px;height:9px;"></li><li>These approximate the root and Jacobian of <img src="roots_eq18096895394918367257.png" alt="$f$" class="equation" style="width:6px;height:10px;"></li><li>Guess <img src="roots_eq10425385513753925692.png" alt="$x^0$" class="equation" style="width:10px;height:10px;"> and <img src="roots_eq16116486306362754532.png" alt="$A^0$" class="equation" style="width:12px;height:10px;">.</li><li><img src="roots_eq16116486306362754532.png" alt="$A^0$" class="equation" style="width:12px;height:10px;"> is often set to the numerical jacobian at x^0.</li></ul></div><p><img src="roots_eq09326207283327803016.png" alt="$f(x) \approx f(x^t) + A^t(x-x^t) = 0$" class="equation" style="width:144px;height:12px;"> which yields the following rule <img src="roots_eq14089601998617289440.png" alt="$x^{t+1} \leftarrow x^t - (A^t)^{-1}f(x^t)$" class="equation" style="width:114px;height:12px;"></p><p>The Jacobian is also updated iteratively: <img src="roots_eq00661369468101077056.png" alt="$A^{t+1} \leftarrow A^t + [f(x^{t+1}) - f(x^t) - A^td^t]\frac{d^t}{d^td^t}$" class="equation" style="width:191px;height:15px;"> where <img src="roots_eq10256782265598405515.png" alt="$d^t = x^{t+1} - x^t$" class="equation" style="width:66px;height:10px;"></p><p>In priactice we will update the inverse of the Jacboian to save an inversion step.</p><p><i>NOTE:</i> The sequence of approximations of the Jacobian DO NOT neccessarily converge to the true Jacobian.</p><p>This method will work if you start sufficiently close, and <img src="roots_eq18096895394918367257.png" alt="$f$" class="equation" style="width:6px;height:10px;"> is well behaved...duh!</p><p>In priactice, I have used this method and it has worked very well for problems where the Jacobian diagonally dominant.</p><h2 id="43">Newton Methods in Practice.</h2><p>See Gravity Example</p><pre class="codeinput"><span class="syscmd">!rm *_eq*.png</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018b</a><br></p></div><script type="text/x-mathjax-config">
+  // https://stackoverflow.com/a/14631703/97160
+  MathJax.Extension.myImg2jax = {
+    version: "1.0",
+    PreProcess: function (element) {
+      var images = element.getElementsByTagName("img");
+      for (var i = images.length - 1; i >= 0; i--) {
+        var img = images[i];
+        if (img.className === "equation") {
+          var match = img.alt.match(/^(\$\$?)([\s\S]*)\1$/m);
+          if (!match) continue;
+          var script = document.createElement("script");
+          script.type = "math/tex";
+          if (match[1] === "$$") {script.type += ";mode=display"}
+          MathJax.HTML.setScript(script, match[2]);
+          img.parentNode.replaceChild(script, img);
+        }
+      }
+    }
+  };
+  MathJax.Hub.Register.PreProcessor(["PreProcess", MathJax.Extension.myImg2jax]);
+  </script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_CHTML"></script><!--
+##### SOURCE BEGIN #####
+%% Root Finding and Fixed Points
+%
+%
+% There are many many examples from economics we seek to either find the root or the 
+% fixed point to a non-linear of (often many) equations, which cannot be computed analytically.
+%
+% * Many estimation algorithms for equilibrium problems involve a nested
+% structure where there is some root-finding problem in the inner nest:
+% BLP, dynamic discrete choice (rust, labor models), prodction function, trade models. 
+% * You may want to simulate a model and find equilibria using neccessary
+% conditions. 
+% * Model where equilibria may be defined by a simple threshold of a
+% non-linear equation. 
+
+%% Roots
+% 
+% A function $f$ from $R^n$ to $R^n$ is given and one must compute a vector
+% $x$  that satifies: $f(x)=0$.
+
+%% Fixed Points
+% 
+% A function $g$ from $R^n$ to $R^n$ is given and one must compute a vector
+% $x$  that satifies: $x=g(x)$.
+
+%%
+% Notice that these two forms are equivilent:
+%
+% $g(x) = x - f(x)$
+%
+% *OR*
+%
+% $f(x) = x - g(x)$
+%
+% so we will use the same methods to solve both types of problems. 
+
+%%
+% <html>
+% <br><br><br><br>
+% <img src="graph1.png" width="25%"/>
+% <br><br><br><br>
+% </html>
+
+%% Examples
+%
+% * Demand and supply market clearing
+% * FOCs from an optimization problem (more on this later)
+
+%% Iterative Methods
+%
+% We will consider methods that *systematically* look over the range of $x$
+% until $f(x) = 0$
+
+%% Bisection Method
+%
+% Intermediate Value Theorem: If a continuous real-valued function assumes two 
+% distinct values, then it must assume all values in between. 
+%
+% If $f$ is continuous and $f(a)$ and $f(b)$ have different signs, then there 
+% must be at least one root $x$ in $[a,b]$.
+%
+% Evaluate $f$ at the bisection of $a$ and $b$. Take the new interval to be the 
+% bisected interval with endpoints of different signs. Repeat. 
+
+%%
+% <html>
+% <br><br><br><br>
+% <img src="graph1.png" width="25%"/>
+% <br><br><br><br>
+% </html>
+
+clear
+close all
+addpath('~/Dropbox/MATLAB/compecon/CEtools')
+
+%% Bisection Example
+
+f = @(x) x.^3;
+a = -6;
+b = 12;
+
+tol = 1e-4;
+s = sign(f(a)); % sign if the left boundary 
+x = (a+b)/2; % inital midpoint
+d = (b-a)/2; 
+xsave=[];
+
+while d>tol
+	d=d/2; % length to cut the next interval
+	xsave = [xsave x];
+	if s == sign(f(x))
+		x = x+d;
+	else
+		x = x-d;
+	end
+end
+xsave = [xsave x];
+
+fprintf('Solution using user written code: %3.9f\n\n\n',x)
+
+disp(xsave)
+
+%%
+% Alternatively, we can use the |bisect| function from the COMPECON toolbox.
+
+x2 = bisect (f,-6,12);  % (function name, a, b)
+fprintf('Solution using user bisect code: %3.9f\n',x2)
+
+%%
+% Pros and cons of bisection
+%
+% * Pro: Guaranteed to find a root.
+% * Con: Slow (no gradient information).
+% * Con: Will only find one root.
+% * Con: Only good for single variable functions
+% * Con: Can be very slow b/c it does not use info on shape of function
+
+%% Function iteration
+%
+% * Supply a guess $x^0$
+% * Use the updating rule $x^{(t+1)} \leftarrow g(x^(t))$.
+
+%% 
+% The starting guess must be close to the fixed point where $||g'(x*)||<1$
+
+%%
+% <html>
+% <br><br><br><br>
+% <img src="graph2.png" width="25%"/>
+% <br><br><br><br>
+% </html>
+
+%% Function Iteration Example
+%
+% From the COMPECON Toolbox:
+
+g = @(x) x.^0.5;
+
+xFP1 = fixpoint(g,0.1) % (function name, starting vlaue)
+xFP2 = fixpoint(g,1.8) % no start from above the FP
+
+%% Write our own Function Routine
+% and capture the results graphically 
+
+vidfile = VideoWriter('html/testmovie-below.mp4','MPEG-4');
+vidfile.FrameRate = 1;
+open(vidfile);
+
+xvalues = 0:.1:2;
+x_init = 0.1;
+xtol = 0.001;
+error = 100;
+niter=0;
+while error>xtol && niter<20
+    niter=niter+1;
+    x_new = g(x_init(end));        
+    error = (x_new - x_init(end)).^2;
+    x_init = [x_init x_new];
+    
+    f = figure('visible','off');
+    plot(xvalues,g(xvalues),'LineWidth',2);
+    hold on
+    plot(xvalues,xvalues,'LineWidth',2);
+    hold on    
+    plot(x_init,x_init,'*','LineWidth',2)
+    hold off
+    
+%     F(niter) = getframe(gcf); 
+    F(niter) = getframe(f);
+    
+    writeVideo(vidfile, F(niter));
+    
+    
+end
+close(vidfile)
+
+
+%%
+% <html>
+% <br><br><br><br>
+% <video width="640" height="480" controls>
+% <source src="testmovie-below.mp4" type="video/mp4">
+% </video>
+% <br><br><br><br>
+% </html>
+
+
+%% Function Interation Example (from above)
+vidfile = VideoWriter('html/testmovie-above.mp4','MPEG-4');
+vidfile.FrameRate = 1;
+open(vidfile);
+
+xvalues = 0:.1:4;
+x_init = 3.8;
+xtol = 0.001;
+error = 100;
+niter=0;
+while error>xtol && niter<20
+    niter=niter+1;
+    x_new = g(x_init(end));        
+    error = (x_new - x_init(end)).^2;
+    x_init = [x_init x_new];
+    
+    f = figure('visible','off');
+    plot(xvalues,g(xvalues),'LineWidth',2);
+    hold on 
+    plot(xvalues,xvalues,'LineWidth',2);
+    hold on
+    plot(x_init,x_init,'*','LineWidth',2)
+    hold off
+    
+%     F(niter) = getframe(gcf); 
+    F(niter) = getframe(f);
+    
+    writeVideo(vidfile, F(niter));
+    
+    
+end
+close(vidfile)
+
+
+%%
+% <html>
+% <br><br><br><br>
+% <video width="640" height="480" controls>
+% <source src="testmovie-above.mp4" type="video/mp4">
+% </video>
+% <br><br><br><br>
+% </html>
+
+
+%% Newton's Method
+%
+% * Use derivative information
+% * Probably most common method.
+% * Sometimes we know the derivative (pen a paper).
+% * Sometimes we need to approximate the derivative.
+% * Same thing goes with second derivatives. 
+%
+%
+
+%%
+% *The idea:*
+
+%%
+% # guess a point
+% # linearize the function around that point 
+% # find the root of the linear function using taylor expansion
+% # use that point as your new guess and repeat
+
+%%
+% <html>
+% <br><br><br><br>
+% <img src="graph3.png" width="25%"/>
+% <br><br><br><br>
+% </html>
+
+
+%%
+% First-order Taylor approximation: $f(x)\approx f(x^t) + f'(x^t)(x - x^t) = 0$
+%
+% which yields the following iteration rule: $x^{t+1}\leftarrow x^t - [f'(x^t)]^{-1}f(x^t)$
+%
+% * *What do you notice about this iterative method?*
+% * We need to know the derivative!
+% * We will discuss this in detail later.
+
+%%
+% *Convergence*: Judd Theorem 2.1 (page 130) REPLACE_WITH_DASH_DASH If $x^1$ is "sufficiently" close
+% to $x^*$, $f'(x^*)\ne0$ and $\mid \frac{f''(x^*)}{f'(x^*)}<\infty$, then the Newton
+% sequence will converge to $x^*$. Also, $f$ needs to be "smooth."
+%
+% * Warning: if $f'(x^t)$ is close to zero, then it can overshoot and cause
+% problems
+
+
+
+%% Newton Example
+%
+% Simple demand function in a separate file:
+
+%%
+%
+% <include>simpleFunc.m</include>
+% 
+
+%%
+xvals = .3:.05:.7;
+plot(xvals,simpleFunc(xvals))
+hold on;
+plot(xvals,zeros(size(xvals)))
+hold off;
+
+%% 
+% Set options for the COMPECON function 'newton':
+
+optset('newton','maxit',20);optset('newton','showiters',1);
+
+%%
+% Now, call the 'newton' routine to find the root of simpleFunc.
+
+[fstar,fval,flag] = newton('simpleFunc',.1)
+
+%%
+% What happens if we pick a _weird_ starting vlaue?
+xvals = 0:.05:.7;
+plot(xvals,simpleFunc(xvals))
+hold on;
+plot(xvals,zeros(size(xvals)))
+hold off;
+
+
+%%
+[fstar,fval,flag] = newton('simpleFunc',0)
+
+
+%% Quasi-Newton Methods
+%
+% Many times we do not have an analytical derivative:
+%
+% * It is difficult to compute analytically.
+% * Potentially make mistakes in coding.
+% * In general humans make mistakes.
+
+%%
+% Quasi-Newton methods are the same as the Newton method, except with an 
+% approximation of the jacobian.
+
+%%
+% _Secant Method_
+%
+% Univariate Newton method with Jacobian approximation.
+%
+% Replace $f'$ with an approximation from the last two function values:
+%
+% $f'(x^t) \approx \frac{f(x^t) - f(x^{t-1})}{x^t - x^{t-1}}$
+%
+% which yields the following update rule:
+%
+% $x^{t+1} \leftarrow x^t - \frac{ x^t - x^{t-1} }{ f(x^t) - f(x^{t-1}) } f(x^t)$
+%
+% You are constructing the approximating line through the two points $(x^t,f(x^t))$ 
+% and $(x^{t-1},f(x^{t-1}))$.
+
+%%
+% <html>
+% <br><br><br><br><br><br>
+% </html>
+% 
+
+%%
+%  [GRAPH]
+
+%%
+% <html>
+% <br><br><br><br><br><br>
+% </html>
+
+
+%%
+% _Broyden's Method_
+%
+% Multivariate version of the secant method. 
+%
+% * Generate a sequence of vectors $x^t$ and matrices $A^t$
+% * These approximate the root and Jacobian of $f$
+% * Guess $x^0$ and $A^0$.
+% * $A^0$ is often set to the numerical jacobian at x^0.
+
+%%
+% $f(x) \approx f(x^t) + A^t(x-x^t) = 0$
+% which yields the following rule
+% $x^{t+1} \leftarrow x^t - (A^t)^{-1}f(x^t)$
+%
+
+%%
+% The Jacobian is also updated iteratively: 
+% $A^{t+1} \leftarrow A^t + [f(x^{t+1}) - f(x^t) -
+% A^td^t]\frac{d^t}{d^td^t}$
+% where $d^t = x^{t+1} - x^t$
+%
+% In priactice we will update the inverse of the Jacboian to save an inversion step. 
+%
+% _NOTE:_ The sequence of approximations of the Jacobian DO NOT neccessarily 
+% converge to the true Jacobian. 
+
+%%
+% This method will work if you start sufficiently close, and $f$ is well behaved...duh!
+% 
+% In priactice, I have used this method and it has worked very well for problems
+% where the Jacobian diagonally dominant. 
+
+%% Newton Methods in Practice.
+% See Gravity Example
+
+!rm *_eq*.png
+
+
+
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>
