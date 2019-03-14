@@ -1,0 +1,106 @@
+---
+title: "Roots -- Elementary Methods"
+author: Charles Murry | Boston College
+output: revealjs::revealjs_presentation
+width: 800
+height: 450
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("~/Dropbox/Teaching/BC-Methods/github/empirical-methods/Finding Roots/")
+```
+
+
+## Envronmnet I
+
+* Let's day we have a system of $N$ non-linear equations and $N$ unknowns. 
+* $f_1(x_1,...,x_n) = 0$
+* **Also**,order the $x$'s so that the $x$ that "affects" $f_i$ the most is in the "correct" position.
+* Ex. $\frac{\partial f_2}{\partial x_2}>\frac{\partial f_2}{\partial x_k}\,\,\, \forall k\ne2$
+
+
+## Environment II
+
+* Also, consider that the Jacobian is nightmare to compute for the entire system. 
+    - Hard to derive analytically
+    - Costly to compute
+- **But**, $f_i(x_i;x_{i'})$ is not hard to compute.
+
+## Main Idea
+* Go through system of equations, one equaiton at a time. 
+* Solve each equation for the "dominant" unknown, *conditional* on the other unknowns. 
+
+## Gauss Jacobi 
+<style type="text/css">
+  .reveal p {
+    text-align: left;
+  }
+  .reveal ul {
+    display: block;
+  }
+  .reveal ol {
+    display: block;
+  }  
+</style>
+
+    while not converged
+  
+      for i=1:N
+        solve f_i(x_1...,x_N)=0 for x_i only
+        
+        (actually, no need to solve f_i exactly!!)
+        
+        save updated x_i but do not use
+        
+      end
+      
+      update x vector with new guesses
+      
+      convergence: x^new == x^old
+      
+    end
+        
+        
+## Gauss Seidel
+<style type="text/css">
+  .reveal p {
+    text-align: left;
+  }
+  .reveal ul {
+    display: block;
+  }
+  .reveal ol {
+    display: block;
+  }  
+</style>
+
+    while not converged
+  
+      for i=1:N
+        solve f_i(x_1...,x_N)=0 for x_i only
+        
+        (actually, no need to solve f_i exactly!!)
+        
+        update x_i
+        
+      end
+      
+      convergence: x^new == x^old
+      
+    end
+
+  
+## Notes
+
+* This obviously depends on ordering.
+* Not guaranteed to work.
+* Jacobi or Seidel might work better.
+* For best results, the Jacobian needs to be "diagonally dominant"
+* Good to combine with other methods
+    - First GJ, switch to Newton (if possible)
+* Can use Newton/Bisection/etc at inner step
+  
+  
+  
+  

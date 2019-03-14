@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Root Finding and Fixed Points</title><meta name="generator" content="MATLAB 9.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-03-11"><meta name="DC.source" content="roots.m"><style type="text/css">
+      --><title>Root Finding and Fixed Points</title><meta name="generator" content="MATLAB 9.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-03-14"><meta name="DC.source" content="roots.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -137,7 +137,7 @@ xFP2 =
 
     1.0000
 
-</pre><h2 id="16">Write our own Function Routine</h2><p>and capture the results graphically</p><pre class="codeinput">vidfile = VideoWriter(<span class="string">'html/testmovie-below.mp4'</span>,<span class="string">'MPEG-4'</span>);
+</pre><h2 id="16">Write our own Function Routine</h2><p>and capture the results graphically</p><pre class="codeinput">vidfile = VideoWriter(<span class="string">'testmovie-below.mp4'</span>,<span class="string">'MPEG-4'</span>);
 vidfile.FrameRate = 1;
 open(vidfile);
 
@@ -174,7 +174,7 @@ close(vidfile)
 <source src="testmovie-below.mp4" type="video/mp4">
 </video>
 <br><br><br><br>
-</p><h2 id="18">Function Interation Example (from above)</h2><pre class="codeinput">vidfile = VideoWriter(<span class="string">'html/testmovie-above.mp4'</span>,<span class="string">'MPEG-4'</span>);
+</p><h2 id="18">Function Interation Example (from above)</h2><pre class="codeinput">vidfile = VideoWriter(<span class="string">'testmovie-above.mp4'</span>,<span class="string">'MPEG-4'</span>);
 vidfile.FrameRate = 1;
 open(vidfile);
 
@@ -448,7 +448,7 @@ xFP2 = fixpoint(g,1.8) % no start from above the FP
 %% Write our own Function Routine
 % and capture the results graphically 
 
-vidfile = VideoWriter('html/testmovie-below.mp4','MPEG-4');
+vidfile = VideoWriter('testmovie-below.mp4','MPEG-4');
 vidfile.FrameRate = 1;
 open(vidfile);
 
@@ -492,7 +492,7 @@ close(vidfile)
 
 
 %% Function Interation Example (from above)
-vidfile = VideoWriter('html/testmovie-above.mp4','MPEG-4');
+vidfile = VideoWriter('testmovie-above.mp4','MPEG-4');
 vidfile.FrameRate = 1;
 open(vidfile);
 
