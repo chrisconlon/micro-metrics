@@ -1,0 +1,539 @@
+
+%
+% This is a borrowed LaTeX template file for lecture notes for CS267,
+% Applications of Parallel Computing, UCBerkeley EECS Department.
+% Now being used for CMU's 10725 Fall 2012 Optimization course
+% taught by Geoff Gordon and Ryan Tibshirani.  When preparing 
+% LaTeX notes for this class, please use this template.
+%
+% To familiarize yourself with this template, the body contains
+% some examples of its use.  Look them over.  Then you can
+% run LaTeX on this file.  After you have LaTeXed this file then
+% you can look over the result either by printing it out with
+% dvips or using xdvi. "pdflatex template.tex" should also work.
+%
+
+\documentclass[twoside]{article}
+
+\setlength{\oddsidemargin}{0.25 in}
+\setlength{\evensidemargin}{-0.25 in}
+\setlength{\topmargin}{-0.6 in}
+\setlength{\textwidth}{6.5 in}
+\setlength{\textheight}{8.5 in}
+\setlength{\headsep}{0.75 in}
+\setlength{\parindent}{0 in}
+\setlength{\parskip}{0.1 in}
+
+%
+% ADD PACKAGES here:
+%
+
+\usepackage{amsmath,amsfonts,graphicx, url}
+\usepackage{soul}
+%\usepackage{versions}
+
+%\includeversion{extra}
+%\excludeversion{extra}
+
+%
+% The following commands set up the lecnum (lecture number)
+% counter and make various numbering schemes work relative
+% to the lecture number.
+%
+\newcounter{lecnum}
+\renewcommand{\thepage}{\thelecnum-\arabic{page}}
+\renewcommand{\thesection}{\thelecnum.\arabic{section}}
+\renewcommand{\theequation}{\thelecnum.\arabic{equation}}
+\renewcommand{\thefigure}{\thelecnum.\arabic{figure}}
+\renewcommand{\thetable}{\thelecnum.\arabic{table}}
+
+\newcommand{\ind}[1]{{\bf 1  }[ #1 ] }
+%
+% The following macro is used to generate the header.
+%
+\newcommand{\lecture}[4]{
+   \pagestyle{myheadings}
+   \thispagestyle{plain}
+   \newpage
+   \setcounter{lecnum}{#1}
+   \setcounter{page}{1}
+   \noindent
+   \begin{center}
+   \framebox{
+      \vbox{\vspace{2mm}
+    \hbox to 6.28in { {\bf ECON 512: Empirical Methods
+	\hfill Fall 2018/Spring 2019} }
+       \vspace{4mm}
+       \hbox to 6.28in { {\Large \hfill Lecture #1: #2  \hfill} }
+       \vspace{2mm}
+       \hbox to 6.28in { {\it Instructor: #3 \hfill Date: #4} }
+      \vspace{2mm}}
+   }
+   \end{center}
+   \markboth{Lecture #1: #2}{Lecture #1: #2}
+
+%   {\bf Note}: {\it LaTeX template courtesy of UC Berkeley EECS dept.}
+%
+%   {\bf Disclaimer}: {\it These notes have not been subjected to the
+%   usual scrutiny reserved for formal publications.  They may be distributed
+%   outside this class only with the permission of the Instructor.}
+%   \vspace*{4mm}
+}
+%
+% Convention for citations is authors' initials followed by the year.
+% For example, to cite a paper by Leighton and Maggs you would type
+% \cite{LM89}, and to cite a paper by Strassen you would type \cite{S69}.
+% (To avoid bibliography problems, for now we redefine the \cite command.)
+% Also commands that create a suitable format for the reference list.
+\renewcommand{\cite}[1]{[#1]}
+\def\beginrefs{\begin{list}%
+        {[\arabic{equation}]}{\usecounter{equation}
+         \setlength{\leftmargin}{2.0truecm}\setlength{\labelsep}{0.4truecm}%
+         \setlength{\labelwidth}{1.6truecm}}}
+\def\endrefs{\end{list}}
+\def\bibentry#1{\item[\hbox{[#1]}]}
+
+%Use this command for a figure; it puts a figure in wherever you want it.
+%usage: \fig{NUMBER}{SPACE-IN-INCHES}{CAPTION}
+\newcommand{\fig}[3]{
+			\vspace{#2}
+			\begin{center}
+			Figure \thelecnum.#1:~#3
+			\end{center}
+	}
+% Use these for theorems, lemmas, proofs, etc.
+\newtheorem{theorem}{Theorem}[lecnum]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newenvironment{proof}{{\bf Proof:}}{\hfill\rule{2mm}{2mm}}
+
+% **** IF YOU WANT TO DEFINE ADDITIONAL MACROS FOR YOURSELF, PUT THEM HERE:
+
+\newcommand\E{\mathbb{E}}
+
+\begin{document}
+%FILL IN THE RIGHT INFO.
+%\lecture{**LECTURE-NUMBER**}{**DATE**}{**LECTURER**}{**SCRIBE**}
+\lecture{5}{Markov Chain Monte Carlo Methods}{Paul Grieco}{Feb 18/25}
+%\footnotetext{These notes are partially based on those of Nigel Mansell.}
+
+% **** YOUR NOTES GO HERE:
+
+% Some general latex examples and examples making use of the
+% macros follow.  
+%**** IN GENERAL, BE BRIEF. LONG SCRIBE NOTES, NO MATTER HOW WELL WRITTEN,
+%**** ARE NEVER READ BY ANYBODY.
+
+These lecture notes are for my personal use. 
+If you are reading them, I decided to distribute them as an experiment. 
+There are typos and probably outright errors, if you find them please accept my apologies and report them to me. 
+
+These notes will introduce sampling methods leading to MCMC methods. 
+These methods allow us to integrate over complicated distributions via simulation. 
+They are most closely associated
+with Bayesian estimation but can be used in frequentist estimation as well.
+\begin{itemize}
+\item Cameron and Trivedi, \ul{Microeconometrics}, Ch 13. 
+\item Rossi, Allenby, MucCulloch, \ul{Bayesian Statistics and Marketing}. 
+\item Robert and Casella, \ul{Monte Carlo Statistical Methods}. 
+\item Chernozhukov and Hong (2003, Journal of Econometrics) for frequentist interpretation.
+\end{itemize}
+
+\section{Quick Overview of Bayesian Estimation}
+
+In parametric estimation, we wish to know about an unknown parameter $\theta^0 \in R^N$, we have some data $y$, 
+and we know that $L(y|\theta)$ is the likelihood of $y$ given that $\theta = \theta^0$. 
+
+A frequentist approach is to derive an estimator (e.g., maximum likelihood) and analyze the statistical properties of that estimator.
+$$ \hat{\theta} = \max_{\theta} L(y | \theta).$$
+
+Bayesians, on the other hand start with a prior belief $p(\theta)$ on the identity of the true parameter $\theta^0$. Then the use the data to update
+their belief to a posterior distribution using Bayes rule. Note that the key ingredient here is the likelihood:
+$$\pi(\theta | y) = \frac{L(y | \theta) p(\theta)}{f(y)}$$ 
+where $f(y) = \int L(y|\theta)\pi(\theta) d\theta$ is the marginal distribution of $y$. 
+
+There is nothing fancy here, its just: 
+$$Pr(A | B) = \frac{Pr(A \cap B)}{Pr(B)} = \frac{Pr(B|A) Pr(A)}{Pr(B)}.$$
+
+For Bayesians, $\rho(\cdot)$ is the outcome of estimation, it summarizes everything we know about where $\theta$ is, and typically we report its moments. Unfortunately, except in special cases, $\rho(\cdot)$ is typically not tractable, so MCMC estimation steps in as a way to simulate draws from $\rho$ that we can analyze. 
+
+Frequentists have many complaints about Bayesianism, largely because it is subjective, as exemplified by the presence of a prior. For a long time, priors had to be chosen very carefully so that $\rho(\cdot)$ was tractable. 
+
+However, even if you are a committed frequentist, Laplace estimators allow you to use MCMC techniques. They convert your objective function (which you would maximize) into a distribution (sometimes called a quasi-posterior) where your estimate is the mean of this distribution. 
+
+So we can use MCMC estimators without really fighting about Bayesian vs. Frequentist estimation, although they have pluses and minuses computationally: 
+\begin{itemize}
+\item Good: They avoid the need to solve a complicated non-convex optimization problem. 
+\item Bad: they necessitate a complex integration. 
+\end{itemize}
+
+
+\section{An Analytically Tractable Example }
+
+Adapted from (Cameron \& Trivedi, p 422):  
+
+Here is a simple example of a Bayesian estimaton to show that there is nothing about a posterior per se that requires MCMC.   Suppose you observe $N$ draws from 
+a normal distribution with mean $\theta$ and variance $\sigma^2$, e.g., 
+$$y_i \sim N(\theta, \sigma^2).$$ 
+Suppose further $\sigma^2$ is known, but you want to estimate $\theta$. A frequentist might use maximum likelihood estimation. The likelihood is:
+\begin{align*}
+L(y|\theta) &= \prod_{i=1}^N (2\pi \sigma^2)^{- \frac{1}{2} } \exp \left\{ - \frac{(y_i - \theta)^2}{2 \sigma^2} \right\} \\
+&= (2\pi \sigma^2)^{- \frac{N}{2} } \exp  \left\{ - \sum_{i=1}^N \frac{(y_i - \theta)^2}{2 \sigma^2} \right\} \\
+& \propto  \exp  \left\{ \frac{-1}{2 \sigma^2}  \sum_{i=1}^N (y_i - \bar{y} +\bar{y} - \theta)^2 \right\} \\
+&  \propto  \exp  \left\{ - \frac{1}{2 \sigma^2}  \sum_{i=1}^N (y_i - \bar{y})^2 \right\} \exp  \left\{ - \frac{N}{2 \sigma^2} (\bar{y} - \theta)^2 \right\} \\
+&  \propto  \exp  \left\{ - \frac{N}{2 \sigma^2}   (\bar{y} - \theta)^2 \right\} \\
+\end{align*}
+This is clearly maximized at $\bar{y}$ which would be the frequentist's MLE estimate. However, a Bayesian would have a prior belief for $\theta$, suppose
+that belief is normally distributed, with mean $\mu$ and variance $\tau^2$, then we have a prior density: 
+$$p(\theta) =  (2\pi \tau^2)^{- \frac{1}{2} } \exp \left\{ - \frac{(\theta - \mu)^2}{2 \tau^2} \right\}.$$
+Following Bayes's rule, the Posterior density is proportional to: 
+\begin{align*}
+\pi(\theta | y) & \propto L(y|\theta) p(\theta) \\
+& \propto \exp  \left\{ - \frac{N}{2 \sigma^2}   (\bar{y} - \theta)^2 \right\} \exp \left\{ - \frac{(\theta - \mu)^2}{2 \tau^2} \right\} \\
+& \propto \exp \left\{ - \frac{1}{2} \left[ \frac{  (\bar{y} - \theta)^2 }{N^{-1} \sigma^2} + \frac{(\theta - \mu)^2}{ \tau^2 } \right] \right\} \\
+& \propto  \exp \left\{ - \frac{1}{2} \left[ \frac{ (\theta - \tilde{\mu})^2 }{\tilde{\tau}^2} \right] \right\}
+\end{align*} 
+Where,  
+$$\tilde{\mu} = \tilde{\tau}^2 \left( \frac{N}{\sigma^2} \bar{y} + \frac{1}{\tau^2} \mu \right)$$
+$$\tilde{\tau}^2 = \left(  \frac{N}{\sigma^2} + \frac{1}{\tau^2} \right)^{-1} $$
+The final line is the kernel of a normal distribution.\footnote{It can be obtained by completing the square of the second to last line, it's not pleasant and
+the full derivation is on Cameron \& Trividi, p 443.} So we have 
+found that the posterior is normally distributed with mean $\tilde{\mu}$ which is a weighted sum of $\bar{y}$ and the prior mean $\mu$ where
+weights relate to the precision of the prior and MLE. 
+
+Since the posterior is normal, it's easy to compute its moments. However, in general, we won't have such a clean result. So even though we can 
+write down the density of $\pi$ fairly easily, calculating its moments will require simulation. 
+
+But how? The rest of these notes will focus on this: How one might simulate a sample of draws from a distribution that does not have a simple closed form.
+
+\section{Monte Carlo Integration and Importance Sampling}
+
+\subsection{Monte Carlo Integration using $\rho(\cdot)$ directly}
+
+The point of monte carlo integration is to use draws from a distribution to calculate the moments of $\rho(\theta|y)$. If $\rho(\cdot)$ is ``easy'' to draw from (say, uniform or normal) than we can use traditional monte carlo integration techniques: 
+$$E[m(\theta)] = \int_\Theta m(\theta) \rho(\theta|y) d\theta \approx \frac{1}{S} \sum_{s=1}^S m(\theta_s)$$
+\begin{itemize}
+\item $m(\cdot)$ is an arbitrary function, say identity if we want the mean. We need to assume this expectation exists (of course).  
+\item $\theta_s$ is a draw from $\rho(\theta|y)$. 
+\end{itemize}
+
+However, this isn't helpful if we don't know how to generate draws from $\rho(\cdot)$ and if we did, we could probably just integrate it directly. 
+
+\subsection{Importance Sampling}
+
+Let's say that $\rho(\cdot)$ is hard to draw from, however there is some distribution $g(\cdot)$ that is easy to draw from, and is close to $\rho$. Let's further say that $g$ is absolutely continuous with respect to $\rho$: $ g(\cdot) > 0 $ on the support of $\rho$. Then, 
+
+$$E[m(\theta)] =  \int_\Theta \frac{ m(\theta) \rho(\theta|y)}{g(\theta)} g(\theta) d\theta \approx \frac{1}{S} \sum_{i=s}^S m(\theta_s) \frac{\rho(\theta_s|y)}{g(\theta_s)}$$
+
+where $\theta_s$ is a draw from $g(\theta)$. 
+
+Importance sampling simply draws from $g(\cdot)$ and then re-weights draws according to relative density of the posterior and $g$. It
+will work great \emph{as long as $g$ is a good approximation to $\rho$}. 
+\begin{itemize}
+\item If $\frac{\rho}{g}$ is low, then we down weight these draws, leading to inefficiency of the simulator. 
+\item If $\frac{\rho}{g}$ is high, then we upweight when we see these draws, but we won't see them very often also leading to inefficiency. 
+\end{itemize}
+
+The ``ideal'' $g$ would simply be $\rho$, but the whole point is that drawing from $\rho$ isn't tractable. 
+
+In practice, particularly when $\theta$ is high dimensional, finding a ``good'' candidate for $g$ is hard, if different $g$'s generate different results, we know we have a problem. This is where MCMC methods can help.
+
+\section{Markov Chain Monte Carlo}
+
+So far, we've only considered methods which take $iid$ draws from some distribution. MCMC methods draw from a Markov chain instead. 
+We use this when: 
+\begin{itemize}
+\item Analytic solutions aren't tractable. 
+\item IID sampleing doesn't give adequate covergage (perhaps dimension is too high or good approximation of $\rho$ is unknown). 
+\end{itemize}
+The goal becomes constructing an ergodic Markov Chain $F$ (so that the stationary distribution exists) such that the stationary
+distribution is exactly $\rho$.  If we do this then we can generate moments of $\rho$ from
+
+$$ E[m(\theta)] \approx \frac{1}{S} \sum_{i=1}^S m(\theta_i) $$
+where $\theta_i \sim F(\cdot | \theta_{i-1})$. 
+
+\section{A Little Markov Chain Theory}
+
+To keep things simple, let the state space for $\theta$ be discrete, $\Theta = \{\theta^{(1)}, \ldots, \theta^{(K)} \}$. Of course this isn't reasonable for estimation but it allows me to 
+skip over a bunch of measure theory.  Let our chain be defined by
+$$P(\theta_{r+1} = \theta^{(j)} | \theta_r = \theta^{(i)}) = p_{ij} $$
+So the Markov transition matrix is, 
+$$P = \begin{bmatrix} p_{11} & p_{12} & \ldots & p_{1K} \\
+ p_{21} & p_{22} & \ldots&  p_{2K} \\
+ \vdots & & & \vdots \\
+ p_{K1} & p_{K2} & \ldots&  p_{KK} \end{bmatrix}$$
+
+\subsection{Stationarity}
+
+Let $\pi_0$ be an initial distribution over states (a $1 \times K$ vector). Then the distribution over states after 1 period will be:
+$$Pr( \theta_1 = \theta^{(j)}) = \sum_{i=1}^K Pr(\theta_0 = \theta^{(i)}) p_{ij} = \sum_{i=1}^K \pi_{0i} p_{ij} $$
+Or in matrix notation for the entire distribution, 
+$$\pi_1 = \pi_0 P$$
+
+If for all $i,j$: $p_{ij} > 0$, then every state will be visited infinitely often and then chain is irreducible. In the discrete case, irreducibility implies 
+the chain is ergodic, which means a stationary distribution exists and is unique:\footnote{This condition is stronger than we need, but is typically satisfied given that we get to design the chain.} 
+$$ \lim_{r \rightarrow \infty} \pi_0P^r = \pi$$
+for any $\pi_0$ and of course, 
+$$ \pi = \pi P $$
+The stationary distribution $\pi$ is sometimes called the invariant distribution. 
+
+\subsection{Time Reversibility}
+
+Time reversibility is a symmetry property of a Markov chain. We'll need it because it gives us another way to prove a chain is generating the stationary distribution we want. It is at the heart of the Metropolis-Hastings algorithm. 
+
+\begin{definition} A chain is time reversible with respect to $\pi$ if it has the same behavior backwards and forwards starting from $\pi$. That is if the chance of seeing a transition from $i$ to $j$ is the same as seeing a transition from $j$ to $i$: 
+$$ \pi_i p_{ij} = \pi_j p_{ji}$$
+\end{definition}
+
+First, what does it mean to ``run a Markov Chain backwards?", it's not even clear this sequence is a Markov chain, but it turns out that it is:
+\begin{align*}
+Pr(\theta_r| \theta_{r+1}, \theta_{r+2}, \ldots) &= \frac{Pr(\theta_r, \theta_{r+1}, \theta_{r+2}, \ldots)}{Pr(\theta_{r+1}, \theta_{r+2}, \ldots)} \\
+& =  \frac{Pr(\theta_r) Pr(\theta_{r+1} | \theta_r) Pr(\theta_{r+2}, \ldots | \theta_r, \theta_{r+1})}{Pr(\theta_{r+1}) Pr(\theta_{r+2}, \ldots| \theta_{r+1})} \\
+& = \frac{Pr(\theta_r) Pr(\theta_{r+1} | \theta_r) }{Pr(\theta_{r+1}))} 
+\end{align*}
+Where the last equality follows from the fact that $Pr(\theta_{r+2}, \ldots | \theta_r, \theta_{r+1}) = Pr(\theta_{r+2}, \ldots| \theta_{r+1})$ because the sequence $\theta_r$ is a generated by a Markov chain going forward. This shows you the chain is also a markov chain going backwards since $\theta_r$ depends only on $\theta_{r+1}$.
+
+This backwards chain has transition probabilities: 
+$$p^*_{ij} = \frac{\pi_j p_{ji}}{\pi_i}$$
+Time reversibility with respect to $\pi$ is the property that for a given distribution of states $p^*_{ij} = p_{ij}$ which implies: 
+$$\pi_i p_{ij} = \pi_j p_{ji}$$
+
+\begin{theorem}
+If a chain is time reversible with respect to $\pi$, then $\pi$ is the stationary distribution of the chain. 
+\end{theorem}
+
+Proof: 
+Time reversibility means,
+$$\pi_i p_{ij} = \pi_j p_{ji}$$
+Sum these equations over $i$:
+$$\sum_i \pi_i p_{ij} = \pi_j \sum_i p_{ji}$$
+$$ \pi P = \pi.$$ 
+All of this extends to continuous states, see Rossi, page 62 or other sources for details. 
+
+Notice that this does not imply that all stationary distributions are time reversible. We will be designing time reversible chains, so this is all we need. 
+
+\section{Gibbs Sampling}
+
+A Gibbs sampler is a Markov chain constructed by cycling through conditional distributions related to $\pi$. It is used to deal with problems drawing from 
+a high dimensional space. 
+
+Suppose $\theta$ can be divided into subvectors $\theta = (\theta^1, \ldots \theta^P)$. While it is difficult to draw from 
+the joint distribution of $\theta$, conditional distributions, such as $f_1(\theta^1| \theta^2, \ldots, \theta^P)$ are tractable. 
+Then the Gibbs sampling algorithm suggests: 
+
+\begin{enumerate}
+\item Given initial state $\theta_0$
+\item For $1 \leq s \leq S$:
+\begin{enumerate}
+\item Draw $\theta^1_r$ from $f_1( \theta^1_r |  \theta^2_{r-1}, \ldots, \theta^P_{r-1})$. 
+\item Draw $\theta^2_r$ from $f_2( \theta^2_r |  \theta^1_r, \theta^3_{r-1}, \ldots, \theta^P_{r-1})$. 
+\item $\vdots$
+\item Draw $\theta^P_r$ from $f_2( \theta^P_r |  \theta^1_r, \ldots, \theta^{P-1}_{r})$.
+\end{enumerate}
+\item Compute:
+$$ E[m(\theta)] = \frac{1}{S} \sum_{s = B}^S m(\theta_s) $$
+Where $B < S$ is a suitable burn-in period to ensure chain has converged. 
+\end{enumerate}
+
+\subsection{Why it works:} 
+\begin{itemize}
+\item Gibbs sampler is clearly a Markov Chain, ergodic as long as conditional distributions have full support. 
+\item Invariant distribution is the joint distribution of $\theta$: 
+\begin{itemize}
+\item Assume $\theta_{r-1}$ is a draw from $\pi$, then $\theta_{r-1}^i$ is a draw from the marginal distribution 
+$$\pi_i(\theta_i) = \int \pi(\theta^i, \theta^{-i}) d\theta^{-i}.$$
+\item So then in our first draw we have: 
+$$\theta^1_r \sim \int f_1(\theta^1 | \theta^{-1}_{r-1}) \pi_{-1}(\theta^{-1}_{r-1}) d \theta^{-1} = \pi_1(\theta_1)$$
+So we have a draw from the marginal distribution of $\theta^1$. 
+\item Repeating for $2, \ldots P$ gives us a new draw from the joint distribution. 
+\end{itemize}
+\end{itemize}
+
+\subsection{Where is it useful?}
+
+There are actually quite a few cases where conditional distributions are conjugate but joints are not:\footnote{A conjugate prior is one which, when multiplied against a likelihood, produces a tractable distribution.} 
+\begin{itemize}
+\item Linear regression with unknown variance. 
+\item Hierarchical Linear Models. 
+\item Latent Variable Models (e.g., Probit) 
+\end{itemize}
+
+Here let's think about a Probit model, which is the simplest form of data augmentation. Given the model: 
+$$ z_i = x_i \beta + \epsilon_i $$
+$$ y_i = \begin{cases} 0 & z_i \leq 0 \\ 1 & z_i > 0 \end{cases}$$
+$$ \epsilon_i \sim N(0, 1)$$
+We observe a random sample of $(y_i, x_i)$ and want to estimate $\beta$. 
+
+Suppose we have a prior $\beta \sim N(\bar{\beta}, A^{-1})$. If we observed $z_i$ then the posterior would be normal (normal is the conjugate prior of normal). However, when $z$ is unobserved there is no simple conjugate prior.  Instead, we can use an ``augmentation step'' by employing a Gibbs sampler with two blocks $(z_i, \beta)$, the second step uses draws of $z$ and the normal conjugate prior:
+
+\begin{enumerate}
+\item Given $\beta_{r-1}$, draw $z_i$ by drawing from a truncated normal: 
+$$ z_{i, r} | \beta_{r-1}, y_i, x_i \sim \mbox{TruncatedNormal}_a^b(-x_i \beta_{r-1}, 1) $$
+Where bounds are $a = 0, b = \infty$ if $y_i = 1$ and $a = -\infty, b = 0$ if $y_i = 0$
+\item Draw $\beta_r | z_{i,r}, x_i$ from the posterior of a regression of $z$ on $x$:
+$$\beta_r \sim N(\tilde{\beta}, (X'X + A)^{-1})$$
+where $\tilde{\beta} = (X'X + A)^{-1}(X'z + A\bar{\beta})$. 
+\item After many draws, we have a sample of $\beta_r$ which we use as draws from the stationary distribution. 
+\end{enumerate}
+
+\subsection{Example}
+
+The file {\tt simpleGibbs.m} implements Gibbs sampling to draw from a bivariate normal: 
+
+$$(y_1, y_2)' \sim N\left( \begin{pmatrix} \mu_1 \\ \mu_2 \end{pmatrix}, \begin{pmatrix} \sigma_1^2 & \rho \sigma_1 \sigma_2 \\ \rho \sigma_1 \sigma_2 & \sigma_2^2 \end{pmatrix} \right) $$
+
+This trivially implies conditional distributions: 
+$$y_1 | y_2 \sim N(\mu_1 + \rho \frac{\sigma_1}{\sigma_2}(y_2 - \mu_2), \sigma_1^2(1 - \rho^2))$$
+
+Let's go through the code and see how it works: 
+Items to consider: 
+\begin{itemize}
+\item See what happens when you start from (50, 50). 
+\item See what happens when you raise $\rho$ to .95. 
+\item Choosing a burn-in period. 
+\item The relationship between correlation and convergence. 
+\item Checking autocorrelation of the chain: 
+$$s_{\theta_i}(k) = \frac{ \sum_{r = k+1}^R (\theta_r - \bar{\theta})(\theta_{r-k} - \bar{\theta})}{ \sum_r=1^R  (\theta_r - \bar{\theta})^2} $$
+\item Can also check for convergence by computing moments from different subsamples of the chain and making sure they are robust.
+\end{itemize}
+
+\subsection{Has my chain converged?}
+
+While MCMC measures have nice convergence properties in the limit, it's hard to know how long to run the chain.  The more complicated the chain (say in the dimensionality of the state space, the harder it is to make sure the chain has converged. 
+
+Some rules of thumb: 
+\begin{itemize}
+\item Use a burn in period- Throw away the initial $B$ draws of the chain to try to eliminate the effect of the starting point. 
+\item Plot a time series of the draws along key dimensions to make sure they do not have a trend. (One could even regress draws against a time trend). 
+\item Run chain from several start points and compare results. 
+\item Take different subsamples of the same chain draws and compare results.
+\item Compute the autocorellation function: 
+$$s_{\theta_i}(k) = \frac{ \sum_{r = k+1}^R (\theta_r - \bar{\theta})(\theta_{r-k} - \bar{\theta})}{ \sum_{r=1}^R  (\theta_r - \bar{\theta})^2} $$
+To make sure correlation is dying as time between draws increases. 
+\end{itemize}
+
+At the end of the day, there is no ``proof'' of convergence. This is analogous to finding the global optimium of a non-convex function. 
+Sadly, MCMC is \emph{not} a free lunch.
+
+\section{Metropolis-Hastings Algorithm}
+
+Gibbs sampling is great if $\theta$ can be segmented into easy-to-draw from conditionals. However, that is not always the case. 
+Metropolis-hastings gives us a general way to operationalize MCMC. 
+
+Idea from importance sampling: draw from a known distribution and re-weight. 
+
+For simplicity, let's again do everything with discrete states. 
+Suppose we want to draw from $\pi$. But we only know how to draw from some candidate distribution $q_i$ (a known density that is potentially conditional on current state). 
+That is: 
+$$q_{ij} = Pr( \theta^{(j)} | \theta^{(i)})$$ 
+The MH algorithm generates a Time-Reversible Markov chain with respect to $\pi$ by following: 
+\begin{enumerate}
+\item Initialize $\theta_0$ to some initial state. 
+\item For $t = 1:T$:
+\begin{enumerate}
+\item Let $i$ be such that $\theta_{t-1} = \theta^{(i)}$, draw a candidate state $\tilde{\theta}$ from $q_i$,  
+\item Let $j$ be such that $\tilde{\theta} = \theta^{(j)}$, compute: $$\alpha_{ij} = \min\left\{ 1, \frac{\pi_j q_{ji}}{\pi_i q_{ij}} \right\}$$
+\item Draw: 
+$$\theta_t = \begin{cases}  \tilde{\theta} & \mbox{w.p. } \alpha_{ij} \\  \theta_{t-1} & \mbox{w.p. }  1 - \alpha_{ij} \end{cases} $$
+\end{enumerate}
+\end{enumerate}
+
+\begin{theorem}
+The Markov Chain $P = [p_{ij}]$ generated by the Metropolis-Hastings algorithm is time reversible with respect to $\pi$. 
+\end{theorem}
+
+To see why: 
+$$ p_{ij} = q_{ij}\alpha_{ij} = q_{ij} \min\left\{ 1, \frac{\pi_j q_{ji}}{\pi_i q_{ij}} \right\} $$
+Therefore
+$$\pi_i p_{ij} = \pi_i q_{ij} \min\left\{ 1, \frac{\pi_j q_{ji}}{\pi_i q_{ij}} \right\} = \min\left\{ \pi_i q_{ij} , \pi_j q_{ji} \right\}$$
+Which equals, 
+$$\pi_j p_{ji} = \pi_j q_{ji} \min\left\{ 1, \frac{\pi_i q_{ij}}{\pi_j q_{ji}} \right\} = \min\left\{ \pi_j q_{ji} , \pi_i q_{ij} \right\}$$
+
+Continuous state version just replaces probabilities with densities and deals with measure theory issues.
+
+Usually, we will use symmetric proposals so that $q_{ij} = q_{ji}$, then notice that the probability of choosing a state is related directly to the ratio of posterior density. We always transition to higher equal or higher density points, but sometimes transition to lower density points. 
+
+\subsection{Gibbs Sampling as a Special Case (optional)}
+
+It turns out that Gibbs Sampling is a special case of the MH algorithm where the conditional distributions are the proposals. To see, this, let $\pi(\theta_1, \theta_2)$ be the joint distribution of $(\theta_1, \theta_2)$ while $m(\theta_i)$ is the marginal and $c(\theta_i|\theta_{-i})$ is the conditional distribution of $\theta_i$ given $\theta_{-i}$. 
+Then given $\theta_2$, Gibbs sampling will draw:
+$$\tilde{\theta}_1 \sim c( \cdot | \theta_2)$$
+and the new point will be $\tilde{\theta} = (\tilde{\theta}_1, \theta_2)$. Following the MH example, compute $\alpha$: 
+$$ \alpha = \frac{ \pi(\tilde{\theta}_1, \theta_2)c(\theta_1 | \theta_2)}{ \pi(\theta_1, \theta_2)c(\tilde{\theta_1} | \theta_2)} = 
+ \frac{ c(\tilde{\theta}_1| \theta_2)m(\theta_2)c(\theta_1 | \theta_2)}{ c(\theta_1 | \theta_2)m(\theta_2)c(\tilde{\theta_1} | \theta_2)} = 1$$
+ 
+So acceptance rate is always 1, which is why we didn't have to deal with it.  The first equality follows because a transition from $\tilde{\theta}$ to
+$\theta$ occurs when $\theta_2$ is fixed in the Gibbs sampler and $\theta_1$ is drawn. The second equality applies the fact that the joint distribution
+is the conditional times the marginal. 
+
+\section{Metropolis Hastings Estimation Example}
+
+Let's do a very simple MCMC estimation of a mean and variance. 
+
+\subsection{Setup:}
+
+\emph{Need to clean up notation here.}
+
+Suppose we have data $y = \{y_1, \ldots, y_N\}$ from a DGP: 
+$$ y_i \sim N(\mu, \sigma^2).$$ 
+We wish to estimate $(\mu, \sigma)$. The likelihood is, 
+\begin{align*}
+ L(y | \mu, \sigma) & = \prod_{i=1}^N f(y_i | \mu, \sigma) \\
+ & =  \prod_{i=1}^N \frac{1}{\sqrt{2 \sigma^2 \pi}} \exp \left\{ - \frac{1}{2} \left( \frac{y_i - \mu}{\sigma} \right)^2 \right\} \\
+ & = \prod_{i=1}^N \phi\left( \frac{y_i - \mu}{\sigma} \right) %
+ \end{align*}
+
+Let's assume we have a prior belief on the parameters: 
+$$\begin{pmatrix} \mu  \\ \sigma \end{pmatrix} \sim N \left( \begin{pmatrix} \bar{\mu} \\ \bar{\sigma} \end{pmatrix}, \Omega \right) $$
+It's an odd prior since we believe it is possible $\sigma$ is negative, but people have weird beliefs these days. This implies the prior density is: 
+$$f(\mu, \sigma) = (2\pi)^{-1} | \Omega |^{-\frac{1}{2}} \exp \left \{ \begin{pmatrix} \mu - \bar{\mu} \\ \sigma - \bar{\sigma} \end{pmatrix}' \Omega^{-1} 
+\begin{pmatrix} \mu - \bar{\mu} \\ \sigma - \bar{\sigma} \end{pmatrix} \right\}$$
+And the posterior is, 
+$$\pi(\mu, \sigma | y) \propto L(y | \mu, \sigma) f(\mu, \sigma).$$ 
+Where $\propto$ means ``proportionate to'' we know there is a constant of integration that depends only on $y$, but we don't need to worry about it. 
+
+This is a well-defined distribution, but it is not normal, so we don't really know how to draw from it. Moreover, the conditional $\sigma | \beta, y$ does
+not have a closed form either. So we can't just employ Gibbs Sampling. 
+
+\subsection{Implementation of M-H Algorithm}
+
+We will draw from this posterior using a random walk distribution Metropolis-Hastings algorithm. Let $\theta = (\mu, \sigma)'$, then our
+proposal is: $$ \tilde{\theta_t} \sim \theta_{t-1} + \xi_t $$
+where
+$$ \xi_t \sim N \left(  \begin{pmatrix} 0\\ 0 \end{pmatrix}, \Sigma_p \right) $$
+Notice that this proposal is symmetric, that will be convenient. 
+
+As usual, the likelihood itself is going to be really small, so we will use the log likelihood everywhere. Our algorithm is: 
+
+\begin{enumerate}
+\item Start with $\theta_0 = (\mu_0, \sigma_0)$
+\item Compute the log posterior of $\theta_0$:
+$$ \pi(\theta_0) = \sum_{i=1}^N \log \phi \left( \frac{y_i - \mu_0}{\sigma_0} \right)  + \log f(\theta_0) $$
+\item For $1 \leq t \leq T$: 
+\begin{enumerate}
+\item Draw $\xi_t$, compute $\tilde{\theta}_t = \theta_{t-1} + \xi_t$. 
+\item Compute $\pi(\tilde{\theta}_t)$ and $\log \alpha =  \pi(\tilde{\theta}_t) - \pi(\theta_0)$
+\item Draw $u \sim Unif(0,1)$
+\item Define
+$$ \theta_t = 
+\begin{cases}
+\tilde{\theta}_t & \log(u) < \log \alpha \\
+\theta_{t-1} & \mbox{otherwise}
+\end{cases}. $$
+\end{enumerate}
+\item Compute moments using the sample $\{\theta_B, \ldots, \theta_T\}$ where $B$ is the burn in period. 
+\end{enumerate}
+
+\subsection{Go over Code}
+This algorithm is implemented in {\tt metroHastMain.m } in the class repository.
+Some things to keep in mind: 
+\begin{itemize}
+\item Look at the acceptance rate, but you don't want to to be too close to 0 or 1. If it is 0, you have perfect auto-correlation. If it is 1 you probably haven't converged. 
+\item There are ``rules of thumb'' that say acceptance should be between 20 and 70 percent. Your milage may vary. 
+\item Proposal densities will also affect performance. 
+\item As will start point. 
+\end{itemize}
+\end{document}

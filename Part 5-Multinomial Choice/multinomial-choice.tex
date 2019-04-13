@@ -1,4 +1,6 @@
-\documentclass[xcolor=pdftex,dvipsnames,table,mathserif]{beamer}
+\documentclass[xcolor=pdftex,dvipsnames,table,mathserif,aspectratio=169]{beamer}
+% \documentclass[11pt, aspectratio=169]{beamer}
+
 \usetheme{default}
 %\usetheme{Darmstadt}
 %\usepackage{times}
@@ -13,6 +15,137 @@
 \usepackage{relsize}
 \usepackage{pdfpages}
 \usepackage[absolute,overlay]{textpos} 
+
+
+\usepackage{pgfpages}
+% These slides also contain speaker notes. You can print just the slides,
+% just the notes, or both, depending on the setting below. Comment out the want
+% you want.
+\setbeameroption{show notes}
+\setbeameroption{hide notes} % Only slide
+%\setbeameroption{show only notes} % Only notes
+%\setbeameroption{show notes on second screen=right} % Both
+
+\usepackage{helvet}
+\usepackage[default]{lato}
+\usepackage{array}
+
+
+\usepackage{tikz}
+\usepackage{verbatim}
+\setbeamertemplate{note page}{\pagecolor{yellow!5}\insertnote}
+\usetikzlibrary{positioning}
+% \usetikzlibrary{snakes}
+\usetikzlibrary{decorations}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{shapes.misc}
+\usetikzlibrary{matrix,shapes,arrows,fit,tikzmark}
+\usepackage{amsmath}
+\usepackage{mathpazo}
+\usepackage{hyperref}
+\usepackage{lipsum}
+\usepackage{multimedia}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+% \usepackage{enumitem}
+\usepackage{bbm}
+\newcolumntype{d}[0]{D{.}{.}{5}}
+
+\newcommand{\Skip}{\vspace{1em}}
+\newcommand{\Squish}{\vspace{-1em}}
+
+
+\usepackage{changepage}
+\usepackage{appendixnumberbeamer}
+\newcommand{\beginbackup}{
+   \newcounter{framenumbervorappendix}
+   \setcounter{framenumbervorappendix}{\value{framenumber}}
+   \setbeamertemplate{footline}
+   {
+     \leavevmode%
+     \hline
+     box{%
+       \begin{beamercolorbox}[wd=\paperwidth,ht=2.25ex,dp=1ex,right]{footlinecolor}%
+%         \insertframenumber  \hspace*{2ex} 
+       \end{beamercolorbox}}%
+     \vskip0pt%
+   }
+ }
+\newcommand{\backupend}{
+   \addtocounter{framenumbervorappendix}{-\value{framenumber}}
+   \addtocounter{framenumber}{\value{framenumbervorappendix}} 
+}
+
+
+\usepackage{graphicx}
+\usepackage[space]{grffile}
+\usepackage{booktabs}
+
+% These are my colors -- there are many like them, but these ones are mine.
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{red}{RGB}{213,94,0}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{green}{RGB}{0,158,115}
+
+\hypersetup{
+  colorlinks=false,
+  linkbordercolor = {white},
+  linkcolor = {blue}
+}
+
+
+%% I use a beige off white for my background
+\definecolor{MyBackground}{RGB}{255,253,218}
+
+%% Uncomment this if you want to change the background color to something else
+%\setbeamercolor{background canvas}{bg=MyBackground}
+
+%% Change the bg color to adjust your transition slide background color!
+\newenvironment{transitionframe}{
+  \setbeamercolor{background canvas}{bg=yellow}
+  \begin{frame}}{
+    \end{frame}
+}
+
+\setbeamercolor{frametitle}{fg=blue}
+\setbeamercolor{title}{fg=black}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{navigation symbols}{} 
+\setbeamertemplate{itemize items}{-}
+\setbeamercolor{itemize item}{fg=blue}
+\setbeamercolor{itemize subitem}{fg=blue}
+\setbeamercolor{enumerate item}{fg=blue}
+\setbeamercolor{enumerate subitem}{fg=blue}
+\setbeamercolor{button}{bg=MyBackground,fg=blue,}
+
+
+
+% If you like road maps, rather than having clutter at the top, have a roadmap show up at the end of each section 
+% (and after your introduction)
+% Uncomment this is if you want the roadmap!
+\AtBeginSection[]
+{
+   \begin{frame}
+       \frametitle{Roadmap of Talk}
+       \tableofcontents[currentsection]
+   \end{frame}
+}
+\setbeamercolor{section in toc}{fg=blue}
+\setbeamercolor{subsection in toc}{fg=red}
+\setbeamersize{text margin left=1em,text margin right=1em} 
+
+\newenvironment{wideitemize}{\itemize\addtolength{\itemsep}{10pt}}{\enditemize}
+\newenvironment{wideenumerate}{\enumerate\addtolength{\itemsep}{10pt}}{\endenumerate}
+\newenvironment{widedescription}{\description\addtolength{\itemsep}{10pt}}{\enddescription}
+
+
+
+
+
 
 
 \newenvironment{reference}[2]{% 
@@ -31,12 +164,13 @@
   \end{frame}
 }
 \begin{document}
-\title{Multinomial Choice/ Statistical Demand Models}
-\author{Chris Conlon}
-\institute{Microeconometrics}
+\title{Multinomial Choice/ Statistical Demand Models*}
+\author{Charlie Murry}
+\institute{Empirical Methods | Boston College}
 \date{\today}
 
-\frame{\titlepage}
+\frame{\titlepage \footnotesize \emph{*Based heavily on notes from Chris Conlon (NYU Stern).}}
+
 
 
 \section{Multinomial Choice}
@@ -49,7 +183,7 @@ Most decisions agents make are not necessarily binary:
 \item Choosing a partner.
 \item Choosing a mutual fund/manager.
 \item Choosing where to live.
-\item Choosing a brand of (yogurt, laundry detergent, orange juice, cars, etc.).
+\item Choosing a brand/model of (yogurt, laundry detergent, orange juice, cars, etc.).
  \end{itemize}
 \end{frame}
 
@@ -78,6 +212,7 @@ P_{ij} &=& Prob( U_{ij} > U_{ik} \quad \forall j \neq k)\\
  &=& Prob( V_{ij} + \varepsilon_{ij} > V_{ik} + \varepsilon_{ij} \quad \forall j \neq k)\\
  &=& Prob( \varepsilon_{ij}-\varepsilon_{ik} > V_{ik} - V_{ij} \quad \forall j \neq k)
 \end{eqnarray*}
+\emph{*Notice additive separability.*}\\[1em]
 \pause
 It is helpful to define $f(\varepsilon_{i})$ as the $J$ vector of individual $i$'s unobserved utility.
 \begin{eqnarray*}
@@ -130,54 +265,61 @@ only $d = k_b - k_c$ is identified.
 \begin{frame}
 \frametitle{Basic Identification}
 Location
-\begin{itemize}
+\begin{wideitemize}
 \item Technically we can't really fully specify $f(\varepsilon_i)$ since we can always re-normalize: $\widetilde{\varepsilon_{ijk}} = \varepsilon_{ij} - \varepsilon_{ik}$ and write $g(\widetilde{\varepsilon_{ik}})$. Thus any $g(\widetilde{\varepsilon_{ik}})$ is consistent with infinitely many $f(\varepsilon_i)$.
+\item e.g. we only observe if $U_{ij} > U_{ik}$, not by how much.
 \item Logit pins down $f(\varepsilon_i)$ sufficiently with parametric restrictions.
 \item Probit does not. We must generally normalize one dimension of $f(\varepsilon_i)$ in the probit model. Usually a diagonal term of $\Omega$ so that $\omega_{11} =1$ for example. (Actually we need to do more!).
-\end{itemize}
+\end{wideitemize}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Basic Identification}
 Scale
-\begin{itemize}
+\begin{wideitemize}
 \item Consider: $U_{ij}^0 = V_{ij} + \varepsilon_{ij}$ and  $U_{ij}^1 = \lambda V_{ij} + \lambda \varepsilon_{ij}$ with $\lambda > 0$. Multiplying by constant $\lambda$ factor doesn't change any statements about $U_{ij} > U_{ik}$.
 \item We normalize this by fixing the variance of $\varepsilon_{ij}$ since $Var(\lambda \varepsilon_{ij} ) = \sigma_e^2 \lambda^2$.
 \item Normalizing this variance normalizes the scale of utility.
 \item For the logit case the variance is normalized to $\pi^2/6$. (this emerges as a constant of integration to guarantee a proper density).
-\end{itemize}
+\end{wideitemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Observed Heteroskedasticity}
-Consider the case where $Var(\varepsilon_{ij}^B) = \sigma^2$ and   $Var(\varepsilon_{ij}^C) =  k^2 \sigma^2$ :
-\begin{itemize}
-\item We can estimate
-\begin{eqnarray*}
-U_{ij} &=& x_j \beta + \varepsilon_{ij}^B\\
-U_{ij} &=& x_j \beta + \varepsilon_{ij}^C
-\end{eqnarray*}
-becomes:
-\begin{eqnarray*}
-U_{ij} &=& x_j \beta + \varepsilon_{ij}\\
-U_{ij} &=& x_j \beta/k+ \varepsilon_{ij}
-\end{eqnarray*}
-\item Some interpret this as saying that in segment $C$ the unobserved factors are $\hat{k}$ times larger.
-\end{itemize}
-\end{frame}
+% \begin{frame}
+% \frametitle{Observed Heteroskedasticity}
+% Consider the case where $Var(\varepsilon_{ij}^B) = \sigma^2$ and   $Var(\varepsilon_{ij}^C) =  k^2 \sigma^2$ :
+% \begin{itemize}
+% \item We can estimate
+% \begin{eqnarray*}
+% U_{ij} &=& x_j \beta + \varepsilon_{ij}^B\\
+% U_{ij} &=& x_j \beta + \varepsilon_{ij}^C
+% \end{eqnarray*}
+% becomes:
+% \begin{eqnarray*}
+% U_{ij} &=& x_j \beta + \varepsilon_{ij}\\
+% U_{ij} &=& x_j \beta/k+ \varepsilon_{ij}
+% \end{eqnarray*}
+% \item Some interpret this as saying that in segment $C$ the unobserved factors are $\hat{k}$ times larger.
+% \end{itemize}
+% \end{frame}
 
 \begin{frame}
 \frametitle{Deeper Identification Results}
 Different ways to look at identification
-\begin{itemize}
+\begin{wideitemize}
 \item Are we interested in non-parametric identification of $V_{ij}$, specifying $f(\varepsilon_i)$?
 \item Or are we interested in non-parametric identification of $U_{ij}$. (Generally hard).
-\begin{itemize}
+\begin{wideitemize}
 \item Generally we require a large support (special-regressor) or ``completeness'' condition.
 \item Lewbel (2000) does random utility with additively separable but nonparametric error.\item Berry and Haile (2015) with non-separable error (and endogeneity).
-\end{itemize}
-\end{itemize}
+\end{wideitemize}
+\end{wideitemize}
 \end{frame}
 
 
 \begin{frame}
-\frametitle{Logit}
+\frametitle{Multinomial Logit (MNL)}
 \begin{itemize}
 \item Logit has closed form choice probabilities
 \begin{eqnarray*}
@@ -199,7 +341,7 @@ E[\max_j U_{ij}] = \log \left(\sum_j \exp[V_{ij}] \right) + C
 \begin{eqnarray*}
 E[\max_j U_{ij}] = \log \left(\sum_j \exp[V_{ij}] \right) + C
 \end{eqnarray*}
-\item Expected utility of best option (without knowledge of realized $\varepsilon_i$) does not depend on $\epsilon_{ij}$.
+\item Expected utility of best option (no knowledge of realized $\varepsilon_i$) does not depend on $\epsilon_{ij}$.
 \item This is a globally concave function in $V_{ij}$ (more on that later).
 \item Allows simple computation of $\Delta CS$ for consumer welfare.
 \end{itemize}
@@ -208,32 +350,32 @@ E[\max_j U_{ij}] = \log \left(\sum_j \exp[V_{ij}] \right) + C
 \begin{frame}
 \frametitle{Multinomial Logit}
 Multinomial Logit goes by a lot of names in various literatures
-\begin{itemize}
+\begin{wideitemize}
 \item The problem of multiple choice is often called \alert{multiclass classification} or \alert{softmax regression} in other literatures.
 \item In general these models assume you have individual level data
-\end{itemize}
+\end{wideitemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Alternative Interpretation}
-Statistics/Computer Science offer an alternative interpretation
-\begin{itemize}
-\item Sometimes this is called \alert{softmax} regression.
-\item Think of this as a continuous/concave approximation to the maximum.
-\item Consider $\max\{x,y\}$ vs $\log(\exp(x) + \exp(y))$. The $\exp$ exaggerates the differences between $x$ and $y$ so that the larger term dominates.
-\item We can accomplish this by rescaling $k$:  $\log(\exp(kx) + \exp(ky))/k$ as $k$ becomes large the derivatives become infinite and this approximates the ``hard'' maximum.
-\item $g(1, 2) = 2.31$, but $g(10, 20) = 20.00004$.
-\end{itemize}
-\end{frame}
+% \begin{frame}
+% \frametitle{Alternative Interpretation}
+% Statistics/Computer Science offer an alternative interpretation
+% \begin{itemize}
+% \item Sometimes this is called \alert{softmax} regression.
+% \item Think of this as a continuous/concave approximation to the maximum.
+% \item Consider $\max\{x,y\}$ vs $\log(\exp(x) + \exp(y))$. The $\exp$ exaggerates the differences between $x$ and $y$ so that the larger term dominates.
+% \item We can accomplish this by rescaling $k$:  $\log(\exp(kx) + \exp(ky))/k$ as $k$ becomes large the derivatives become infinite and this approximates the ``hard'' maximum.
+% \item $g(1, 2) = 2.31$, but $g(10, 20) = 20.00004$.
+% \end{itemize}
+% \end{frame}
 
-\begin{frame}{Alternative Interpretation}
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=2in]{./resources/hardmax.png}
-\includegraphics[width=2in]{./resources/softmax.png}
-\end{center}
-\end{figure}
-\end{frame}
+% \begin{frame}{Alternative Interpretation}
+% \begin{figure}[htbp]
+% \begin{center}
+% \includegraphics[width=2in]{./resources/hardmax.png}
+% \includegraphics[width=2in]{./resources/softmax.png}
+% \end{center}
+% \end{figure}
+% \end{frame}
 
 \begin{frame}
 \frametitle{Multinomial Logit: Identification}
@@ -302,11 +444,11 @@ s_{ij} = \frac{e^{V_{ij}/\sigma}}{\sum_k e^{V_{ik}/\sigma}} \approx \frac{e^{\be
 \begin{eqnarray*}
 \frac{s_{ij}}{s_{ik}} = \frac{e^{V_{ij}}}{\sum_{k'} e^{V_{ik'}}} / \frac{e^{V_{ik}}}{\sum_{k'} e^{V_{ik'}}} = \frac{e^{V_{ij}}}{e^{V_{ik}}} = \exp[V_{ij} - V_{ik}].
 \end{eqnarray*}
-\begin{itemize}
+\begin{wideitemize}
 \item The ratio of choice probabilities for $j$ and $k$ depends only on $j$ and $k$ and not on any alternative $l$, this is known as \alert{independence of irrelevant alternatives}.
 \item For some (Luce (1959)) IIA was an attractive property for axiomatizing choice.
 \item In fact the logit was derived in the search for a statistical model that satsified various axioms.
-\end{itemize}
+\end{wideitemize}
 \end{frame}
 
 \begin{frame}{IIA Property}
@@ -324,7 +466,7 @@ s_{ij} = \frac{e^{V_{ij}/\sigma}}{\sum_k e^{V_{ik}/\sigma}} \approx \frac{e^{\be
 \item IIA implies that we can obtain consistent estimates for $\beta$ on any subset of alternatives.
 \item This means instead of using all $J$ alternatives in the choice set, we could estimate on some subset $S \subset J$.
 \item This used to be a way to reduce the computational burden of estimation (not clear this is an issue in 2016).
-\item Sometimes we have \alert{choice based samples} where we oversample people who choose a particular alternative. Manski and Lerman (1977) show we can get consistent estimates for all but the ASC. This requires knowledge of the difference between the true rate $A_j$ and the choice-based sample rate $S_j$.
+\item Sometimes we have \alert{choice based samples} where we oversample people who choose a particular alternative. Manski and Lerman (1977) show we can get consistent estimates for all but the constant. This requires knowledge of the difference between the true rate $A_j$ and the choice-based sample rate $S_j$.
 \item Hausman proposes a specification test of the logit model: estimate on the full dataset to get $\hat{\beta}$, construct a smaller subsample $S^k \subset J$ and $\hat{\beta^k}$ for one or more subsets $k$. If $|\hat{\beta}^k - \hat{\beta}|$ is small enough.
 \end{itemize}
 \end{frame}
@@ -356,7 +498,7 @@ Cross elasticity doesn't really depend on $j$.
 \begin{itemize}
 \item This leads to the idea of proportional substitution. As option $k$ gets better it proportionally reduces the shares of the all other choices.
 \item Likewise removing an option $k$ means that $\tilde{s}_{ij} = \frac{s_{ij}}{1-s_{ik}}$ for all other $j$.
-\item This might be a desirable property but probably not.
+\item This is not a desireable property for most empirical work. 
 \end{itemize}
 \end{frame}
 
@@ -368,13 +510,13 @@ Cross elasticity doesn't really depend on $j$.
 \frametitle{Multinomial Logit: Estimation with Individual Data}
 Estimation is straightforward via Maximum Likelihood (MLE):
 \begin{eqnarray*}
-L(\mathbf{y} | \mathbf{x}, \theta) &=& \prod_{i=1}^N  \underbrace{\frac{n_i!}{\prod_{j=1}^J y_{ij}!}}_{C(\mathbf{y})} \prod_{j=1}^J  s_{ij}(x_{ij},\theta)^{y_{ij}} \\
-ll(\mathbf{y} | \mathbf{x}, \theta) &=& \sum_{i=1}^N \log(C(\mathbf{y}))   + \sum_{i=1}^N \sum_{j=1}^J y_{ij} \log( s_{ij}(x_{ij},\theta)) \\
+% L(\mathbf{y} | \mathbf{x}, \theta) &=& \prod_{i=1}^N  \underbrace{\frac{n_i!}{\prod_{j=1}^J y_{ij}!}}_{C(\mathbf{y})} \prod_{j=1}^J  s_{ij}(x_{ij},\theta)^{y_{ij}} \\
+% ll(\mathbf{y} | \mathbf{x}, \theta) &=& \sum_{i=1}^N \log(C(\mathbf{y}))   + \sum_{i=1}^N \sum_{j=1}^J y_{ij} \log( s_{ij}(x_{ij},\theta)) \\
 l(\mathbf{y} | \mathbf{x}, \theta) &\approx& \sum_{i=1}^N \sum_{j=1}^J y_{ij} \log( s_{ij}(x_{ij},\theta))
 \end{eqnarray*}
-\begin{itemize}
-\item We can ignore the combinatorial term (with the factorials) since it does not affect the location of the maximum (it is additive and doesn't depend on $\theta$).
-\end{itemize}
+% \begin{itemize}
+% \item We can ignore the combinatorial term (with the factorials) since it does not affect the location of the maximum (it is additive and doesn't depend on $\theta$).
+% \end{itemize}
 \end{frame}
 
 \begin{frame}
